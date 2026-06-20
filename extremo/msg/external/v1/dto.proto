@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+// Package extremo.msg.external.v1 holds the PUBLIC data-transfer objects of the
+// Extremo external partner API. These are hand-built for external consumers and
+// intentionally expose only safe, stable fields. Internal database shapes
+// (primary keys exposed as opaque ids, foreign keys, soft-delete flags,
+// audit timestamps, nested internal relations) are NOT represented here.
+package extremo.msg.external.v1;
+
+option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/msg/external/v1;external";
+
+import "google/protobuf/timestamp.proto";
+
+// BookingStatus is the public lifecycle state of a booking.
+enum BookingStatus {
+  // Unspecified / unknown status.
+  BOOKING_STATUS_UNSPECIFIED = 0;
+  // The booking was canceled.
+  BOOKING_STATUS_CANCELED = 1;
+  // Draft — not yet confirmed.
+  BOOKING_STATUS_DRAFT = 2;
+  // Reserved / confirmed.
+  BOOKING_STATUS_RESERVED = 3;
+  // Ordered (checked out / fulfilled).
+  BOOKING_STATUS_ORDERED = 4;
+  // The customer did not show up.
+  BOOKING_STATUS_NO_SHOW = 5;
+}
+
+// SlotStatus is the availability state of a calendar slot.
+enum SlotStatus {
+  // Unspecified / unknown status.
+  SLOT_STATUS_UNSPECIFIED = 0;
+  // The slot is bookable.
+  SLOT_STATUS_AVAILABLE = 1;
+  // The slot is partially taken (some capacity used).
+  SLOT_STATUS_BUSY = 2;
+  // The slot is fully booked.
+  SLOT_STATUS_FULL = 3;
+}
+
+// Service is a public service / menu offering of a tenant.
+message Service {
+  // Opaque public identifier of the service.
+  uint64 id = 1;
+  // Display name.
+  string name = 2;
+  // Description.
+  string desc = 3;
+  // Duration in minutes.
+  int32 duration = 4;
+  // Price in the tenant's minor currency unit (e.g. JPY).
+  int64 price = 5;
+  // Display order (ascending).
+  int32 sort = 6;
+  // Child services for hierarchical menus.
+  repeated Service children = 7;
+  // Public image URLs.
+  repeated string image_urls = 8;
+}
+
+// TenantProfile is the public profile of a tenant (shop).
+message TenantProfile {
+  // Opaque public identifier of the tenant.
+  uint64 id = 1;
+  // Shop name.
+  string name = 2;
+  // Description.
+  string desc = 3;
+  // Public link (website / booking page).
+  string link = 4;
+  // Public contact phone.
+  string phone = 5;
+  // Public image URLs.
+  repeated string image_urls = 6;
+}
+
+// Staff is the minimal public representation of a staff member.
+message Staff {
+  // Opaque public identifier of the staff member.
+  uint64 id = 1;
+  // Display name.
+  string name = 2;
+}
+
+// Booking is a public booking / reservation.
+message Booking {
+  // Opaque public identifier of the booking.
+  uint64 id = 1;
+  // Title.
+  string name = 2;
+  // Description.
+  string desc = 3;
+  // Lifecycle status.
+  BookingStatus status = 4;
+  // Start time (UTC).
+  google.protobuf.Timestamp start_at = 5;
+  // End time (UTC).
+  google.protobuf.Timestamp end_at = 6;
+}
+
+// AvailabilitySlot is a single bookable time window with its resolved status.
+message AvailabilitySlot {
+  // Start time (UTC).
+  google.protobuf.Timestamp start_at = 1;
+  // End time (UTC).
+  google.protobuf.Timestamp end_at = 2;
+  // Availability status of this slot.
+  SlotStatus status = 3;
+}

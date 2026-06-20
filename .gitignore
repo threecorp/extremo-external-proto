@@ -1,0 +1,15 @@
+__pycache__
+venv
+extremo_proto.egg-info
+dist
+node_modules/
+# Claude Code
+.claude/cache/
+.claude/logs/
+.claude/*.jsonl
+.claude/settings.local.json
+# nix-direnv
+.direnv/
+
+# Serena
+.serena/

@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+// Package extremo.api.external.services.v1 is part of the Extremo external
+// partner API. Unlike the internal `public/` services (which are anonymous and
+// read-only for the booking page), the `external/` surface is authenticated via
+// OAuth2 client_credentials / API key and scoped. It returns public DTOs only.
+package extremo.api.external.services.v1;
+
+option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/api/external/services/v1;services";
+
+import "buf/validate/validate.proto";
+import "extremo/msg/external/v1/dto.proto";
+import "google/api/annotations.proto";
+
+// ServiceService exposes a tenant's public service catalog to authenticated
+// external API consumers. Read-only.
+service ServiceService {
+  // ListServices returns the service catalog for a tenant.
+  rpc ListServices(ListServicesRequest) returns (ListServicesResponse) {
+    option (google.api.http) = {get: "/api/external/v1/{tenant_id}/services"};
+  }
+}
+
+// ListServicesRequest selects a tenant's services with pagination.
+message ListServicesRequest {
+  // Tenant whose services to list.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // 1-based page number.
+  int64 page = 2 [(buf.validate.field).int64.gt = 0];
+  // Page size (1..100).
+  int64 page_size = 3 [(buf.validate.field).int64 = {
+    gt: 0
+    lte: 100
+  }];
+}
+
+// ListServicesResponse is a page of public services.
+message ListServicesResponse {
+  // The services on this page.
+  repeated extremo.msg.external.v1.Service services = 1;
+  // Total number of services across all pages.
+  int64 total_size = 2 [(buf.validate.field).int64.gte = 0];
+}

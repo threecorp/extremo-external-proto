@@ -1,0 +1,26 @@
+version: v2
+# Standalone module for the Extremo EXTERNAL partner API.
+# It deliberately does NOT depend on the internal extremo-proto module, so it is
+# impossible to `import "extremo/msg/db/v1/db.proto"` (or any internal type) from
+# here — `buf build` fails on an unknown import. That makes the public/internal
+# anti-corruption boundary a CI-enforced invariant, not a convention.
+modules:
+  - path: .
+    excludes:
+      - .direnv
+deps:
+  - buf.build/bufbuild/protovalidate
+  - buf.build/googleapis/googleapis
+  - buf.build/protocolbuffers/wellknowntypes
+breaking:
+  use:
+    - FILE
+lint:
+  use:
+    - COMMENTS
+    - STANDARD
+  rpc_allow_google_protobuf_empty_requests: true
+  rpc_allow_google_protobuf_empty_responses: true
+  except:
+    - ENUM_VALUE_PREFIX
+    - RPC_REQUEST_RESPONSE_UNIQUE
