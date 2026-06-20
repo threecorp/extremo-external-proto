@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+// Package extremo.api.external.tenants.v1 is part of the Extremo external
+// partner API. Unlike the internal `public/` services (which are anonymous and
+// read-only for the booking page), the `external/` surface is authenticated via
+// OAuth2 client_credentials / API key and scoped. It returns public DTOs only.
+package extremo.api.external.tenants.v1;
+
+option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/api/external/tenants/v1;tenants";
+
+import "buf/validate/validate.proto";
+import "extremo/msg/external/v1/dto.proto";
+import "google/api/annotations.proto";
+
+// TenantService exposes a tenant's public profile to authenticated external API
+// consumers. Read-only.
+service TenantService {
+  // GetTenant returns a single tenant's public profile.
+  rpc GetTenant(GetTenantRequest) returns (GetTenantResponse) {
+    option (google.api.http) = {get: "/api/external/v1/{tenant_id}"};
+  }
+}
+
+// GetTenantRequest selects a tenant by its public identifier.
+message GetTenantRequest {
+  // Tenant whose public profile to fetch.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+}
+
+// GetTenantResponse carries a tenant's public profile.
+message GetTenantResponse {
+  // The tenant's public profile.
+  extremo.msg.external.v1.TenantProfile tenant = 1;
+}
