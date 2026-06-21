@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+// Package extremo.api.external.availability.v1 is part of the Extremo external
+// partner API. Unlike the internal `public/` services (which are anonymous and
+// read-only for the booking page), the `external/` surface is authenticated via
+// OAuth2 client_credentials / API key and scoped. It returns public DTOs only.
+package extremo.api.external.availability.v1;
+
+option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/api/external/availability/v1;availability";
+
+import "buf/validate/validate.proto";
+import "extremo/msg/external/v1/dto.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+// AvailabilityService exposes a tenant's calendar slot availability to
+// authenticated external API consumers. Read-only.
+service AvailabilityService {
+  // ListSlots returns per-slot availability (AVAILABLE / BUSY / FULL) for a
+  // tenant's service over a date range.
+  rpc ListSlots(ListSlotsRequest) returns (ListSlotsResponse) {
+    option (google.api.http) = {get: "/api/external/v1/{tenant_id}/availability"};
+  }
+}
+
+// ListSlotsRequest selects a tenant + service + date range to compute availability for.
+message ListSlotsRequest {
+  // Tenant whose availability to compute.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Service whose duration drives slot feasibility.
+  uint64 service_id = 2 [(buf.validate.field).uint64.gt = 0];
+  // Start of the date range to compute (inclusive).
+  google.protobuf.Timestamp opened_at = 3 [(buf.validate.field).required = true];
+  // End of the date range to compute (exclusive).
+  google.protobuf.Timestamp closed_at = 4 [(buf.validate.field).required = true];
+}
+
+// ListSlotsResponse is the computed availability grid for the requested range.
+message ListSlotsResponse {
+  // Per-slot availability over the requested range.
+  repeated extremo.msg.external.v1.AvailabilitySlot slots = 1;
+  // Scheduling strategy used to compute the grid: "coop", "slot", or "hybrid".
+  string schedule_type = 2;
+}
