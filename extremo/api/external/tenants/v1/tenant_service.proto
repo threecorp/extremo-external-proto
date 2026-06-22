@@ -6,11 +6,11 @@ syntax = "proto3";
 // OAuth2 client_credentials / API key and scoped. It returns public DTOs only.
 package extremo.api.external.tenants.v1;
 
-option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/api/external/tenants/v1;tenants";
-
 import "buf/validate/validate.proto";
 import "extremo/msg/external/v1/dto.proto";
 import "google/api/annotations.proto";
+
+option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/api/external/tenants/v1;tenants";
 
 // TenantService exposes a tenant's public profile to authenticated external API
 // consumers. Read-only.

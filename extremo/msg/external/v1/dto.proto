@@ -7,9 +7,9 @@ syntax = "proto3";
 // audit timestamps, nested internal relations) are NOT represented here.
 package extremo.msg.external.v1;
 
-option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/msg/external/v1;external";
-
 import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/msg/external/v1;external";
 
 // BookingStatus is the public lifecycle state of a booking.
 enum BookingStatus {
