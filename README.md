@@ -14,7 +14,7 @@ The Extremo internal protos live in a private monorepo. The external API is deli
 2. **Open spec.** Partners can read the entire contract from one public repo, and Extremo ships the reference implementation (the "open core" / open-protocol playbook).
 3. **Independent stability.** `buf breaking` on this repo gates the external API's v1 compatibility.
 
-The external surface is **authenticated** (OAuth2 `client_credentials` / per-tenant API key + scopes) and distinct from the internal anonymous `public/` booking-page services.
+The external surface is **authenticated** (per-tenant API key + scopes) and distinct from the internal anonymous `public/` booking-page services.
 
 ## Layout
 
