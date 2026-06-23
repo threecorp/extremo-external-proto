@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+// Package extremo.api.external.books.v1 is part of the Extremo external partner
+// API. Unlike the anonymous internal `public/` booking-page services, the
+// `external/` surface is authenticated via a per-tenant API key and scoped.
+// Bookings are customer-PII-adjacent, so this service requires the `book.read`
+// scope (stricter than the public-grade services/tenants/availability reads) and
+// returns the public Booking DTO only — no client identity, staff, internal
+// foreign keys, or pricing.
+package extremo.api.external.books.v1;
+
+import "buf/validate/validate.proto";
+import "extremo/msg/external/v1/dto.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/api/external/books/v1;books";
+
+// BookService exposes a tenant's bookings to authenticated external API
+// consumers. Read-only.
+service BookService {
+  // ListBookings returns a tenant's bookings whose time window falls in
+  // [start_at, end_at], newest first, paginated.
+  rpc ListBookings(ListBookingsRequest) returns (ListBookingsResponse) {
+    option (google.api.http) = {get: "/api/external/v1/{tenant_id}/books"};
+  }
+  // GetBooking returns a single booking by its opaque id, scoped to the tenant.
+  rpc GetBooking(GetBookingRequest) returns (GetBookingResponse) {
+    option (google.api.http) = {get: "/api/external/v1/{tenant_id}/books/{id}"};
+  }
+}
+
+// ListBookingsRequest selects a tenant's bookings within a bounded time window.
+// The window is required so the query is never unbounded.
+message ListBookingsRequest {
+  // Tenant whose bookings to list (must match the API key's tenant).
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Inclusive start of the time window.
+  google.protobuf.Timestamp start_at = 2 [(buf.validate.field).required = true];
+  // Inclusive end of the time window.
+  google.protobuf.Timestamp end_at = 3 [(buf.validate.field).required = true];
+  // 1-based page number.
+  int64 page = 4 [(buf.validate.field).int64.gt = 0];
+  // Page size (1..100).
+  int64 page_size = 5 [(buf.validate.field).int64 = {
+    gt: 0
+    lte: 100
+  }];
+}
+
+// ListBookingsResponse is a page of public bookings.
+message ListBookingsResponse {
+  // The bookings on this page.
+  repeated extremo.msg.external.v1.Booking bookings = 1;
+  // Total number of bookings across all pages within the window.
+  int64 total_size = 2 [(buf.validate.field).int64.gte = 0];
+}
+
+// GetBookingRequest selects a single booking under a tenant.
+message GetBookingRequest {
+  // Tenant the booking belongs to (must match the API key's tenant).
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Opaque public identifier of the booking.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+}
+
+// GetBookingResponse carries the requested public booking.
+message GetBookingResponse {
+  // The booking.
+  extremo.msg.external.v1.Booking booking = 1;
+}
