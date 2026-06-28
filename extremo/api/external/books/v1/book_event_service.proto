@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+// Package extremo.api.external.books.v1 is part of the Extremo external partner
+// API. BookEventService exposes a tenant's booking change feed: an append-only,
+// cursor-paginated stream of booking lifecycle changes (create / update /
+// confirm / cancel / no-show) so an authenticated external consumer can poll
+// for changes incrementally. It requires the `book_event.read` scope and
+// returns public BookingEvent DTOs only — no actor identity or raw internal
+// field diffs. This same feed is the substrate the future webhook delivery
+// worker consumes (extremo-db#24).
+package extremo.api.external.books.v1;
+
+import "buf/validate/validate.proto";
+import "extremo/msg/external/v1/dto.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/api/external/books/v1;books";
+
+// BookEventService streams a tenant's booking lifecycle changes as a
+// cursor-paginated feed. Read-only.
+service BookEventService {
+  // ListBookingEvents returns booking change events after the given cursor, in
+  // ascending (oldest-first) order, so a consumer can advance through the feed
+  // incrementally by passing next_cursor back on each call.
+  rpc ListBookingEvents(ListBookingEventsRequest) returns (ListBookingEventsResponse) {
+    option (google.api.http) = {get: "/api/external/v1/{tenant_id}/booking-events"};
+  }
+}
+
+// ListBookingEventsRequest pages a tenant's booking change feed forward from an
+// opaque cursor.
+message ListBookingEventsRequest {
+  // Tenant whose event feed to read (must match the API key's tenant).
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Opaque cursor from a previous response's next_cursor. Empty starts from the
+  // beginning of the feed.
+  string cursor = 2;
+  // Page size (1..100).
+  int32 page_size = 3 [(buf.validate.field).int32 = {
+    gt: 0
+    lte: 100
+  }];
+}
+
+// ListBookingEventsResponse is a page of booking change events.
+message ListBookingEventsResponse {
+  // The events on this page, oldest-cursor first.
+  repeated extremo.msg.external.v1.BookingEvent events = 1;
+  // Cursor to pass as the next request's cursor to continue after this page.
+  string next_cursor = 2;
+  // True if more events may exist after this page.
+  bool has_more = 3;
+}
