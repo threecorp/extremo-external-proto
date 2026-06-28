@@ -24,6 +24,9 @@ protocol:  ## Generate code (go, ts, dart) from .proto schema
 	# google.* / buf.validate.* (see go.mod), so `externalgo/` contains only our
 	# `extremo/*` packages and `go build ./...` stays clean.
 	@buf generate --path extremo
+	@# E-6: openapiv2 defaults info.title to a proto filename; set a
+	@# partner-facing title/version/description on the merged spec.
+	@jq '.info.title="Extremo Public API" | .info.version="v1" | .info.description="Authenticated, scoped partner API (per-tenant API key). Read access to a tenant services, profile, availability, bookings, and the booking change feed."' openapi/external.swagger.json > openapi/external.swagger.json.tmp && mv openapi/external.swagger.json.tmp openapi/external.swagger.json
 	@-go tool fix -force context externalgo
 	@-make gomodule
 	@-tree externalgo
@@ -48,7 +51,11 @@ clean-ts:  ## Clean generated ts code
 	rm -rf externaltsnode/*
 
 
-clean: | clean-go clean-dart clean-ts  ## Clean generated code
+clean-openapi:  ## Clean generated OpenAPI spec
+	rm -rf openapi/*
+
+
+clean: | clean-go clean-dart clean-ts clean-openapi  ## Clean generated code
 
 
 help:  ## Show all of tasks

@@ -16,6 +16,19 @@ plugins:
       - generate_unbound_methods=true
       - logtostderr=true
 
+  # ----- OpenAPI / Swagger (public API docs, E-6) -----
+  # Merge every external service into one openapi/external.swagger.json. The
+  # external module excludes extremo.msg.db.v1 from its dependency closure, so
+  # the published spec is structurally free of internal types (the same
+  # anti-corruption boundary the DTOs enforce). The HTTP paths come from the
+  # google.api.http annotations already on each RPC.
+  - remote: buf.build/grpc-ecosystem/openapiv2:v2.24.0
+    out: openapi
+    opt:
+      - allow_merge=true
+      - merge_file_name=external
+      - logtostderr=true
+
   # ----- Dart / TypeScript -----
   # TODO(external-proto): re-enable Dart + TS SDK generation once the plugin
   # versions are reconciled with the pinned buf (1.59.0) edition output —

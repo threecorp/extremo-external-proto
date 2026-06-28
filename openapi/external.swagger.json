@@ -1,0 +1,655 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Extremo Public API",
+    "description": "Authenticated, scoped partner API (per-tenant API key). Read access to a tenant services, profile, availability, bookings, and the booking change feed.",
+    "version": "v1"
+  },
+  "tags": [
+    {
+      "name": "AvailabilityService"
+    },
+    {
+      "name": "BookEventService"
+    },
+    {
+      "name": "BookService"
+    },
+    {
+      "name": "ServiceService"
+    },
+    {
+      "name": "TenantService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/external/v1/{tenantId}": {
+      "get": {
+        "summary": "GetTenant returns a single tenant's public profile.",
+        "operationId": "TenantService_GetTenant",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetTenantResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "description": "Tenant whose public profile to fetch.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "TenantService"
+        ]
+      }
+    },
+    "/api/external/v1/{tenantId}/availability": {
+      "get": {
+        "summary": "ListSlots returns per-slot availability (AVAILABLE / BUSY / FULL) for a\ntenant's service over a date range.",
+        "operationId": "AvailabilityService_ListSlots",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListSlotsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "description": "Tenant whose availability to compute.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "serviceId",
+            "description": "Service whose duration drives slot feasibility.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "openedAt",
+            "description": "Start of the date range to compute (inclusive).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "closedAt",
+            "description": "End of the date range to compute (exclusive).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "tags": [
+          "AvailabilityService"
+        ]
+      }
+    },
+    "/api/external/v1/{tenantId}/booking-events": {
+      "get": {
+        "summary": "ListBookingEvents returns booking change events after the given cursor, in\nascending (oldest-first) order, so a consumer can advance through the feed\nincrementally by passing next_cursor back on each call.",
+        "operationId": "BookEventService_ListBookingEvents",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListBookingEventsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "description": "Tenant whose event feed to read (must match the API key's tenant).",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "cursor",
+            "description": "Opaque cursor from a previous response's next_cursor. Empty starts from the\nbeginning of the feed.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pageSize",
+            "description": "Page size (1..100).",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "BookEventService"
+        ]
+      }
+    },
+    "/api/external/v1/{tenantId}/books": {
+      "get": {
+        "summary": "ListBookings returns a tenant's bookings whose time window falls in\n[start_at, end_at], newest first, paginated.",
+        "operationId": "BookService_ListBookings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListBookingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "description": "Tenant whose bookings to list (must match the API key's tenant).",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "startAt",
+            "description": "Inclusive start of the time window.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "endAt",
+            "description": "Inclusive end of the time window.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "page",
+            "description": "1-based page number.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "pageSize",
+            "description": "Page size (1..100).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "BookService"
+        ]
+      }
+    },
+    "/api/external/v1/{tenantId}/books/{id}": {
+      "get": {
+        "summary": "GetBooking returns a single booking by its opaque id, scoped to the tenant.",
+        "operationId": "BookService_GetBooking",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetBookingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "description": "Tenant the booking belongs to (must match the API key's tenant).",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "id",
+            "description": "Opaque public identifier of the booking.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "BookService"
+        ]
+      }
+    },
+    "/api/external/v1/{tenantId}/services": {
+      "get": {
+        "summary": "ListServices returns the service catalog for a tenant.",
+        "operationId": "ServiceService_ListServices",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListServicesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "description": "Tenant whose services to list.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "page",
+            "description": "1-based page number.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "pageSize",
+            "description": "Page size (1..100).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "ServiceService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1AvailabilitySlot": {
+      "type": "object",
+      "properties": {
+        "startAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Start time (UTC)."
+        },
+        "endAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "End time (UTC)."
+        },
+        "status": {
+          "$ref": "#/definitions/v1SlotStatus",
+          "description": "Availability status of this slot."
+        }
+      },
+      "description": "AvailabilitySlot is a single bookable time window with its resolved status."
+    },
+    "v1Booking": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Opaque public identifier of the booking."
+        },
+        "name": {
+          "type": "string",
+          "description": "Title."
+        },
+        "desc": {
+          "type": "string",
+          "description": "Description."
+        },
+        "status": {
+          "$ref": "#/definitions/v1BookingStatus",
+          "description": "Lifecycle status."
+        },
+        "startAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Start time (UTC)."
+        },
+        "endAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "End time (UTC)."
+        }
+      },
+      "description": "Booking is a public booking / reservation."
+    },
+    "v1BookingEvent": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string",
+          "description": "Opaque cursor for this event. Pass the response's next_cursor back as the\nrequest cursor to fetch events after this one."
+        },
+        "type": {
+          "$ref": "#/definitions/v1BookingEventType",
+          "description": "What kind of change this event represents."
+        },
+        "bookingId": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Opaque public identifier of the booking this event is about."
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the change occurred (UTC)."
+        },
+        "booking": {
+          "$ref": "#/definitions/v1Booking",
+          "description": "Snapshot of the booking after the change. Absent if the booking has since\nbeen hard-deleted (the event type still records what happened)."
+        }
+      },
+      "description": "BookingEvent is one entry in a tenant's booking change feed: an append-only,\ncursor-paginated stream of booking lifecycle changes. An external consumer\npolls \"what changed since my last cursor\", and the same feed backs webhook\ndelivery. Internal audit detail (actor identity, raw field diffs) is not\nexposed."
+    },
+    "v1BookingEventType": {
+      "type": "string",
+      "enum": [
+        "BOOKING_EVENT_TYPE_UNSPECIFIED",
+        "BOOKING_EVENT_TYPE_CREATED",
+        "BOOKING_EVENT_TYPE_UPDATED",
+        "BOOKING_EVENT_TYPE_CONFIRMED",
+        "BOOKING_EVENT_TYPE_CANCELED",
+        "BOOKING_EVENT_TYPE_NO_SHOW"
+      ],
+      "default": "BOOKING_EVENT_TYPE_UNSPECIFIED",
+      "description": "BookingEventType is the public kind of a booking change in the event feed.\nInternal mutation kinds are folded into this stable public vocabulary (e.g.\nreject/delete both surface as CANCELED).\n\n - BOOKING_EVENT_TYPE_UNSPECIFIED: Unspecified / unknown event type.\n - BOOKING_EVENT_TYPE_CREATED: A booking was created.\n - BOOKING_EVENT_TYPE_UPDATED: A booking's attributes changed.\n - BOOKING_EVENT_TYPE_CONFIRMED: A booking was confirmed (accepted by the tenant).\n - BOOKING_EVENT_TYPE_CANCELED: A booking was canceled (canceled, rejected, or deleted).\n - BOOKING_EVENT_TYPE_NO_SHOW: The customer did not show up."
+    },
+    "v1BookingStatus": {
+      "type": "string",
+      "enum": [
+        "BOOKING_STATUS_UNSPECIFIED",
+        "BOOKING_STATUS_CANCELED",
+        "BOOKING_STATUS_DRAFT",
+        "BOOKING_STATUS_RESERVED",
+        "BOOKING_STATUS_ORDERED",
+        "BOOKING_STATUS_NO_SHOW"
+      ],
+      "default": "BOOKING_STATUS_UNSPECIFIED",
+      "description": "BookingStatus is the public lifecycle state of a booking.\n\n - BOOKING_STATUS_UNSPECIFIED: Unspecified / unknown status.\n - BOOKING_STATUS_CANCELED: The booking was canceled.\n - BOOKING_STATUS_DRAFT: Draft — not yet confirmed.\n - BOOKING_STATUS_RESERVED: Reserved / confirmed.\n - BOOKING_STATUS_ORDERED: Ordered (checked out / fulfilled).\n - BOOKING_STATUS_NO_SHOW: The customer did not show up."
+    },
+    "v1GetBookingResponse": {
+      "type": "object",
+      "properties": {
+        "booking": {
+          "$ref": "#/definitions/v1Booking",
+          "description": "The booking."
+        }
+      },
+      "description": "GetBookingResponse carries the requested public booking."
+    },
+    "v1GetTenantResponse": {
+      "type": "object",
+      "properties": {
+        "tenant": {
+          "$ref": "#/definitions/v1TenantProfile",
+          "description": "The tenant's public profile."
+        }
+      },
+      "description": "GetTenantResponse carries a tenant's public profile."
+    },
+    "v1ListBookingEventsResponse": {
+      "type": "object",
+      "properties": {
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1BookingEvent"
+          },
+          "description": "The events on this page, oldest-cursor first."
+        },
+        "nextCursor": {
+          "type": "string",
+          "description": "Cursor to pass as the next request's cursor to continue after this page."
+        },
+        "hasMore": {
+          "type": "boolean",
+          "description": "True if more events may exist after this page."
+        }
+      },
+      "description": "ListBookingEventsResponse is a page of booking change events."
+    },
+    "v1ListBookingsResponse": {
+      "type": "object",
+      "properties": {
+        "bookings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Booking"
+          },
+          "description": "The bookings on this page."
+        },
+        "totalSize": {
+          "type": "string",
+          "format": "int64",
+          "description": "Total number of bookings across all pages within the window."
+        }
+      },
+      "description": "ListBookingsResponse is a page of public bookings."
+    },
+    "v1ListServicesResponse": {
+      "type": "object",
+      "properties": {
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Service"
+          },
+          "description": "The services on this page."
+        },
+        "totalSize": {
+          "type": "string",
+          "format": "int64",
+          "description": "Total number of services across all pages."
+        }
+      },
+      "description": "ListServicesResponse is a page of public services."
+    },
+    "v1ListSlotsResponse": {
+      "type": "object",
+      "properties": {
+        "slots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1AvailabilitySlot"
+          },
+          "description": "Per-slot availability over the requested range."
+        },
+        "scheduleType": {
+          "type": "string",
+          "description": "Scheduling strategy used to compute the grid: \"coop\", \"slot\", or \"hybrid\"."
+        }
+      },
+      "description": "ListSlotsResponse is the computed availability grid for the requested range."
+    },
+    "v1Service": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Opaque public identifier of the service."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name."
+        },
+        "desc": {
+          "type": "string",
+          "description": "Description."
+        },
+        "duration": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Duration in minutes."
+        },
+        "price": {
+          "type": "string",
+          "format": "int64",
+          "description": "Price in the tenant's minor currency unit (e.g. JPY)."
+        },
+        "sort": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Display order (ascending)."
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Service"
+          },
+          "description": "Child services for hierarchical menus."
+        },
+        "imageUrls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Public image URLs."
+        }
+      },
+      "description": "Service is a public service / menu offering of a tenant."
+    },
+    "v1SlotStatus": {
+      "type": "string",
+      "enum": [
+        "SLOT_STATUS_UNSPECIFIED",
+        "SLOT_STATUS_AVAILABLE",
+        "SLOT_STATUS_BUSY",
+        "SLOT_STATUS_FULL"
+      ],
+      "default": "SLOT_STATUS_UNSPECIFIED",
+      "description": "SlotStatus is the availability state of a calendar slot.\n\n - SLOT_STATUS_UNSPECIFIED: Unspecified / unknown status.\n - SLOT_STATUS_AVAILABLE: The slot is bookable.\n - SLOT_STATUS_BUSY: The slot is partially taken (some capacity used).\n - SLOT_STATUS_FULL: The slot is fully booked."
+    },
+    "v1TenantProfile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Opaque public identifier of the tenant."
+        },
+        "name": {
+          "type": "string",
+          "description": "Shop name."
+        },
+        "desc": {
+          "type": "string",
+          "description": "Description."
+        },
+        "link": {
+          "type": "string",
+          "description": "Public link (website / booking page)."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Public contact phone."
+        },
+        "imageUrls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Public image URLs."
+        }
+      },
+      "description": "TenantProfile is the public profile of a tenant (shop)."
+    }
+  }
+}
