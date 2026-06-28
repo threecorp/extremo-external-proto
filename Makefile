@@ -48,7 +48,11 @@ clean-ts:  ## Clean generated ts code
 	rm -rf externaltsnode/*
 
 
-clean: | clean-go clean-dart clean-ts  ## Clean generated code
+clean-docs:  ## Clean generated API reference docs
+	rm -rf docs/*
+
+
+clean: | clean-go clean-dart clean-ts clean-docs  ## Clean generated code
 
 
 help:  ## Show all of tasks
