@@ -108,3 +108,41 @@ message AvailabilitySlot {
   // Availability status of this slot.
   SlotStatus status = 3;
 }
+
+// BookingEventType is the public kind of a booking change in the event feed.
+// Internal mutation kinds are folded into this stable public vocabulary (e.g.
+// reject/delete both surface as CANCELED).
+enum BookingEventType {
+  // Unspecified / unknown event type.
+  BOOKING_EVENT_TYPE_UNSPECIFIED = 0;
+  // A booking was created.
+  BOOKING_EVENT_TYPE_CREATED = 1;
+  // A booking's attributes changed.
+  BOOKING_EVENT_TYPE_UPDATED = 2;
+  // A booking was confirmed (accepted by the tenant).
+  BOOKING_EVENT_TYPE_CONFIRMED = 3;
+  // A booking was canceled (canceled, rejected, or deleted).
+  BOOKING_EVENT_TYPE_CANCELED = 4;
+  // The customer did not show up.
+  BOOKING_EVENT_TYPE_NO_SHOW = 5;
+}
+
+// BookingEvent is one entry in a tenant's booking change feed: an append-only,
+// cursor-paginated stream of booking lifecycle changes. An external consumer
+// polls "what changed since my last cursor", and the same feed backs webhook
+// delivery. Internal audit detail (actor identity, raw field diffs) is not
+// exposed.
+message BookingEvent {
+  // Opaque cursor for this event. Pass the response's next_cursor back as the
+  // request cursor to fetch events after this one.
+  string cursor = 1;
+  // What kind of change this event represents.
+  BookingEventType type = 2;
+  // Opaque public identifier of the booking this event is about.
+  uint64 booking_id = 3;
+  // When the change occurred (UTC).
+  google.protobuf.Timestamp occurred_at = 4;
+  // Snapshot of the booking after the change. Absent if the booking has since
+  // been hard-deleted (the event type still records what happened).
+  Booking booking = 5;
+}
