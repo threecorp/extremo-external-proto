@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Protocol Documentation</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Ubuntu:400,700,400italic"/>
+    <style>
+      body {
+        width: 60em;
+        margin: 1em auto;
+        color: #222;
+        font-family: "Ubuntu", sans-serif;
+        padding-bottom: 4em;
+      }
+
+      h1 {
+        font-weight: normal;
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+      }
+
+      h2 {
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+        margin: 1.5em 0;
+      }
+
+      h3 {
+        font-weight: normal;
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+      }
+
+      a {
+        text-decoration: none;
+        color: #567e25;
+      }
+
+      table {
+        width: 100%;
+        font-size: 80%;
+        border-collapse: collapse;
+      }
+
+      thead {
+        font-weight: 700;
+        background-color: #dcdcdc;
+      }
+
+      tbody tr:nth-child(even) {
+        background-color: #fbfbfb;
+      }
+
+      td {
+        border: 1px solid #ccc;
+        padding: 0.5ex 2ex;
+      }
+
+      td p {
+        text-indent: 1em;
+        margin: 0;
+      }
+
+      td p:nth-child(1) {
+        text-indent: 0;  
+      }
+
+       
+      .field-table td:nth-child(1) {  
+        width: 10em;
+      }
+      .field-table td:nth-child(2) {  
+        width: 10em;
+      }
+      .field-table td:nth-child(3) {  
+        width: 6em;
+      }
+      .field-table td:nth-child(4) {  
+        width: auto;
+      }
+
+       
+      .extension-table td:nth-child(1) {  
+        width: 10em;
+      }
+      .extension-table td:nth-child(2) {  
+        width: 10em;
+      }
+      .extension-table td:nth-child(3) {  
+        width: 10em;
+      }
+      .extension-table td:nth-child(4) {  
+        width: 5em;
+      }
+      .extension-table td:nth-child(5) {  
+        width: auto;
+      }
+
+       
+      .enum-table td:nth-child(1) {  
+        width: 10em;
+      }
+      .enum-table td:nth-child(2) {  
+        width: 10em;
+      }
+      .enum-table td:nth-child(3) {  
+        width: auto;
+      }
+
+       
+      .scalar-value-types-table tr {
+        height: 3em;
+      }
+
+       
+      #toc-container ul {
+        list-style-type: none;
+        padding-left: 1em;
+        line-height: 180%;
+        margin: 0;
+      }
+      #toc > li > a {
+        font-weight: bold;
+      }
+
+       
+      .file-heading {
+        width: 100%;
+        display: table;
+        border-bottom: 1px solid #aaa;
+        margin: 4em 0 1.5em 0;
+      }
+      .file-heading h2 {
+        border: none;
+        display: table-cell;
+      }
+      .file-heading a {
+        text-align: right;
+        display: table-cell;
+      }
+
+       
+      .badge {
+        width: 1.6em;
+        height: 1.6em;
+        display: inline-block;
+
+        line-height: 1.6em;
+        text-align: center;
+        font-weight: bold;
+        font-size: 60%;
+
+        color: #89ba48;
+        background-color: #dff0c8;
+
+        margin: 0.5ex 1em 0.5ex -1em;
+        border: 1px solid #fbfbfb;
+        border-radius: 1ex;
+      }
+    </style>
+
+    
+    <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+  </head>
+
+  <body>
+
+    <h1 id="title">Protocol Documentation</h1>
+
+    <h2>Table of Contents</h2>
+
+    <div id="toc-container">
+      <ul id="toc">
+        
+          
+          <li>
+            <a href="#extremo%2fmsg%2fexternal%2fv1%2fdto.proto">extremo/msg/external/v1/dto.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#extremo.msg.external.v1.AvailabilitySlot"><span class="badge">M</span>AvailabilitySlot</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.msg.external.v1.Booking"><span class="badge">M</span>Booking</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.msg.external.v1.BookingEvent"><span class="badge">M</span>BookingEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.msg.external.v1.Service"><span class="badge">M</span>Service</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.msg.external.v1.Staff"><span class="badge">M</span>Staff</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.msg.external.v1.TenantProfile"><span class="badge">M</span>TenantProfile</a>
+                </li>
+              
+              
+                <li>
+                  <a href="#extremo.msg.external.v1.BookingEventType"><span class="badge">E</span>BookingEventType</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.msg.external.v1.BookingStatus"><span class="badge">E</span>BookingStatus</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.msg.external.v1.SlotStatus"><span class="badge">E</span>SlotStatus</a>
+                </li>
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#extremo%2fapi%2fexternal%2favailability%2fv1%2favailability_service.proto">extremo/api/external/availability/v1/availability_service.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#extremo.api.external.availability.v1.ListSlotsRequest"><span class="badge">M</span>ListSlotsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.availability.v1.ListSlotsResponse"><span class="badge">M</span>ListSlotsResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#extremo.api.external.availability.v1.AvailabilityService"><span class="badge">S</span>AvailabilityService</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#extremo%2fapi%2fexternal%2fbooks%2fv1%2fbook_event_service.proto">extremo/api/external/books/v1/book_event_service.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.ListBookingEventsRequest"><span class="badge">M</span>ListBookingEventsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.ListBookingEventsResponse"><span class="badge">M</span>ListBookingEventsResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.BookEventService"><span class="badge">S</span>BookEventService</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#extremo%2fapi%2fexternal%2fbooks%2fv1%2fbook_service.proto">extremo/api/external/books/v1/book_service.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.GetBookingRequest"><span class="badge">M</span>GetBookingRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.GetBookingResponse"><span class="badge">M</span>GetBookingResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.ListBookingsRequest"><span class="badge">M</span>ListBookingsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.ListBookingsResponse"><span class="badge">M</span>ListBookingsResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.BookService"><span class="badge">S</span>BookService</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#extremo%2fapi%2fexternal%2fservices%2fv1%2fservice_service.proto">extremo/api/external/services/v1/service_service.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#extremo.api.external.services.v1.ListServicesRequest"><span class="badge">M</span>ListServicesRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.services.v1.ListServicesResponse"><span class="badge">M</span>ListServicesResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#extremo.api.external.services.v1.ServiceService"><span class="badge">S</span>ServiceService</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#extremo%2fapi%2fexternal%2ftenants%2fv1%2ftenant_service.proto">extremo/api/external/tenants/v1/tenant_service.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#extremo.api.external.tenants.v1.GetTenantRequest"><span class="badge">M</span>GetTenantRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.tenants.v1.GetTenantResponse"><span class="badge">M</span>GetTenantResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#extremo.api.external.tenants.v1.TenantService"><span class="badge">S</span>TenantService</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+        <li><a href="#scalar-value-types">Scalar Value Types</a></li>
+      </ul>
+    </div>
+
+    
+      
+      <div class="file-heading">
+        <h2 id="extremo/msg/external/v1/dto.proto">extremo/msg/external/v1/dto.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="extremo.msg.external.v1.AvailabilitySlot">AvailabilitySlot</h3>
+        <p>AvailabilitySlot is a single bookable time window with its resolved status.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>start_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>Start time (UTC). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>end_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>End time (UTC). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#extremo.msg.external.v1.SlotStatus">SlotStatus</a></td>
+                  <td></td>
+                  <td><p>Availability status of this slot. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.msg.external.v1.Booking">Booking</h3>
+        <p>Booking is a public booking / reservation.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Opaque public identifier of the booking. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Title. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>desc</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Description. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#extremo.msg.external.v1.BookingStatus">BookingStatus</a></td>
+                  <td></td>
+                  <td><p>Lifecycle status. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>start_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>Start time (UTC). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>end_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>End time (UTC). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.msg.external.v1.BookingEvent">BookingEvent</h3>
+        <p>BookingEvent is one entry in a tenant's booking change feed: an append-only,</p><p>cursor-paginated stream of booking lifecycle changes. An external consumer</p><p>polls "what changed since my last cursor", and the same feed backs webhook</p><p>delivery. Internal audit detail (actor identity, raw field diffs) is not</p><p>exposed.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>cursor</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Opaque cursor for this event. Pass the response&#39;s next_cursor back as the
+request cursor to fetch events after this one. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>type</td>
+                  <td><a href="#extremo.msg.external.v1.BookingEventType">BookingEventType</a></td>
+                  <td></td>
+                  <td><p>What kind of change this event represents. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>booking_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Opaque public identifier of the booking this event is about. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>occurred_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>When the change occurred (UTC). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>booking</td>
+                  <td><a href="#extremo.msg.external.v1.Booking">Booking</a></td>
+                  <td></td>
+                  <td><p>Snapshot of the booking after the change. Absent if the booking has since
+been hard-deleted (the event type still records what happened). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.msg.external.v1.Service">Service</h3>
+        <p>Service is a public service / menu offering of a tenant.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Opaque public identifier of the service. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Display name. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>desc</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Description. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>duration</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p>Duration in minutes. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>price</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p>Price in the tenant&#39;s minor currency unit (e.g. JPY). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>sort</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p>Display order (ascending). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>children</td>
+                  <td><a href="#extremo.msg.external.v1.Service">Service</a></td>
+                  <td>repeated</td>
+                  <td><p>Child services for hierarchical menus. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>image_urls</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>Public image URLs. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.msg.external.v1.Staff">Staff</h3>
+        <p>Staff is the minimal public representation of a staff member.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Opaque public identifier of the staff member. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Display name. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.msg.external.v1.TenantProfile">TenantProfile</h3>
+        <p>TenantProfile is the public profile of a tenant (shop).</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Opaque public identifier of the tenant. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Shop name. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>desc</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Description. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>link</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Public link (website / booking page). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>phone</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Public contact phone. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>image_urls</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>Public image URLs. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+        <h3 id="extremo.msg.external.v1.BookingEventType">BookingEventType</h3>
+        <p>BookingEventType is the public kind of a booking change in the event feed.</p><p>Internal mutation kinds are folded into this stable public vocabulary (e.g.</p><p>reject/delete both surface as CANCELED).</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>BOOKING_EVENT_TYPE_UNSPECIFIED</td>
+                <td>0</td>
+                <td><p>Unspecified / unknown event type.</p></td>
+              </tr>
+            
+              <tr>
+                <td>BOOKING_EVENT_TYPE_CREATED</td>
+                <td>1</td>
+                <td><p>A booking was created.</p></td>
+              </tr>
+            
+              <tr>
+                <td>BOOKING_EVENT_TYPE_UPDATED</td>
+                <td>2</td>
+                <td><p>A booking&#39;s attributes changed.</p></td>
+              </tr>
+            
+              <tr>
+                <td>BOOKING_EVENT_TYPE_CONFIRMED</td>
+                <td>3</td>
+                <td><p>A booking was confirmed (accepted by the tenant).</p></td>
+              </tr>
+            
+              <tr>
+                <td>BOOKING_EVENT_TYPE_CANCELED</td>
+                <td>4</td>
+                <td><p>A booking was canceled (canceled, rejected, or deleted).</p></td>
+              </tr>
+            
+              <tr>
+                <td>BOOKING_EVENT_TYPE_NO_SHOW</td>
+                <td>5</td>
+                <td><p>The customer did not show up.</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+        <h3 id="extremo.msg.external.v1.BookingStatus">BookingStatus</h3>
+        <p>BookingStatus is the public lifecycle state of a booking.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>BOOKING_STATUS_UNSPECIFIED</td>
+                <td>0</td>
+                <td><p>Unspecified / unknown status.</p></td>
+              </tr>
+            
+              <tr>
+                <td>BOOKING_STATUS_CANCELED</td>
+                <td>1</td>
+                <td><p>The booking was canceled.</p></td>
+              </tr>
+            
+              <tr>
+                <td>BOOKING_STATUS_DRAFT</td>
+                <td>2</td>
+                <td><p>Draft — not yet confirmed.</p></td>
+              </tr>
+            
+              <tr>
+                <td>BOOKING_STATUS_RESERVED</td>
+                <td>3</td>
+                <td><p>Reserved / confirmed.</p></td>
+              </tr>
+            
+              <tr>
+                <td>BOOKING_STATUS_ORDERED</td>
+                <td>4</td>
+                <td><p>Ordered (checked out / fulfilled).</p></td>
+              </tr>
+            
+              <tr>
+                <td>BOOKING_STATUS_NO_SHOW</td>
+                <td>5</td>
+                <td><p>The customer did not show up.</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+        <h3 id="extremo.msg.external.v1.SlotStatus">SlotStatus</h3>
+        <p>SlotStatus is the availability state of a calendar slot.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>SLOT_STATUS_UNSPECIFIED</td>
+                <td>0</td>
+                <td><p>Unspecified / unknown status.</p></td>
+              </tr>
+            
+              <tr>
+                <td>SLOT_STATUS_AVAILABLE</td>
+                <td>1</td>
+                <td><p>The slot is bookable.</p></td>
+              </tr>
+            
+              <tr>
+                <td>SLOT_STATUS_BUSY</td>
+                <td>2</td>
+                <td><p>The slot is partially taken (some capacity used).</p></td>
+              </tr>
+            
+              <tr>
+                <td>SLOT_STATUS_FULL</td>
+                <td>3</td>
+                <td><p>The slot is fully booked.</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="extremo/api/external/availability/v1/availability_service.proto">extremo/api/external/availability/v1/availability_service.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="extremo.api.external.availability.v1.ListSlotsRequest">ListSlotsRequest</h3>
+        <p>ListSlotsRequest selects a tenant + service + date range to compute availability for.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant whose availability to compute. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>service_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Service whose duration drives slot feasibility. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>opened_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>Start of the date range to compute (inclusive). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>closed_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>End of the date range to compute (exclusive). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.availability.v1.ListSlotsResponse">ListSlotsResponse</h3>
+        <p>ListSlotsResponse is the computed availability grid for the requested range.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>slots</td>
+                  <td><a href="#extremo.msg.external.v1.AvailabilitySlot">extremo.msg.external.v1.AvailabilitySlot</a></td>
+                  <td>repeated</td>
+                  <td><p>Per-slot availability over the requested range. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>schedule_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Scheduling strategy used to compute the grid: &#34;coop&#34;, &#34;slot&#34;, or &#34;hybrid&#34;. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="extremo.api.external.availability.v1.AvailabilityService">AvailabilityService</h3>
+        <p>AvailabilityService exposes a tenant's calendar slot availability to</p><p>authenticated external API consumers. Read-only.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>ListSlots</td>
+                <td><a href="#extremo.api.external.availability.v1.ListSlotsRequest">ListSlotsRequest</a></td>
+                <td><a href="#extremo.api.external.availability.v1.ListSlotsResponse">ListSlotsResponse</a></td>
+                <td><p>ListSlots returns per-slot availability (AVAILABLE / BUSY / FULL) for a
+tenant&#39;s service over a date range.</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+          
+          
+          <h4>Methods with HTTP bindings</h4>
+          <table>
+            <thead>
+              <tr>
+                <td>Method Name</td>
+                <td>Method</td>
+                <td>Pattern</td>
+                <td>Body</td>
+              </tr>
+            </thead>
+            <tbody>
+            
+              
+              
+              <tr>
+                <td>ListSlots</td>
+                <td>GET</td>
+                <td>/api/external/v1/{tenant_id}/availability</td>
+                <td></td>
+              </tr>
+              
+            
+            </tbody>
+          </table>
+          
+        
+    
+      
+      <div class="file-heading">
+        <h2 id="extremo/api/external/books/v1/book_event_service.proto">extremo/api/external/books/v1/book_event_service.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="extremo.api.external.books.v1.ListBookingEventsRequest">ListBookingEventsRequest</h3>
+        <p>ListBookingEventsRequest pages a tenant's booking change feed forward from an</p><p>opaque cursor.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant whose event feed to read (must match the API key&#39;s tenant). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cursor</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Opaque cursor from a previous response&#39;s next_cursor. Empty starts from the
+beginning of the feed. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>page_size</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p>Page size (1..100). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.books.v1.ListBookingEventsResponse">ListBookingEventsResponse</h3>
+        <p>ListBookingEventsResponse is a page of booking change events.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>events</td>
+                  <td><a href="#extremo.msg.external.v1.BookingEvent">extremo.msg.external.v1.BookingEvent</a></td>
+                  <td>repeated</td>
+                  <td><p>The events on this page, oldest-cursor first. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>next_cursor</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Cursor to pass as the next request&#39;s cursor to continue after this page. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>has_more</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p>True if more events may exist after this page. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="extremo.api.external.books.v1.BookEventService">BookEventService</h3>
+        <p>BookEventService streams a tenant's booking lifecycle changes as a</p><p>cursor-paginated feed. Read-only.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>ListBookingEvents</td>
+                <td><a href="#extremo.api.external.books.v1.ListBookingEventsRequest">ListBookingEventsRequest</a></td>
+                <td><a href="#extremo.api.external.books.v1.ListBookingEventsResponse">ListBookingEventsResponse</a></td>
+                <td><p>ListBookingEvents returns booking change events after the given cursor, in
+ascending (oldest-first) order, so a consumer can advance through the feed
+incrementally by passing next_cursor back on each call.</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+          
+          
+          <h4>Methods with HTTP bindings</h4>
+          <table>
+            <thead>
+              <tr>
+                <td>Method Name</td>
+                <td>Method</td>
+                <td>Pattern</td>
+                <td>Body</td>
+              </tr>
+            </thead>
+            <tbody>
+            
+              
+              
+              <tr>
+                <td>ListBookingEvents</td>
+                <td>GET</td>
+                <td>/api/external/v1/{tenant_id}/booking-events</td>
+                <td></td>
+              </tr>
+              
+            
+            </tbody>
+          </table>
+          
+        
+    
+      
+      <div class="file-heading">
+        <h2 id="extremo/api/external/books/v1/book_service.proto">extremo/api/external/books/v1/book_service.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="extremo.api.external.books.v1.GetBookingRequest">GetBookingRequest</h3>
+        <p>GetBookingRequest selects a single booking under a tenant.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant the booking belongs to (must match the API key&#39;s tenant). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Opaque public identifier of the booking. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.books.v1.GetBookingResponse">GetBookingResponse</h3>
+        <p>GetBookingResponse carries the requested public booking.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>booking</td>
+                  <td><a href="#extremo.msg.external.v1.Booking">extremo.msg.external.v1.Booking</a></td>
+                  <td></td>
+                  <td><p>The booking. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.books.v1.ListBookingsRequest">ListBookingsRequest</h3>
+        <p>ListBookingsRequest selects a tenant's bookings within a bounded time window.</p><p>The window is required so the query is never unbounded.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant whose bookings to list (must match the API key&#39;s tenant). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>start_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>Inclusive start of the time window. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>end_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>Inclusive end of the time window. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>page</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p>1-based page number. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>page_size</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p>Page size (1..100). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.books.v1.ListBookingsResponse">ListBookingsResponse</h3>
+        <p>ListBookingsResponse is a page of public bookings.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>bookings</td>
+                  <td><a href="#extremo.msg.external.v1.Booking">extremo.msg.external.v1.Booking</a></td>
+                  <td>repeated</td>
+                  <td><p>The bookings on this page. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>total_size</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p>Total number of bookings across all pages within the window. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="extremo.api.external.books.v1.BookService">BookService</h3>
+        <p>BookService exposes a tenant's bookings to authenticated external API</p><p>consumers. Read-only.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>ListBookings</td>
+                <td><a href="#extremo.api.external.books.v1.ListBookingsRequest">ListBookingsRequest</a></td>
+                <td><a href="#extremo.api.external.books.v1.ListBookingsResponse">ListBookingsResponse</a></td>
+                <td><p>ListBookings returns a tenant&#39;s bookings whose time window falls in
+[start_at, end_at], newest first, paginated.</p></td>
+              </tr>
+            
+              <tr>
+                <td>GetBooking</td>
+                <td><a href="#extremo.api.external.books.v1.GetBookingRequest">GetBookingRequest</a></td>
+                <td><a href="#extremo.api.external.books.v1.GetBookingResponse">GetBookingResponse</a></td>
+                <td><p>GetBooking returns a single booking by its opaque id, scoped to the tenant.</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+          
+          
+          <h4>Methods with HTTP bindings</h4>
+          <table>
+            <thead>
+              <tr>
+                <td>Method Name</td>
+                <td>Method</td>
+                <td>Pattern</td>
+                <td>Body</td>
+              </tr>
+            </thead>
+            <tbody>
+            
+              
+              
+              <tr>
+                <td>ListBookings</td>
+                <td>GET</td>
+                <td>/api/external/v1/{tenant_id}/books</td>
+                <td></td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>GetBooking</td>
+                <td>GET</td>
+                <td>/api/external/v1/{tenant_id}/books/{id}</td>
+                <td></td>
+              </tr>
+              
+            
+            </tbody>
+          </table>
+          
+        
+    
+      
+      <div class="file-heading">
+        <h2 id="extremo/api/external/services/v1/service_service.proto">extremo/api/external/services/v1/service_service.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="extremo.api.external.services.v1.ListServicesRequest">ListServicesRequest</h3>
+        <p>ListServicesRequest selects a tenant's services with pagination.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant whose services to list. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>page</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p>1-based page number. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>page_size</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p>Page size (1..100). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.services.v1.ListServicesResponse">ListServicesResponse</h3>
+        <p>ListServicesResponse is a page of public services.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>services</td>
+                  <td><a href="#extremo.msg.external.v1.Service">extremo.msg.external.v1.Service</a></td>
+                  <td>repeated</td>
+                  <td><p>The services on this page. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>total_size</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p>Total number of services across all pages. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="extremo.api.external.services.v1.ServiceService">ServiceService</h3>
+        <p>ServiceService exposes a tenant's public service catalog to authenticated</p><p>external API consumers. Read-only.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>ListServices</td>
+                <td><a href="#extremo.api.external.services.v1.ListServicesRequest">ListServicesRequest</a></td>
+                <td><a href="#extremo.api.external.services.v1.ListServicesResponse">ListServicesResponse</a></td>
+                <td><p>ListServices returns the service catalog for a tenant.</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+          
+          
+          <h4>Methods with HTTP bindings</h4>
+          <table>
+            <thead>
+              <tr>
+                <td>Method Name</td>
+                <td>Method</td>
+                <td>Pattern</td>
+                <td>Body</td>
+              </tr>
+            </thead>
+            <tbody>
+            
+              
+              
+              <tr>
+                <td>ListServices</td>
+                <td>GET</td>
+                <td>/api/external/v1/{tenant_id}/services</td>
+                <td></td>
+              </tr>
+              
+            
+            </tbody>
+          </table>
+          
+        
+    
+      
+      <div class="file-heading">
+        <h2 id="extremo/api/external/tenants/v1/tenant_service.proto">extremo/api/external/tenants/v1/tenant_service.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="extremo.api.external.tenants.v1.GetTenantRequest">GetTenantRequest</h3>
+        <p>GetTenantRequest selects a tenant by its public identifier.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant whose public profile to fetch. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.tenants.v1.GetTenantResponse">GetTenantResponse</h3>
+        <p>GetTenantResponse carries a tenant's public profile.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant</td>
+                  <td><a href="#extremo.msg.external.v1.TenantProfile">extremo.msg.external.v1.TenantProfile</a></td>
+                  <td></td>
+                  <td><p>The tenant&#39;s public profile. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="extremo.api.external.tenants.v1.TenantService">TenantService</h3>
+        <p>TenantService exposes a tenant's public profile to authenticated external API</p><p>consumers. Read-only.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>GetTenant</td>
+                <td><a href="#extremo.api.external.tenants.v1.GetTenantRequest">GetTenantRequest</a></td>
+                <td><a href="#extremo.api.external.tenants.v1.GetTenantResponse">GetTenantResponse</a></td>
+                <td><p>GetTenant returns a single tenant&#39;s public profile.</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+          
+          
+          <h4>Methods with HTTP bindings</h4>
+          <table>
+            <thead>
+              <tr>
+                <td>Method Name</td>
+                <td>Method</td>
+                <td>Pattern</td>
+                <td>Body</td>
+              </tr>
+            </thead>
+            <tbody>
+            
+              
+              
+              <tr>
+                <td>GetTenant</td>
+                <td>GET</td>
+                <td>/api/external/v1/{tenant_id}</td>
+                <td></td>
+              </tr>
+              
+            
+            </tbody>
+          </table>
+          
+        
+    
+
+    <h2 id="scalar-value-types">Scalar Value Types</h2>
+    <table class="scalar-value-types-table">
+      <thead>
+        <tr><td>.proto Type</td><td>Notes</td><td>C++</td><td>Java</td><td>Python</td><td>Go</td><td>C#</td><td>PHP</td><td>Ruby</td></tr>
+      </thead>
+      <tbody>
+        
+          <tr id="double">
+            <td>double</td>
+            <td></td>
+            <td>double</td>
+            <td>double</td>
+            <td>float</td>
+            <td>float64</td>
+            <td>double</td>
+            <td>float</td>
+            <td>Float</td>
+          </tr>
+        
+          <tr id="float">
+            <td>float</td>
+            <td></td>
+            <td>float</td>
+            <td>float</td>
+            <td>float</td>
+            <td>float32</td>
+            <td>float</td>
+            <td>float</td>
+            <td>Float</td>
+          </tr>
+        
+          <tr id="int32">
+            <td>int32</td>
+            <td>Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint32 instead.</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>int</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>integer</td>
+            <td>Bignum or Fixnum (as required)</td>
+          </tr>
+        
+          <tr id="int64">
+            <td>int64</td>
+            <td>Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint64 instead.</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>int/long</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>integer/string</td>
+            <td>Bignum</td>
+          </tr>
+        
+          <tr id="uint32">
+            <td>uint32</td>
+            <td>Uses variable-length encoding.</td>
+            <td>uint32</td>
+            <td>int</td>
+            <td>int/long</td>
+            <td>uint32</td>
+            <td>uint</td>
+            <td>integer</td>
+            <td>Bignum or Fixnum (as required)</td>
+          </tr>
+        
+          <tr id="uint64">
+            <td>uint64</td>
+            <td>Uses variable-length encoding.</td>
+            <td>uint64</td>
+            <td>long</td>
+            <td>int/long</td>
+            <td>uint64</td>
+            <td>ulong</td>
+            <td>integer/string</td>
+            <td>Bignum or Fixnum (as required)</td>
+          </tr>
+        
+          <tr id="sint32">
+            <td>sint32</td>
+            <td>Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int32s.</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>int</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>integer</td>
+            <td>Bignum or Fixnum (as required)</td>
+          </tr>
+        
+          <tr id="sint64">
+            <td>sint64</td>
+            <td>Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int64s.</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>int/long</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>integer/string</td>
+            <td>Bignum</td>
+          </tr>
+        
+          <tr id="fixed32">
+            <td>fixed32</td>
+            <td>Always four bytes. More efficient than uint32 if values are often greater than 2^28.</td>
+            <td>uint32</td>
+            <td>int</td>
+            <td>int</td>
+            <td>uint32</td>
+            <td>uint</td>
+            <td>integer</td>
+            <td>Bignum or Fixnum (as required)</td>
+          </tr>
+        
+          <tr id="fixed64">
+            <td>fixed64</td>
+            <td>Always eight bytes. More efficient than uint64 if values are often greater than 2^56.</td>
+            <td>uint64</td>
+            <td>long</td>
+            <td>int/long</td>
+            <td>uint64</td>
+            <td>ulong</td>
+            <td>integer/string</td>
+            <td>Bignum</td>
+          </tr>
+        
+          <tr id="sfixed32">
+            <td>sfixed32</td>
+            <td>Always four bytes.</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>int</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>integer</td>
+            <td>Bignum or Fixnum (as required)</td>
+          </tr>
+        
+          <tr id="sfixed64">
+            <td>sfixed64</td>
+            <td>Always eight bytes.</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>int/long</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>integer/string</td>
+            <td>Bignum</td>
+          </tr>
+        
+          <tr id="bool">
+            <td>bool</td>
+            <td></td>
+            <td>bool</td>
+            <td>boolean</td>
+            <td>boolean</td>
+            <td>bool</td>
+            <td>bool</td>
+            <td>boolean</td>
+            <td>TrueClass/FalseClass</td>
+          </tr>
+        
+          <tr id="string">
+            <td>string</td>
+            <td>A string must always contain UTF-8 encoded or 7-bit ASCII text.</td>
+            <td>string</td>
+            <td>String</td>
+            <td>str/unicode</td>
+            <td>string</td>
+            <td>string</td>
+            <td>string</td>
+            <td>String (UTF-8)</td>
+          </tr>
+        
+          <tr id="bytes">
+            <td>bytes</td>
+            <td>May contain any arbitrary sequence of bytes.</td>
+            <td>string</td>
+            <td>ByteString</td>
+            <td>str</td>
+            <td>[]byte</td>
+            <td>ByteString</td>
+            <td>string</td>
+            <td>String (ASCII-8BIT)</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </body>
+</html>
+

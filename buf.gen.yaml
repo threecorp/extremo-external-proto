@@ -16,6 +16,16 @@ plugins:
       - generate_unbound_methods=true
       - logtostderr=true
 
+  # ----- Docs (protoc-gen-doc, self-hosted gRPC API reference, E-6) -----
+  # Renders every external service / method / message — with its proto comments —
+  # into one self-contained docs/external.html. gRPC-native (does NOT assume
+  # REST); because this module excludes extremo.msg.db.v1 from its dependency
+  # closure, no internal types can appear in the published reference.
+  - remote: buf.build/community/pseudomuto-doc:v1.5.1
+    out: docs
+    opt:
+      - html,external.html
+
   # ----- Dart / TypeScript -----
   # TODO(external-proto): re-enable Dart + TS SDK generation once the plugin
   # versions are reconciled with the pinned buf (1.59.0) edition output —
