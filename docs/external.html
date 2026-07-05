@@ -272,6 +272,26 @@
             <ul>
               
                 <li>
+                  <a href="#extremo.api.external.books.v1.CancelBookingRequest"><span class="badge">M</span>CancelBookingRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.CancelBookingResponse"><span class="badge">M</span>CancelBookingResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.CreateBookingRequest"><span class="badge">M</span>CreateBookingRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.CreateBookingResponse"><span class="badge">M</span>CreateBookingResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.Customer"><span class="badge">M</span>Customer</a>
+                </li>
+              
+                <li>
                   <a href="#extremo.api.external.books.v1.GetBookingRequest"><span class="badge">M</span>GetBookingRequest</a>
                 </li>
               
@@ -285,6 +305,14 @@
               
                 <li>
                   <a href="#extremo.api.external.books.v1.ListBookingsResponse"><span class="badge">M</span>ListBookingsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.UpdateBookingRequest"><span class="badge">M</span>UpdateBookingRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.UpdateBookingResponse"><span class="badge">M</span>UpdateBookingResponse</a>
                 </li>
               
               
@@ -442,7 +470,23 @@
                   <td>end_at</td>
                   <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
                   <td></td>
-                  <td><p>End time (UTC). </p></td>
+                  <td><p>End time (UTC). Derived from the booked services&#39; total duration. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>service_ids</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td>repeated</td>
+                  <td><p>Opaque ids of the services booked (see Service.id). May be empty for
+bookings that predate service linkage. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>updated_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>Last modification time (UTC). Echo this back as UpdateBookingRequest
+.expected_updated_at for optimistic concurrency control. </p></td>
                 </tr>
               
             </tbody>
@@ -1090,6 +1134,204 @@ incrementally by passing next_cursor back on each call.</p></td>
       <p></p>
 
       
+        <h3 id="extremo.api.external.books.v1.CancelBookingRequest">CancelBookingRequest</h3>
+        <p>CancelBookingRequest cancels a booking.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant the booking belongs to. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Booking to cancel. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>reason</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Optional free-text cancellation reason (&lt;= 512). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.books.v1.CancelBookingResponse">CancelBookingResponse</h3>
+        <p>CancelBookingResponse carries the canceled booking.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>booking</td>
+                  <td><a href="#extremo.msg.external.v1.Booking">extremo.msg.external.v1.Booking</a></td>
+                  <td></td>
+                  <td><p>The canceled booking (status CANCELED). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.books.v1.CreateBookingRequest">CreateBookingRequest</h3>
+        <p>CreateBookingRequest books one or more services for a customer at a start</p><p>time. The end time is derived server-side from the services' total duration,</p><p>so no end time is accepted.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant to book under (must match the API key&#39;s tenant). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>service_ids</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td>repeated</td>
+                  <td><p>Services to book (&gt;= 1). Opaque service ids (see Service.id). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>start_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>Requested start time (required). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>customer</td>
+                  <td><a href="#extremo.api.external.books.v1.Customer">Customer</a></td>
+                  <td></td>
+                  <td><p>The customer to book for. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Optional booking title. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>desc</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Optional booking note. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>idempotency_key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Optional idempotency key (&lt;= 255). Resending the same key for this tenant
+replays the original booking instead of creating a duplicate. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>external_ref</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Optional partner-side correlation id stored on the booking (&lt;= 255). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.books.v1.CreateBookingResponse">CreateBookingResponse</h3>
+        <p>CreateBookingResponse carries the created booking.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>booking</td>
+                  <td><a href="#extremo.msg.external.v1.Booking">extremo.msg.external.v1.Booking</a></td>
+                  <td></td>
+                  <td><p>The created booking (DRAFT, or RESERVED when the tenant auto-accepts). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.books.v1.Customer">Customer</h3>
+        <p>Customer identifies the end customer a partner books on behalf of. The API</p><p>resolves (or creates) a CLIENT record for the tenant from these details; the</p><p>customer is never echoed back in a Booking response (PII stays server-side).</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Customer display name (required). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>email</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Customer email. Optional, but email or phone is required. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>phone</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Customer phone. Optional, but email or phone is required. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="extremo.api.external.books.v1.GetBookingRequest">GetBookingRequest</h3>
         <p>GetBookingRequest selects a single booking under a tenant.</p>
 
@@ -1190,6 +1432,21 @@ incrementally by passing next_cursor back on each call.</p></td>
                   <td><p>Page size (1..100). </p></td>
                 </tr>
               
+                <tr>
+                  <td>only_external</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p>When true, return only bookings created through the external partner API
+(partner origin), excluding in-store / mypage bookings. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>external_ref</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>When set, return only bookings whose external_ref equals this value. </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -1228,6 +1485,104 @@ incrementally by passing next_cursor back on each call.</p></td>
 
         
       
+        <h3 id="extremo.api.external.books.v1.UpdateBookingRequest">UpdateBookingRequest</h3>
+        <p>UpdateBookingRequest changes a booking. Only the set fields are applied;</p><p>changing service_ids or start_at re-derives the end time.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant the booking belongs to. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Booking to update. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>start_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>Optional new start time. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>service_ids</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td>repeated</td>
+                  <td><p>Optional new service set (opaque service ids). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Optional new title. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>desc</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Optional new note. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>external_ref</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Optional new partner-side correlation id. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>expected_updated_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>Optimistic-lock guard. When set, the update is rejected with ABORTED if the
+booking&#39;s current updated_at differs (echo Booking.updated_at here). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.books.v1.UpdateBookingResponse">UpdateBookingResponse</h3>
+        <p>UpdateBookingResponse carries the updated booking.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>booking</td>
+                  <td><a href="#extremo.msg.external.v1.Booking">extremo.msg.external.v1.Booking</a></td>
+                  <td></td>
+                  <td><p>The updated booking. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
 
       
 
@@ -1235,7 +1590,7 @@ incrementally by passing next_cursor back on each call.</p></td>
 
       
         <h3 id="extremo.api.external.books.v1.BookService">BookService</h3>
-        <p>BookService exposes a tenant's bookings to authenticated external API</p><p>consumers. Read-only.</p>
+        <p>BookService exposes a tenant's bookings to authenticated external API</p><p>consumers: reads (book.read) plus create / update / cancel (book.create,</p><p>book.update).</p>
         <table class="enum-table">
           <thead>
             <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
@@ -1247,14 +1602,44 @@ incrementally by passing next_cursor back on each call.</p></td>
                 <td><a href="#extremo.api.external.books.v1.ListBookingsRequest">ListBookingsRequest</a></td>
                 <td><a href="#extremo.api.external.books.v1.ListBookingsResponse">ListBookingsResponse</a></td>
                 <td><p>ListBookings returns a tenant&#39;s bookings whose time window falls in
-[start_at, end_at], newest first, paginated.</p></td>
+[start_at, end_at], newest first, paginated. Requires book.read.</p></td>
               </tr>
             
               <tr>
                 <td>GetBooking</td>
                 <td><a href="#extremo.api.external.books.v1.GetBookingRequest">GetBookingRequest</a></td>
                 <td><a href="#extremo.api.external.books.v1.GetBookingResponse">GetBookingResponse</a></td>
-                <td><p>GetBooking returns a single booking by its opaque id, scoped to the tenant.</p></td>
+                <td><p>GetBooking returns a single booking by its opaque id, scoped to the tenant.
+Requires book.read.</p></td>
+              </tr>
+            
+              <tr>
+                <td>CreateBooking</td>
+                <td><a href="#extremo.api.external.books.v1.CreateBookingRequest">CreateBookingRequest</a></td>
+                <td><a href="#extremo.api.external.books.v1.CreateBookingResponse">CreateBookingResponse</a></td>
+                <td><p>CreateBooking books a service for a customer. The API resolves (or creates)
+a CLIENT record for the tenant from the supplied customer contact, validates
+the slot against the tenant&#39;s schedule (capacity / staff / no past times),
+and returns the new booking (DRAFT, or RESERVED when the tenant auto-accepts).
+Requires book.create. Supply idempotency_key to make retries safe: resending
+the same key replays the original booking instead of creating a duplicate.</p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateBooking</td>
+                <td><a href="#extremo.api.external.books.v1.UpdateBookingRequest">UpdateBookingRequest</a></td>
+                <td><a href="#extremo.api.external.books.v1.UpdateBookingResponse">UpdateBookingResponse</a></td>
+                <td><p>UpdateBooking changes a booking&#39;s time / services / metadata. Requires
+book.update. Pass expected_updated_at (from Booking.updated_at) for
+optimistic concurrency; a mismatch returns ABORTED.</p></td>
+              </tr>
+            
+              <tr>
+                <td>CancelBooking</td>
+                <td><a href="#extremo.api.external.books.v1.CancelBookingRequest">CancelBookingRequest</a></td>
+                <td><a href="#extremo.api.external.books.v1.CancelBookingResponse">CancelBookingResponse</a></td>
+                <td><p>CancelBooking cancels a booking (DRAFT / RESERVED / ORDERED -&gt; CANCELED).
+Requires book.update. There is no hard-delete on the external surface.</p></td>
               </tr>
             
           </tbody>
@@ -1292,6 +1677,36 @@ incrementally by passing next_cursor back on each call.</p></td>
                 <td>GET</td>
                 <td>/api/external/v1/{tenant_id}/books/{id}</td>
                 <td></td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>CreateBooking</td>
+                <td>POST</td>
+                <td>/api/external/v1/{tenant_id}/books</td>
+                <td>*</td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>UpdateBooking</td>
+                <td>PATCH</td>
+                <td>/api/external/v1/{tenant_id}/books/{id}</td>
+                <td>*</td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>CancelBooking</td>
+                <td>POST</td>
+                <td>/api/external/v1/{tenant_id}/books/{id}:cancel</td>
+                <td>*</td>
               </tr>
               
             

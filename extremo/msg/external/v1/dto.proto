@@ -95,8 +95,14 @@ message Booking {
   BookingStatus status = 4;
   // Start time (UTC).
   google.protobuf.Timestamp start_at = 5;
-  // End time (UTC).
+  // End time (UTC). Derived from the booked services' total duration.
   google.protobuf.Timestamp end_at = 6;
+  // Opaque ids of the services booked (see Service.id). May be empty for
+  // bookings that predate service linkage.
+  repeated uint64 service_ids = 7;
+  // Last modification time (UTC). Echo this back as UpdateBookingRequest
+  // .expected_updated_at for optimistic concurrency control.
+  google.protobuf.Timestamp updated_at = 8;
 }
 
 // AvailabilitySlot is a single bookable time window with its resolved status.
