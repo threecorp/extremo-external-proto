@@ -16,6 +16,22 @@ The Extremo internal protos live in a private monorepo. The external API is deli
 
 The external surface is **authenticated** (per-tenant API key + scopes) and distinct from the internal anonymous `public/` booking-page services.
 
+## Scopes
+
+Each API key is granted a subset of these scopes; every RPC checks the scope it needs.
+
+| Scope | Grants |
+|-------|--------|
+| `service.read` | Read the tenant's service catalog |
+| `tenant.read` | Read the tenant's public profile |
+| `availability.read` | Read computed booking availability |
+| `book.read` | Read the tenant's bookings |
+| `book_event.read` | Read the booking change feed |
+| `book.create` | **Create** a booking for a customer (`CreateBooking`) |
+| `book.update` | **Mutate** a booking (`UpdateBooking` / `CancelBooking`) |
+
+Booking **writes** (`book.create` / `book.update`) let a partner create, reschedule, and cancel bookings on a customer's behalf: `CreateBooking` takes a `Customer{name, email?, phone?}` and the platform resolves (or creates) the tenant's customer record from it, validates the slot against the tenant's schedule (capacity / staff / no past times), and returns the booking. Supply an `idempotency_key` to make retries safe, and echo a booking's `updated_at` as `expected_updated_at` on `UpdateBooking` for optimistic concurrency (a mismatch returns `ABORTED`). Customer contact details are never echoed back in a `Booking` — PII stays server-side.
+
 ## Layout
 
 ```
