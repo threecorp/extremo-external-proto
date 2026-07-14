@@ -36,7 +36,7 @@ message ListBookingEventsRequest {
   // beginning of the feed.
   string cursor = 2;
   // Page size (1..100).
-  int32 page_size = 3 [(buf.validate.field).int32 = {
+  int64 page_size = 3 [(buf.validate.field).int64 = {
     gt: 0
     lte: 100
   }];
