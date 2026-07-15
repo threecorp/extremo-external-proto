@@ -41,7 +41,7 @@ const (
 	BookingStatus_BOOKING_STATUS_RESERVED BookingStatus = 3
 	// Ordered (checked out / fulfilled).
 	BookingStatus_BOOKING_STATUS_ORDERED BookingStatus = 4
-	// The customer did not show up.
+	// The consumer did not show up.
 	BookingStatus_BOOKING_STATUS_NO_SHOW BookingStatus = 5
 )
 
@@ -165,7 +165,7 @@ const (
 	BookingEventType_BOOKING_EVENT_TYPE_CONFIRMED BookingEventType = 3
 	// A booking was canceled (canceled, rejected, or deleted).
 	BookingEventType_BOOKING_EVENT_TYPE_CANCELED BookingEventType = 4
-	// The customer did not show up.
+	// The consumer did not show up.
 	BookingEventType_BOOKING_EVENT_TYPE_NO_SHOW BookingEventType = 5
 )
 
@@ -586,22 +586,22 @@ func (x *Booking) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-// Customer is a tenant's customer (a CLIENT record) as managed over the external
+// Consumer is a tenant's consumer (a CONSUMER record) as managed over the external
 // partner API. `id` is the opaque Extremo handle (tenant-scoped) — use it in future
 // booking calls; `external_ref` echoes the partner's own id when one was supplied
 // at registration. Contact fields echo what the partner registered.
-type Customer struct {
+type Consumer struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Opaque Extremo identifier of the customer (tenant-scoped).
+	// Opaque Extremo identifier of the consumer (tenant-scoped).
 	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Display name.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	// Email, if the customer was registered with one.
+	// Email, if the consumer was registered with one.
 	Email string `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	// Phone, if the customer was registered with one.
+	// Phone, if the consumer was registered with one.
 	Phone string `protobuf:"bytes,4,opt,name=phone,proto3" json:"phone,omitempty"`
 	// Partner-side correlation id, if one was supplied at registration.
 	ExternalRef string `protobuf:"bytes,5,opt,name=external_ref,json=externalRef,proto3" json:"external_ref,omitempty"`
@@ -609,20 +609,20 @@ type Customer struct {
 	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 }
 
-func (x *Customer) Reset() {
-	*x = Customer{}
+func (x *Consumer) Reset() {
+	*x = Consumer{}
 	mi := &file_extremo_msg_external_v1_dto_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Customer) String() string {
+func (x *Consumer) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Customer) ProtoMessage() {}
+func (*Consumer) ProtoMessage() {}
 
-func (x *Customer) ProtoReflect() protoreflect.Message {
+func (x *Consumer) ProtoReflect() protoreflect.Message {
 	mi := &file_extremo_msg_external_v1_dto_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -634,47 +634,47 @@ func (x *Customer) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Customer.ProtoReflect.Descriptor instead.
-func (*Customer) Descriptor() ([]byte, []int) {
+// Deprecated: Use Consumer.ProtoReflect.Descriptor instead.
+func (*Consumer) Descriptor() ([]byte, []int) {
 	return file_extremo_msg_external_v1_dto_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *Customer) GetId() uint64 {
+func (x *Consumer) GetId() uint64 {
 	if x != nil {
 		return x.Id
 	}
 	return 0
 }
 
-func (x *Customer) GetName() string {
+func (x *Consumer) GetName() string {
 	if x != nil {
 		return x.Name
 	}
 	return ""
 }
 
-func (x *Customer) GetEmail() string {
+func (x *Consumer) GetEmail() string {
 	if x != nil {
 		return x.Email
 	}
 	return ""
 }
 
-func (x *Customer) GetPhone() string {
+func (x *Consumer) GetPhone() string {
 	if x != nil {
 		return x.Phone
 	}
 	return ""
 }
 
-func (x *Customer) GetExternalRef() string {
+func (x *Consumer) GetExternalRef() string {
 	if x != nil {
 		return x.ExternalRef
 	}
 	return ""
 }
 
-func (x *Customer) GetCreatedAt() *timestamppb.Timestamp {
+func (x *Consumer) GetCreatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.CreatedAt
 	}
@@ -891,7 +891,7 @@ var file_extremo_msg_external_v1_dto_proto_rawDesc = []byte{
 	0x74, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
 	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74,
 	0x61, 0x6d, 0x70, 0x52, 0x09, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x22, 0xb8,
-	0x01, 0x0a, 0x08, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x65, 0x72, 0x12, 0x0e, 0x0a, 0x02, 0x69,
+	0x01, 0x0a, 0x08, 0x43, 0x6f, 0x6e, 0x73, 0x75, 0x6d, 0x65, 0x72, 0x12, 0x0e, 0x0a, 0x02, 0x69,
 	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e,
 	0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12,
 	0x14, 0x0a, 0x05, 0x65, 0x6d, 0x61, 0x69, 0x6c, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05,
@@ -994,7 +994,7 @@ var file_extremo_msg_external_v1_dto_proto_goTypes = []any{
 	(*TenantProfile)(nil),         // 4: extremo.msg.external.v1.TenantProfile
 	(*Staff)(nil),                 // 5: extremo.msg.external.v1.Staff
 	(*Booking)(nil),               // 6: extremo.msg.external.v1.Booking
-	(*Customer)(nil),              // 7: extremo.msg.external.v1.Customer
+	(*Consumer)(nil),              // 7: extremo.msg.external.v1.Consumer
 	(*AvailabilitySlot)(nil),      // 8: extremo.msg.external.v1.AvailabilitySlot
 	(*BookingEvent)(nil),          // 9: extremo.msg.external.v1.BookingEvent
 	(*timestamppb.Timestamp)(nil), // 10: google.protobuf.Timestamp
@@ -1005,7 +1005,7 @@ var file_extremo_msg_external_v1_dto_proto_depIdxs = []int32{
 	10, // 2: extremo.msg.external.v1.Booking.start_at:type_name -> google.protobuf.Timestamp
 	10, // 3: extremo.msg.external.v1.Booking.end_at:type_name -> google.protobuf.Timestamp
 	10, // 4: extremo.msg.external.v1.Booking.updated_at:type_name -> google.protobuf.Timestamp
-	10, // 5: extremo.msg.external.v1.Customer.created_at:type_name -> google.protobuf.Timestamp
+	10, // 5: extremo.msg.external.v1.Consumer.created_at:type_name -> google.protobuf.Timestamp
 	10, // 6: extremo.msg.external.v1.AvailabilitySlot.start_at:type_name -> google.protobuf.Timestamp
 	10, // 7: extremo.msg.external.v1.AvailabilitySlot.end_at:type_name -> google.protobuf.Timestamp
 	1,  // 8: extremo.msg.external.v1.AvailabilitySlot.status:type_name -> extremo.msg.external.v1.SlotStatus

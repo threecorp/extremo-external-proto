@@ -191,7 +191,7 @@
                 </li>
               
                 <li>
-                  <a href="#extremo.msg.external.v1.Customer"><span class="badge">M</span>Customer</a>
+                  <a href="#extremo.msg.external.v1.Consumer"><span class="badge">M</span>Consumer</a>
                 </li>
               
                 <li>
@@ -284,15 +284,15 @@
                 </li>
               
                 <li>
+                  <a href="#extremo.api.external.books.v1.Consumer"><span class="badge">M</span>Consumer</a>
+                </li>
+              
+                <li>
                   <a href="#extremo.api.external.books.v1.CreateBookingRequest"><span class="badge">M</span>CreateBookingRequest</a>
                 </li>
               
                 <li>
                   <a href="#extremo.api.external.books.v1.CreateBookingResponse"><span class="badge">M</span>CreateBookingResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#extremo.api.external.books.v1.Customer"><span class="badge">M</span>Customer</a>
                 </li>
               
                 <li>
@@ -331,62 +331,62 @@
         
           
           <li>
-            <a href="#extremo%2fapi%2fexternal%2fcustomers%2fv1%2fcustomer_service.proto">extremo/api/external/customers/v1/customer_service.proto</a>
+            <a href="#extremo%2fapi%2fexternal%2fconsumers%2fv1%2fconsumer_service.proto">extremo/api/external/consumers/v1/consumer_service.proto</a>
             <ul>
               
                 <li>
-                  <a href="#extremo.api.external.customers.v1.CreateCustomerRequest"><span class="badge">M</span>CreateCustomerRequest</a>
+                  <a href="#extremo.api.external.consumers.v1.CreateConsumerRequest"><span class="badge">M</span>CreateConsumerRequest</a>
                 </li>
               
                 <li>
-                  <a href="#extremo.api.external.customers.v1.CreateCustomerResponse"><span class="badge">M</span>CreateCustomerResponse</a>
+                  <a href="#extremo.api.external.consumers.v1.CreateConsumerResponse"><span class="badge">M</span>CreateConsumerResponse</a>
                 </li>
               
                 <li>
-                  <a href="#extremo.api.external.customers.v1.DeleteCustomerRequest"><span class="badge">M</span>DeleteCustomerRequest</a>
+                  <a href="#extremo.api.external.consumers.v1.DeleteConsumerRequest"><span class="badge">M</span>DeleteConsumerRequest</a>
                 </li>
               
                 <li>
-                  <a href="#extremo.api.external.customers.v1.DeleteCustomerResponse"><span class="badge">M</span>DeleteCustomerResponse</a>
+                  <a href="#extremo.api.external.consumers.v1.DeleteConsumerResponse"><span class="badge">M</span>DeleteConsumerResponse</a>
                 </li>
               
                 <li>
-                  <a href="#extremo.api.external.customers.v1.GetCustomerByRefRequest"><span class="badge">M</span>GetCustomerByRefRequest</a>
+                  <a href="#extremo.api.external.consumers.v1.GetConsumerByRefRequest"><span class="badge">M</span>GetConsumerByRefRequest</a>
                 </li>
               
                 <li>
-                  <a href="#extremo.api.external.customers.v1.GetCustomerByRefResponse"><span class="badge">M</span>GetCustomerByRefResponse</a>
+                  <a href="#extremo.api.external.consumers.v1.GetConsumerByRefResponse"><span class="badge">M</span>GetConsumerByRefResponse</a>
                 </li>
               
                 <li>
-                  <a href="#extremo.api.external.customers.v1.GetCustomerRequest"><span class="badge">M</span>GetCustomerRequest</a>
+                  <a href="#extremo.api.external.consumers.v1.GetConsumerRequest"><span class="badge">M</span>GetConsumerRequest</a>
                 </li>
               
                 <li>
-                  <a href="#extremo.api.external.customers.v1.GetCustomerResponse"><span class="badge">M</span>GetCustomerResponse</a>
+                  <a href="#extremo.api.external.consumers.v1.GetConsumerResponse"><span class="badge">M</span>GetConsumerResponse</a>
                 </li>
               
                 <li>
-                  <a href="#extremo.api.external.customers.v1.ListCustomersRequest"><span class="badge">M</span>ListCustomersRequest</a>
+                  <a href="#extremo.api.external.consumers.v1.ListConsumersRequest"><span class="badge">M</span>ListConsumersRequest</a>
                 </li>
               
                 <li>
-                  <a href="#extremo.api.external.customers.v1.ListCustomersResponse"><span class="badge">M</span>ListCustomersResponse</a>
+                  <a href="#extremo.api.external.consumers.v1.ListConsumersResponse"><span class="badge">M</span>ListConsumersResponse</a>
                 </li>
               
                 <li>
-                  <a href="#extremo.api.external.customers.v1.UpdateCustomerRequest"><span class="badge">M</span>UpdateCustomerRequest</a>
+                  <a href="#extremo.api.external.consumers.v1.UpdateConsumerRequest"><span class="badge">M</span>UpdateConsumerRequest</a>
                 </li>
               
                 <li>
-                  <a href="#extremo.api.external.customers.v1.UpdateCustomerResponse"><span class="badge">M</span>UpdateCustomerResponse</a>
+                  <a href="#extremo.api.external.consumers.v1.UpdateConsumerResponse"><span class="badge">M</span>UpdateConsumerResponse</a>
                 </li>
               
               
               
               
                 <li>
-                  <a href="#extremo.api.external.customers.v1.CustomerService"><span class="badge">S</span>CustomerService</a>
+                  <a href="#extremo.api.external.consumers.v1.ConsumerService"><span class="badge">S</span>ConsumerService</a>
                 </li>
               
             </ul>
@@ -617,8 +617,8 @@ been hard-deleted (the event type still records what happened). </p></td>
 
         
       
-        <h3 id="extremo.msg.external.v1.Customer">Customer</h3>
-        <p>Customer is a tenant's customer (a CLIENT record) as managed over the external</p><p>partner API. `id` is the opaque Extremo handle (tenant-scoped) — use it in future</p><p>booking calls; `external_ref` echoes the partner's own id when one was supplied</p><p>at registration. Contact fields echo what the partner registered.</p>
+        <h3 id="extremo.msg.external.v1.Consumer">Consumer</h3>
+        <p>Consumer is a tenant's consumer (a CONSUMER record) as managed over the external</p><p>partner API. `id` is the opaque Extremo handle (tenant-scoped) — use it in future</p><p>booking calls; `external_ref` echoes the partner's own id when one was supplied</p><p>at registration. Contact fields echo what the partner registered.</p>
 
         
           <table class="field-table">
@@ -631,7 +631,7 @@ been hard-deleted (the event type still records what happened). </p></td>
                   <td>id</td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
-                  <td><p>Opaque Extremo identifier of the customer (tenant-scoped). </p></td>
+                  <td><p>Opaque Extremo identifier of the consumer (tenant-scoped). </p></td>
                 </tr>
               
                 <tr>
@@ -645,14 +645,14 @@ been hard-deleted (the event type still records what happened). </p></td>
                   <td>email</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>Email, if the customer was registered with one. </p></td>
+                  <td><p>Email, if the consumer was registered with one. </p></td>
                 </tr>
               
                 <tr>
                   <td>phone</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>Phone, if the customer was registered with one. </p></td>
+                  <td><p>Phone, if the consumer was registered with one. </p></td>
                 </tr>
               
                 <tr>
@@ -882,7 +882,7 @@ been hard-deleted (the event type still records what happened). </p></td>
               <tr>
                 <td>BOOKING_EVENT_TYPE_NO_SHOW</td>
                 <td>5</td>
-                <td><p>The customer did not show up.</p></td>
+                <td><p>The consumer did not show up.</p></td>
               </tr>
             
           </tbody>
@@ -929,7 +929,7 @@ been hard-deleted (the event type still records what happened). </p></td>
               <tr>
                 <td>BOOKING_STATUS_NO_SHOW</td>
                 <td>5</td>
-                <td><p>The customer did not show up.</p></td>
+                <td><p>The consumer did not show up.</p></td>
               </tr>
             
           </tbody>
@@ -1322,8 +1322,46 @@ incrementally by passing next_cursor back on each call.</p></td>
 
         
       
+        <h3 id="extremo.api.external.books.v1.Consumer">Consumer</h3>
+        <p>Consumer identifies the end consumer a partner books on behalf of. The API</p><p>resolves (or creates) a CONSUMER record for the tenant from these details; the</p><p>consumer is never echoed back in a Booking response (PII stays server-side).</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Consumer display name (required). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>email</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Consumer email. Optional, but email or phone is required. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>phone</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Consumer phone. Optional, but email or phone is required. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="extremo.api.external.books.v1.CreateBookingRequest">CreateBookingRequest</h3>
-        <p>CreateBookingRequest books one or more services for a customer at a start</p><p>time. The end time is derived server-side from the services' total duration,</p><p>so no end time is accepted.</p>
+        <p>CreateBookingRequest books one or more services for a consumer at a start</p><p>time. The end time is derived server-side from the services' total duration,</p><p>so no end time is accepted.</p>
 
         
           <table class="field-table">
@@ -1354,10 +1392,10 @@ incrementally by passing next_cursor back on each call.</p></td>
                 </tr>
               
                 <tr>
-                  <td>customer</td>
-                  <td><a href="#extremo.api.external.books.v1.Customer">Customer</a></td>
+                  <td>consumer</td>
+                  <td><a href="#extremo.api.external.books.v1.Consumer">Consumer</a></td>
                   <td></td>
-                  <td><p>The customer to book for. </p></td>
+                  <td><p>The consumer to book for. </p></td>
                 </tr>
               
                 <tr>
@@ -1411,44 +1449,6 @@ replays the original booking instead of creating a duplicate. </p></td>
                   <td><a href="#extremo.msg.external.v1.Booking">extremo.msg.external.v1.Booking</a></td>
                   <td></td>
                   <td><p>The created booking (DRAFT, or RESERVED when the tenant auto-accepts). </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="extremo.api.external.books.v1.Customer">Customer</h3>
-        <p>Customer identifies the end customer a partner books on behalf of. The API</p><p>resolves (or creates) a CLIENT record for the tenant from these details; the</p><p>customer is never echoed back in a Booking response (PII stays server-side).</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>name</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>Customer display name (required). </p></td>
-                </tr>
-              
-                <tr>
-                  <td>email</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>Customer email. Optional, but email or phone is required. </p></td>
-                </tr>
-              
-                <tr>
-                  <td>phone</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>Customer phone. Optional, but email or phone is required. </p></td>
                 </tr>
               
             </tbody>
@@ -1743,8 +1743,8 @@ Requires book.read.</p></td>
                 <td>CreateBooking</td>
                 <td><a href="#extremo.api.external.books.v1.CreateBookingRequest">CreateBookingRequest</a></td>
                 <td><a href="#extremo.api.external.books.v1.CreateBookingResponse">CreateBookingResponse</a></td>
-                <td><p>CreateBooking books a service for a customer. The API resolves (or creates)
-a CLIENT record for the tenant from the supplied customer contact, validates
+                <td><p>CreateBooking books a service for a consumer. The API resolves (or creates)
+a CONSUMER record for the tenant from the supplied consumer contact, validates
 the slot against the tenant&#39;s schedule (capacity / staff / no past times),
 and returns the new booking (DRAFT, or RESERVED when the tenant auto-accepts).
 Requires book.create. Supply idempotency_key to make retries safe: resending
@@ -1843,13 +1843,13 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
     
       
       <div class="file-heading">
-        <h2 id="extremo/api/external/customers/v1/customer_service.proto">extremo/api/external/customers/v1/customer_service.proto</h2><a href="#title">Top</a>
+        <h2 id="extremo/api/external/consumers/v1/consumer_service.proto">extremo/api/external/consumers/v1/consumer_service.proto</h2><a href="#title">Top</a>
       </div>
       <p></p>
 
       
-        <h3 id="extremo.api.external.customers.v1.CreateCustomerRequest">CreateCustomerRequest</h3>
-        <p>CreateCustomerRequest registers a customer under a tenant. Email or phone is</p><p>required (the customer's identity); at least one lets Extremo resolve a returning</p><p>customer rather than duplicate them.</p>
+        <h3 id="extremo.api.external.consumers.v1.CreateConsumerRequest">CreateConsumerRequest</h3>
+        <p>CreateConsumerRequest registers a consumer under a tenant. Email or phone is</p><p>required (the consumer's identity); at least one lets Extremo resolve a returning</p><p>consumer rather than duplicate them.</p>
 
         
           <table class="field-table">
@@ -1862,35 +1862,35 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
                   <td>tenant_id</td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
-                  <td><p>Tenant to register the customer under (must match the API key&#39;s tenant). </p></td>
+                  <td><p>Tenant to register the consumer under (must match the API key&#39;s tenant). </p></td>
                 </tr>
               
                 <tr>
                   <td>name</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>Customer display name (required). </p></td>
+                  <td><p>Consumer display name (required). </p></td>
                 </tr>
               
                 <tr>
                   <td>email</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>Customer email. Optional, but email or phone is required. </p></td>
+                  <td><p>Consumer email. Optional, but email or phone is required. </p></td>
                 </tr>
               
                 <tr>
                   <td>phone</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>Customer phone. Optional, but email or phone is required. </p></td>
+                  <td><p>Consumer phone. Optional, but email or phone is required. </p></td>
                 </tr>
               
                 <tr>
                   <td>external_ref</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>Optional partner-side id, recorded so the partner can later GetCustomerByRef. </p></td>
+                  <td><p>Optional partner-side id, recorded so the partner can later GetConsumerByRef. </p></td>
                 </tr>
               
             </tbody>
@@ -1900,8 +1900,8 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
 
         
       
-        <h3 id="extremo.api.external.customers.v1.CreateCustomerResponse">CreateCustomerResponse</h3>
-        <p>CreateCustomerResponse carries the registered customer.</p>
+        <h3 id="extremo.api.external.consumers.v1.CreateConsumerResponse">CreateConsumerResponse</h3>
+        <p>CreateConsumerResponse carries the registered consumer.</p>
 
         
           <table class="field-table">
@@ -1911,10 +1911,10 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
             <tbody>
               
                 <tr>
-                  <td>customer</td>
-                  <td><a href="#extremo.msg.external.v1.Customer">extremo.msg.external.v1.Customer</a></td>
+                  <td>consumer</td>
+                  <td><a href="#extremo.msg.external.v1.Consumer">extremo.msg.external.v1.Consumer</a></td>
                   <td></td>
-                  <td><p>The registered (or resolved) customer. </p></td>
+                  <td><p>The registered (or resolved) consumer. </p></td>
                 </tr>
               
             </tbody>
@@ -1924,8 +1924,8 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
 
         
       
-        <h3 id="extremo.api.external.customers.v1.DeleteCustomerRequest">DeleteCustomerRequest</h3>
-        <p>DeleteCustomerRequest deactivates a customer for this tenant.</p>
+        <h3 id="extremo.api.external.consumers.v1.DeleteConsumerRequest">DeleteConsumerRequest</h3>
+        <p>DeleteConsumerRequest deactivates a consumer for this tenant.</p>
 
         
           <table class="field-table">
@@ -1938,14 +1938,14 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
                   <td>tenant_id</td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
-                  <td><p>Tenant the customer belongs to. </p></td>
+                  <td><p>Tenant the consumer belongs to. </p></td>
                 </tr>
               
                 <tr>
                   <td>id</td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
-                  <td><p>Opaque Extremo id of the customer. </p></td>
+                  <td><p>Opaque Extremo id of the consumer. </p></td>
                 </tr>
               
             </tbody>
@@ -1955,15 +1955,15 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
 
         
       
-        <h3 id="extremo.api.external.customers.v1.DeleteCustomerResponse">DeleteCustomerResponse</h3>
-        <p>DeleteCustomerResponse is empty.</p>
+        <h3 id="extremo.api.external.consumers.v1.DeleteConsumerResponse">DeleteConsumerResponse</h3>
+        <p>DeleteConsumerResponse is empty.</p>
 
         
 
         
       
-        <h3 id="extremo.api.external.customers.v1.GetCustomerByRefRequest">GetCustomerByRefRequest</h3>
-        <p>GetCustomerByRefRequest selects a customer by the partner's own external_ref.</p>
+        <h3 id="extremo.api.external.consumers.v1.GetConsumerByRefRequest">GetConsumerByRefRequest</h3>
+        <p>GetConsumerByRefRequest selects a consumer by the partner's own external_ref.</p>
 
         
           <table class="field-table">
@@ -1976,7 +1976,7 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
                   <td>tenant_id</td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
-                  <td><p>Tenant the customer belongs to. </p></td>
+                  <td><p>Tenant the consumer belongs to. </p></td>
                 </tr>
               
                 <tr>
@@ -1993,8 +1993,8 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
 
         
       
-        <h3 id="extremo.api.external.customers.v1.GetCustomerByRefResponse">GetCustomerByRefResponse</h3>
-        <p>GetCustomerByRefResponse carries the customer.</p>
+        <h3 id="extremo.api.external.consumers.v1.GetConsumerByRefResponse">GetConsumerByRefResponse</h3>
+        <p>GetConsumerByRefResponse carries the consumer.</p>
 
         
           <table class="field-table">
@@ -2004,10 +2004,10 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
             <tbody>
               
                 <tr>
-                  <td>customer</td>
-                  <td><a href="#extremo.msg.external.v1.Customer">extremo.msg.external.v1.Customer</a></td>
+                  <td>consumer</td>
+                  <td><a href="#extremo.msg.external.v1.Consumer">extremo.msg.external.v1.Consumer</a></td>
                   <td></td>
-                  <td><p>The customer. </p></td>
+                  <td><p>The consumer. </p></td>
                 </tr>
               
             </tbody>
@@ -2017,8 +2017,8 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
 
         
       
-        <h3 id="extremo.api.external.customers.v1.GetCustomerRequest">GetCustomerRequest</h3>
-        <p>GetCustomerRequest selects a customer by its Extremo id.</p>
+        <h3 id="extremo.api.external.consumers.v1.GetConsumerRequest">GetConsumerRequest</h3>
+        <p>GetConsumerRequest selects a consumer by its Extremo id.</p>
 
         
           <table class="field-table">
@@ -2031,14 +2031,14 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
                   <td>tenant_id</td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
-                  <td><p>Tenant the customer belongs to. </p></td>
+                  <td><p>Tenant the consumer belongs to. </p></td>
                 </tr>
               
                 <tr>
                   <td>id</td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
-                  <td><p>Opaque Extremo id of the customer. </p></td>
+                  <td><p>Opaque Extremo id of the consumer. </p></td>
                 </tr>
               
             </tbody>
@@ -2048,8 +2048,8 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
 
         
       
-        <h3 id="extremo.api.external.customers.v1.GetCustomerResponse">GetCustomerResponse</h3>
-        <p>GetCustomerResponse carries the customer.</p>
+        <h3 id="extremo.api.external.consumers.v1.GetConsumerResponse">GetConsumerResponse</h3>
+        <p>GetConsumerResponse carries the consumer.</p>
 
         
           <table class="field-table">
@@ -2059,10 +2059,10 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
             <tbody>
               
                 <tr>
-                  <td>customer</td>
-                  <td><a href="#extremo.msg.external.v1.Customer">extremo.msg.external.v1.Customer</a></td>
+                  <td>consumer</td>
+                  <td><a href="#extremo.msg.external.v1.Consumer">extremo.msg.external.v1.Consumer</a></td>
                   <td></td>
-                  <td><p>The customer. </p></td>
+                  <td><p>The consumer. </p></td>
                 </tr>
               
             </tbody>
@@ -2072,8 +2072,8 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
 
         
       
-        <h3 id="extremo.api.external.customers.v1.ListCustomersRequest">ListCustomersRequest</h3>
-        <p>ListCustomersRequest pages a tenant's customers.</p>
+        <h3 id="extremo.api.external.consumers.v1.ListConsumersRequest">ListConsumersRequest</h3>
+        <p>ListConsumersRequest pages a tenant's consumers.</p>
 
         
           <table class="field-table">
@@ -2086,7 +2086,7 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
                   <td>tenant_id</td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
-                  <td><p>Tenant whose customers to list. </p></td>
+                  <td><p>Tenant whose consumers to list. </p></td>
                 </tr>
               
                 <tr>
@@ -2110,8 +2110,8 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
 
         
       
-        <h3 id="extremo.api.external.customers.v1.ListCustomersResponse">ListCustomersResponse</h3>
-        <p>ListCustomersResponse is a page of customers.</p>
+        <h3 id="extremo.api.external.consumers.v1.ListConsumersResponse">ListConsumersResponse</h3>
+        <p>ListConsumersResponse is a page of consumers.</p>
 
         
           <table class="field-table">
@@ -2121,17 +2121,17 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
             <tbody>
               
                 <tr>
-                  <td>customers</td>
-                  <td><a href="#extremo.msg.external.v1.Customer">extremo.msg.external.v1.Customer</a></td>
+                  <td>consumers</td>
+                  <td><a href="#extremo.msg.external.v1.Consumer">extremo.msg.external.v1.Consumer</a></td>
                   <td>repeated</td>
-                  <td><p>The customers on this page. </p></td>
+                  <td><p>The consumers on this page. </p></td>
                 </tr>
               
                 <tr>
                   <td>total_size</td>
                   <td><a href="#int64">int64</a></td>
                   <td></td>
-                  <td><p>Total number of customers across all pages. </p></td>
+                  <td><p>Total number of consumers across all pages. </p></td>
                 </tr>
               
             </tbody>
@@ -2141,8 +2141,8 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
 
         
       
-        <h3 id="extremo.api.external.customers.v1.UpdateCustomerRequest">UpdateCustomerRequest</h3>
-        <p>UpdateCustomerRequest patches a customer's mutable fields. An empty field leaves</p><p>the current value unchanged.</p>
+        <h3 id="extremo.api.external.consumers.v1.UpdateConsumerRequest">UpdateConsumerRequest</h3>
+        <p>UpdateConsumerRequest patches a consumer's mutable fields. An empty field leaves</p><p>the current value unchanged.</p>
 
         
           <table class="field-table">
@@ -2155,14 +2155,14 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
                   <td>tenant_id</td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
-                  <td><p>Tenant the customer belongs to. </p></td>
+                  <td><p>Tenant the consumer belongs to. </p></td>
                 </tr>
               
                 <tr>
                   <td>id</td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
-                  <td><p>Opaque Extremo id of the customer. </p></td>
+                  <td><p>Opaque Extremo id of the consumer. </p></td>
                 </tr>
               
                 <tr>
@@ -2186,8 +2186,8 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
 
         
       
-        <h3 id="extremo.api.external.customers.v1.UpdateCustomerResponse">UpdateCustomerResponse</h3>
-        <p>UpdateCustomerResponse carries the updated customer.</p>
+        <h3 id="extremo.api.external.consumers.v1.UpdateConsumerResponse">UpdateConsumerResponse</h3>
+        <p>UpdateConsumerResponse carries the updated consumer.</p>
 
         
           <table class="field-table">
@@ -2197,10 +2197,10 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
             <tbody>
               
                 <tr>
-                  <td>customer</td>
-                  <td><a href="#extremo.msg.external.v1.Customer">extremo.msg.external.v1.Customer</a></td>
+                  <td>consumer</td>
+                  <td><a href="#extremo.msg.external.v1.Consumer">extremo.msg.external.v1.Consumer</a></td>
                   <td></td>
-                  <td><p>The updated customer. </p></td>
+                  <td><p>The updated consumer. </p></td>
                 </tr>
               
             </tbody>
@@ -2216,8 +2216,8 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
       
 
       
-        <h3 id="extremo.api.external.customers.v1.CustomerService">CustomerService</h3>
-        <p>CustomerService manages a tenant's customers (CLIENT records) over the external</p><p>partner API. Reads require the customer.read scope; writes require customer.write.</p>
+        <h3 id="extremo.api.external.consumers.v1.ConsumerService">ConsumerService</h3>
+        <p>ConsumerService manages a tenant's consumers (CONSUMER records) over the external</p><p>partner API. Reads require the consumer.read scope; writes require consumer.write.</p>
         <table class="enum-table">
           <thead>
             <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
@@ -2225,47 +2225,47 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
           <tbody>
             
               <tr>
-                <td>CreateCustomer</td>
-                <td><a href="#extremo.api.external.customers.v1.CreateCustomerRequest">CreateCustomerRequest</a></td>
-                <td><a href="#extremo.api.external.customers.v1.CreateCustomerResponse">CreateCustomerResponse</a></td>
-                <td><p>CreateCustomer registers (or resolves) a tenant customer. Resolution is by
-email/phone: a returning customer resolves to the existing record. Rejected with
+                <td>CreateConsumer</td>
+                <td><a href="#extremo.api.external.consumers.v1.CreateConsumerRequest">CreateConsumerRequest</a></td>
+                <td><a href="#extremo.api.external.consumers.v1.CreateConsumerResponse">CreateConsumerResponse</a></td>
+                <td><p>CreateConsumer registers (or resolves) a tenant consumer. Resolution is by
+email/phone: a returning consumer resolves to the existing record. Rejected with
 AlreadyExists if the contact belongs to tenant staff (OWNER/MEMBER).</p></td>
               </tr>
             
               <tr>
-                <td>GetCustomer</td>
-                <td><a href="#extremo.api.external.customers.v1.GetCustomerRequest">GetCustomerRequest</a></td>
-                <td><a href="#extremo.api.external.customers.v1.GetCustomerResponse">GetCustomerResponse</a></td>
-                <td><p>GetCustomer returns a customer by its Extremo id.</p></td>
+                <td>GetConsumer</td>
+                <td><a href="#extremo.api.external.consumers.v1.GetConsumerRequest">GetConsumerRequest</a></td>
+                <td><a href="#extremo.api.external.consumers.v1.GetConsumerResponse">GetConsumerResponse</a></td>
+                <td><p>GetConsumer returns a consumer by its Extremo id.</p></td>
               </tr>
             
               <tr>
-                <td>GetCustomerByRef</td>
-                <td><a href="#extremo.api.external.customers.v1.GetCustomerByRefRequest">GetCustomerByRefRequest</a></td>
-                <td><a href="#extremo.api.external.customers.v1.GetCustomerByRefResponse">GetCustomerByRefResponse</a></td>
-                <td><p>GetCustomerByRef returns a customer by the partner&#39;s own external_ref.</p></td>
+                <td>GetConsumerByRef</td>
+                <td><a href="#extremo.api.external.consumers.v1.GetConsumerByRefRequest">GetConsumerByRefRequest</a></td>
+                <td><a href="#extremo.api.external.consumers.v1.GetConsumerByRefResponse">GetConsumerByRefResponse</a></td>
+                <td><p>GetConsumerByRef returns a consumer by the partner&#39;s own external_ref.</p></td>
               </tr>
             
               <tr>
-                <td>ListCustomers</td>
-                <td><a href="#extremo.api.external.customers.v1.ListCustomersRequest">ListCustomersRequest</a></td>
-                <td><a href="#extremo.api.external.customers.v1.ListCustomersResponse">ListCustomersResponse</a></td>
-                <td><p>ListCustomers returns the tenant&#39;s customers, paginated.</p></td>
+                <td>ListConsumers</td>
+                <td><a href="#extremo.api.external.consumers.v1.ListConsumersRequest">ListConsumersRequest</a></td>
+                <td><a href="#extremo.api.external.consumers.v1.ListConsumersResponse">ListConsumersResponse</a></td>
+                <td><p>ListConsumers returns the tenant&#39;s consumers, paginated.</p></td>
               </tr>
             
               <tr>
-                <td>UpdateCustomer</td>
-                <td><a href="#extremo.api.external.customers.v1.UpdateCustomerRequest">UpdateCustomerRequest</a></td>
-                <td><a href="#extremo.api.external.customers.v1.UpdateCustomerResponse">UpdateCustomerResponse</a></td>
-                <td><p>UpdateCustomer updates a customer&#39;s mutable fields (display name, external_ref).</p></td>
+                <td>UpdateConsumer</td>
+                <td><a href="#extremo.api.external.consumers.v1.UpdateConsumerRequest">UpdateConsumerRequest</a></td>
+                <td><a href="#extremo.api.external.consumers.v1.UpdateConsumerResponse">UpdateConsumerResponse</a></td>
+                <td><p>UpdateConsumer updates a consumer&#39;s mutable fields (display name, external_ref).</p></td>
               </tr>
             
               <tr>
-                <td>DeleteCustomer</td>
-                <td><a href="#extremo.api.external.customers.v1.DeleteCustomerRequest">DeleteCustomerRequest</a></td>
-                <td><a href="#extremo.api.external.customers.v1.DeleteCustomerResponse">DeleteCustomerResponse</a></td>
-                <td><p>DeleteCustomer deactivates the customer&#39;s CLIENT role for this tenant (soft; the
+                <td>DeleteConsumer</td>
+                <td><a href="#extremo.api.external.consumers.v1.DeleteConsumerRequest">DeleteConsumerRequest</a></td>
+                <td><a href="#extremo.api.external.consumers.v1.DeleteConsumerResponse">DeleteConsumerResponse</a></td>
+                <td><p>DeleteConsumer deactivates the consumer&#39;s CONSUMER role for this tenant (soft; the
 underlying global user is never deleted).</p></td>
               </tr>
             
@@ -2290,9 +2290,9 @@ underlying global user is never deleted).</p></td>
               
               
               <tr>
-                <td>CreateCustomer</td>
+                <td>CreateConsumer</td>
                 <td>POST</td>
-                <td>/api/external/v1/{tenant_id}/customers</td>
+                <td>/api/external/v1/{tenant_id}/consumers</td>
                 <td>*</td>
               </tr>
               
@@ -2300,9 +2300,9 @@ underlying global user is never deleted).</p></td>
               
               
               <tr>
-                <td>GetCustomer</td>
+                <td>GetConsumer</td>
                 <td>GET</td>
-                <td>/api/external/v1/{tenant_id}/customers/{id}</td>
+                <td>/api/external/v1/{tenant_id}/consumers/{id}</td>
                 <td></td>
               </tr>
               
@@ -2310,9 +2310,9 @@ underlying global user is never deleted).</p></td>
               
               
               <tr>
-                <td>GetCustomerByRef</td>
+                <td>GetConsumerByRef</td>
                 <td>GET</td>
-                <td>/api/external/v1/{tenant_id}/customers:byRef</td>
+                <td>/api/external/v1/{tenant_id}/consumers:byRef</td>
                 <td></td>
               </tr>
               
@@ -2320,9 +2320,9 @@ underlying global user is never deleted).</p></td>
               
               
               <tr>
-                <td>ListCustomers</td>
+                <td>ListConsumers</td>
                 <td>GET</td>
-                <td>/api/external/v1/{tenant_id}/customers</td>
+                <td>/api/external/v1/{tenant_id}/consumers</td>
                 <td></td>
               </tr>
               
@@ -2330,9 +2330,9 @@ underlying global user is never deleted).</p></td>
               
               
               <tr>
-                <td>UpdateCustomer</td>
+                <td>UpdateConsumer</td>
                 <td>PATCH</td>
-                <td>/api/external/v1/{tenant_id}/customers/{id}</td>
+                <td>/api/external/v1/{tenant_id}/consumers/{id}</td>
                 <td>*</td>
               </tr>
               
@@ -2340,9 +2340,9 @@ underlying global user is never deleted).</p></td>
               
               
               <tr>
-                <td>DeleteCustomer</td>
+                <td>DeleteConsumer</td>
                 <td>DELETE</td>
-                <td>/api/external/v1/{tenant_id}/customers/{id}</td>
+                <td>/api/external/v1/{tenant_id}/consumers/{id}</td>
                 <td></td>
               </tr>
               
