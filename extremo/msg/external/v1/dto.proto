@@ -105,6 +105,25 @@ message Booking {
   google.protobuf.Timestamp updated_at = 8;
 }
 
+// Customer is a tenant's customer (a CLIENT record) as managed over the external
+// partner API. `id` is the opaque Extremo handle (tenant-scoped) — use it in future
+// booking calls; `external_ref` echoes the partner's own id when one was supplied
+// at registration. Contact fields echo what the partner registered.
+message Customer {
+  // Opaque Extremo identifier of the customer (tenant-scoped).
+  uint64 id = 1;
+  // Display name.
+  string name = 2;
+  // Email, if the customer was registered with one.
+  string email = 3;
+  // Phone, if the customer was registered with one.
+  string phone = 4;
+  // Partner-side correlation id, if one was supplied at registration.
+  string external_ref = 5;
+  // Registration time (UTC).
+  google.protobuf.Timestamp created_at = 6;
+}
+
 // AvailabilitySlot is a single bookable time window with its resolved status.
 message AvailabilitySlot {
   // Start time (UTC).

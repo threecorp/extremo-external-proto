@@ -191,6 +191,10 @@
                 </li>
               
                 <li>
+                  <a href="#extremo.msg.external.v1.Customer"><span class="badge">M</span>Customer</a>
+                </li>
+              
+                <li>
                   <a href="#extremo.msg.external.v1.Service"><span class="badge">M</span>Service</a>
                 </li>
               
@@ -320,6 +324,69 @@
               
                 <li>
                   <a href="#extremo.api.external.books.v1.BookService"><span class="badge">S</span>BookService</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#extremo%2fapi%2fexternal%2fcustomers%2fv1%2fcustomer_service.proto">extremo/api/external/customers/v1/customer_service.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#extremo.api.external.customers.v1.CreateCustomerRequest"><span class="badge">M</span>CreateCustomerRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.customers.v1.CreateCustomerResponse"><span class="badge">M</span>CreateCustomerResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.customers.v1.DeleteCustomerRequest"><span class="badge">M</span>DeleteCustomerRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.customers.v1.DeleteCustomerResponse"><span class="badge">M</span>DeleteCustomerResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.customers.v1.GetCustomerByRefRequest"><span class="badge">M</span>GetCustomerByRefRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.customers.v1.GetCustomerByRefResponse"><span class="badge">M</span>GetCustomerByRefResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.customers.v1.GetCustomerRequest"><span class="badge">M</span>GetCustomerRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.customers.v1.GetCustomerResponse"><span class="badge">M</span>GetCustomerResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.customers.v1.ListCustomersRequest"><span class="badge">M</span>ListCustomersRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.customers.v1.ListCustomersResponse"><span class="badge">M</span>ListCustomersResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.customers.v1.UpdateCustomerRequest"><span class="badge">M</span>UpdateCustomerRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.customers.v1.UpdateCustomerResponse"><span class="badge">M</span>UpdateCustomerResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#extremo.api.external.customers.v1.CustomerService"><span class="badge">S</span>CustomerService</a>
                 </li>
               
             </ul>
@@ -541,6 +608,65 @@ request cursor to fetch events after this one. </p></td>
                   <td></td>
                   <td><p>Snapshot of the booking after the change. Absent if the booking has since
 been hard-deleted (the event type still records what happened). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.msg.external.v1.Customer">Customer</h3>
+        <p>Customer is a tenant's customer (a CLIENT record) as managed over the external</p><p>partner API. `id` is the opaque Extremo handle (tenant-scoped) — use it in future</p><p>booking calls; `external_ref` echoes the partner's own id when one was supplied</p><p>at registration. Contact fields echo what the partner registered.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Opaque Extremo identifier of the customer (tenant-scoped). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Display name. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>email</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Email, if the customer was registered with one. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>phone</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Phone, if the customer was registered with one. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>external_ref</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Partner-side correlation id, if one was supplied at registration. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>created_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>Registration time (UTC). </p></td>
                 </tr>
               
             </tbody>
@@ -1707,6 +1833,517 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
                 <td>POST</td>
                 <td>/api/external/v1/{tenant_id}/books/{id}:cancel</td>
                 <td>*</td>
+              </tr>
+              
+            
+            </tbody>
+          </table>
+          
+        
+    
+      
+      <div class="file-heading">
+        <h2 id="extremo/api/external/customers/v1/customer_service.proto">extremo/api/external/customers/v1/customer_service.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="extremo.api.external.customers.v1.CreateCustomerRequest">CreateCustomerRequest</h3>
+        <p>CreateCustomerRequest registers a customer under a tenant. Email or phone is</p><p>required (the customer's identity); at least one lets Extremo resolve a returning</p><p>customer rather than duplicate them.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant to register the customer under (must match the API key&#39;s tenant). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Customer display name (required). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>email</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Customer email. Optional, but email or phone is required. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>phone</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Customer phone. Optional, but email or phone is required. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>external_ref</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Optional partner-side id, recorded so the partner can later GetCustomerByRef. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.customers.v1.CreateCustomerResponse">CreateCustomerResponse</h3>
+        <p>CreateCustomerResponse carries the registered customer.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>customer</td>
+                  <td><a href="#extremo.msg.external.v1.Customer">extremo.msg.external.v1.Customer</a></td>
+                  <td></td>
+                  <td><p>The registered (or resolved) customer. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.customers.v1.DeleteCustomerRequest">DeleteCustomerRequest</h3>
+        <p>DeleteCustomerRequest deactivates a customer for this tenant.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant the customer belongs to. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Opaque Extremo id of the customer. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.customers.v1.DeleteCustomerResponse">DeleteCustomerResponse</h3>
+        <p>DeleteCustomerResponse is empty.</p>
+
+        
+
+        
+      
+        <h3 id="extremo.api.external.customers.v1.GetCustomerByRefRequest">GetCustomerByRefRequest</h3>
+        <p>GetCustomerByRefRequest selects a customer by the partner's own external_ref.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant the customer belongs to. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>external_ref</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The partner-side correlation id supplied at creation. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.customers.v1.GetCustomerByRefResponse">GetCustomerByRefResponse</h3>
+        <p>GetCustomerByRefResponse carries the customer.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>customer</td>
+                  <td><a href="#extremo.msg.external.v1.Customer">extremo.msg.external.v1.Customer</a></td>
+                  <td></td>
+                  <td><p>The customer. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.customers.v1.GetCustomerRequest">GetCustomerRequest</h3>
+        <p>GetCustomerRequest selects a customer by its Extremo id.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant the customer belongs to. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Opaque Extremo id of the customer. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.customers.v1.GetCustomerResponse">GetCustomerResponse</h3>
+        <p>GetCustomerResponse carries the customer.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>customer</td>
+                  <td><a href="#extremo.msg.external.v1.Customer">extremo.msg.external.v1.Customer</a></td>
+                  <td></td>
+                  <td><p>The customer. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.customers.v1.ListCustomersRequest">ListCustomersRequest</h3>
+        <p>ListCustomersRequest pages a tenant's customers.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant whose customers to list. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>page</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p>1-based page number. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>page_size</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p>Page size (1..100). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.customers.v1.ListCustomersResponse">ListCustomersResponse</h3>
+        <p>ListCustomersResponse is a page of customers.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>customers</td>
+                  <td><a href="#extremo.msg.external.v1.Customer">extremo.msg.external.v1.Customer</a></td>
+                  <td>repeated</td>
+                  <td><p>The customers on this page. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>total_size</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p>Total number of customers across all pages. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.customers.v1.UpdateCustomerRequest">UpdateCustomerRequest</h3>
+        <p>UpdateCustomerRequest patches a customer's mutable fields. An empty field leaves</p><p>the current value unchanged.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant the customer belongs to. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Opaque Extremo id of the customer. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>New display name (empty = unchanged). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>external_ref</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>New partner-side external_ref (empty = unchanged). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.customers.v1.UpdateCustomerResponse">UpdateCustomerResponse</h3>
+        <p>UpdateCustomerResponse carries the updated customer.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>customer</td>
+                  <td><a href="#extremo.msg.external.v1.Customer">extremo.msg.external.v1.Customer</a></td>
+                  <td></td>
+                  <td><p>The updated customer. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="extremo.api.external.customers.v1.CustomerService">CustomerService</h3>
+        <p>CustomerService manages a tenant's customers (CLIENT records) over the external</p><p>partner API. Reads require the customer.read scope; writes require customer.write.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>CreateCustomer</td>
+                <td><a href="#extremo.api.external.customers.v1.CreateCustomerRequest">CreateCustomerRequest</a></td>
+                <td><a href="#extremo.api.external.customers.v1.CreateCustomerResponse">CreateCustomerResponse</a></td>
+                <td><p>CreateCustomer registers (or resolves) a tenant customer. Resolution is by
+email/phone: a returning customer resolves to the existing record. Rejected with
+AlreadyExists if the contact belongs to tenant staff (OWNER/MEMBER).</p></td>
+              </tr>
+            
+              <tr>
+                <td>GetCustomer</td>
+                <td><a href="#extremo.api.external.customers.v1.GetCustomerRequest">GetCustomerRequest</a></td>
+                <td><a href="#extremo.api.external.customers.v1.GetCustomerResponse">GetCustomerResponse</a></td>
+                <td><p>GetCustomer returns a customer by its Extremo id.</p></td>
+              </tr>
+            
+              <tr>
+                <td>GetCustomerByRef</td>
+                <td><a href="#extremo.api.external.customers.v1.GetCustomerByRefRequest">GetCustomerByRefRequest</a></td>
+                <td><a href="#extremo.api.external.customers.v1.GetCustomerByRefResponse">GetCustomerByRefResponse</a></td>
+                <td><p>GetCustomerByRef returns a customer by the partner&#39;s own external_ref.</p></td>
+              </tr>
+            
+              <tr>
+                <td>ListCustomers</td>
+                <td><a href="#extremo.api.external.customers.v1.ListCustomersRequest">ListCustomersRequest</a></td>
+                <td><a href="#extremo.api.external.customers.v1.ListCustomersResponse">ListCustomersResponse</a></td>
+                <td><p>ListCustomers returns the tenant&#39;s customers, paginated.</p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateCustomer</td>
+                <td><a href="#extremo.api.external.customers.v1.UpdateCustomerRequest">UpdateCustomerRequest</a></td>
+                <td><a href="#extremo.api.external.customers.v1.UpdateCustomerResponse">UpdateCustomerResponse</a></td>
+                <td><p>UpdateCustomer updates a customer&#39;s mutable fields (display name, external_ref).</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteCustomer</td>
+                <td><a href="#extremo.api.external.customers.v1.DeleteCustomerRequest">DeleteCustomerRequest</a></td>
+                <td><a href="#extremo.api.external.customers.v1.DeleteCustomerResponse">DeleteCustomerResponse</a></td>
+                <td><p>DeleteCustomer deactivates the customer&#39;s CLIENT role for this tenant (soft; the
+underlying global user is never deleted).</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+          
+          
+          <h4>Methods with HTTP bindings</h4>
+          <table>
+            <thead>
+              <tr>
+                <td>Method Name</td>
+                <td>Method</td>
+                <td>Pattern</td>
+                <td>Body</td>
+              </tr>
+            </thead>
+            <tbody>
+            
+              
+              
+              <tr>
+                <td>CreateCustomer</td>
+                <td>POST</td>
+                <td>/api/external/v1/{tenant_id}/customers</td>
+                <td>*</td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>GetCustomer</td>
+                <td>GET</td>
+                <td>/api/external/v1/{tenant_id}/customers/{id}</td>
+                <td></td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>GetCustomerByRef</td>
+                <td>GET</td>
+                <td>/api/external/v1/{tenant_id}/customers:byRef</td>
+                <td></td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>ListCustomers</td>
+                <td>GET</td>
+                <td>/api/external/v1/{tenant_id}/customers</td>
+                <td></td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>UpdateCustomer</td>
+                <td>PATCH</td>
+                <td>/api/external/v1/{tenant_id}/customers/{id}</td>
+                <td>*</td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>DeleteCustomer</td>
+                <td>DELETE</td>
+                <td>/api/external/v1/{tenant_id}/customers/{id}</td>
+                <td></td>
               </tr>
               
             
