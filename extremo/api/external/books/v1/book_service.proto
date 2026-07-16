@@ -3,10 +3,14 @@ syntax = "proto3";
 // Package extremo.api.external.books.v1 is part of the Extremo external partner
 // API. Unlike the anonymous internal `public/` booking-page services, the
 // `external/` surface is authenticated via a per-tenant API key and scoped.
-// Bookings are customer-PII-adjacent, so this service requires the `book.read`
+// Bookings are customer-PII-adjacent, so the reads require the `book.read`
 // scope (stricter than the public-grade services/tenants/availability reads) and
-// returns the public Booking DTO only — no client identity, staff, internal
-// foreign keys, or pricing.
+// return the public Booking DTO only — no client identity, staff, internal
+// foreign keys, or pricing. The writes (CreateBooking / UpdateBooking /
+// CancelBooking) require the `book.create` / `book.update` scope; a created
+// booking is validated by the same availability rules as an in-store booking
+// (schedule capacity, staff coverage, no past times), returning InvalidArgument
+// when a slot is full or the time is in the past.
 package extremo.api.external.books.v1;
 
 import "buf/validate/validate.proto";
@@ -17,16 +21,47 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/api/external/books/v1;books";
 
 // BookService exposes a tenant's bookings to authenticated external API
-// consumers. Read-only.
+// consumers: reads (book.read) plus create / update / cancel (book.create,
+// book.update).
 service BookService {
   // ListBookings returns a tenant's bookings whose time window falls in
-  // [start_at, end_at], newest first, paginated.
+  // [start_at, end_at], newest first, paginated. Requires book.read.
   rpc ListBookings(ListBookingsRequest) returns (ListBookingsResponse) {
     option (google.api.http) = {get: "/api/external/v1/{tenant_id}/books"};
   }
   // GetBooking returns a single booking by its opaque id, scoped to the tenant.
+  // Requires book.read.
   rpc GetBooking(GetBookingRequest) returns (GetBookingResponse) {
     option (google.api.http) = {get: "/api/external/v1/{tenant_id}/books/{id}"};
+  }
+  // CreateBooking books a service for a customer. The API resolves (or creates)
+  // a CLIENT record for the tenant from the supplied customer contact, validates
+  // the slot against the tenant's schedule (capacity / staff / no past times),
+  // and returns the new booking (DRAFT, or RESERVED when the tenant auto-accepts).
+  // Requires book.create. Supply idempotency_key to make retries safe: resending
+  // the same key replays the original booking instead of creating a duplicate.
+  rpc CreateBooking(CreateBookingRequest) returns (CreateBookingResponse) {
+    option (google.api.http) = {
+      post: "/api/external/v1/{tenant_id}/books"
+      body: "*"
+    };
+  }
+  // UpdateBooking changes a booking's time / services / metadata. Requires
+  // book.update. Pass expected_updated_at (from Booking.updated_at) for
+  // optimistic concurrency; a mismatch returns ABORTED.
+  rpc UpdateBooking(UpdateBookingRequest) returns (UpdateBookingResponse) {
+    option (google.api.http) = {
+      patch: "/api/external/v1/{tenant_id}/books/{id}"
+      body: "*"
+    };
+  }
+  // CancelBooking cancels a booking (DRAFT / RESERVED / ORDERED -> CANCELED).
+  // Requires book.update. There is no hard-delete on the external surface.
+  rpc CancelBooking(CancelBookingRequest) returns (CancelBookingResponse) {
+    option (google.api.http) = {
+      post: "/api/external/v1/{tenant_id}/books/{id}:cancel"
+      body: "*"
+    };
   }
 }
 
@@ -46,6 +81,11 @@ message ListBookingsRequest {
     gt: 0
     lte: 100
   }];
+  // When true, return only bookings created through the external partner API
+  // (partner origin), excluding in-store / mypage bookings.
+  bool only_external = 6;
+  // When set, return only bookings whose external_ref equals this value.
+  string external_ref = 7 [(buf.validate.field).string.max_len = 255];
 }
 
 // ListBookingsResponse is a page of public bookings.
@@ -67,5 +107,103 @@ message GetBookingRequest {
 // GetBookingResponse carries the requested public booking.
 message GetBookingResponse {
   // The booking.
+  extremo.msg.external.v1.Booking booking = 1;
+}
+
+// Customer identifies the end customer a partner books on behalf of. The API
+// resolves (or creates) a CLIENT record for the tenant from these details; the
+// customer is never echoed back in a Booking response (PII stays server-side).
+message Customer {
+  option (buf.validate.message).cel = {
+    id: "customer.contact_required"
+    message: "customer.email or customer.phone must be set"
+    expression: "this.email != '' || this.phone != ''"
+  };
+  // Customer display name (required).
+  string name = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 255
+  }];
+  // Customer email. Optional, but email or phone is required.
+  string email = 2 [(buf.validate.field).string.max_len = 255];
+  // Customer phone. Optional, but email or phone is required.
+  string phone = 3 [(buf.validate.field).string.max_len = 32];
+}
+
+// CreateBookingRequest books one or more services for a customer at a start
+// time. The end time is derived server-side from the services' total duration,
+// so no end time is accepted.
+message CreateBookingRequest {
+  // Tenant to book under (must match the API key's tenant).
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Services to book (>= 1). Opaque service ids (see Service.id).
+  repeated uint64 service_ids = 2 [(buf.validate.field).repeated = {
+    min_items: 1
+    items: {
+      uint64: {gt: 0}
+    }
+  }];
+  // Requested start time (required).
+  google.protobuf.Timestamp start_at = 3 [(buf.validate.field).required = true];
+  // The customer to book for.
+  Customer customer = 4 [(buf.validate.field).required = true];
+  // Optional booking title.
+  string name = 5 [(buf.validate.field).string.max_len = 255];
+  // Optional booking note.
+  string desc = 6 [(buf.validate.field).string.max_len = 1024];
+  // Optional idempotency key (<= 255). Resending the same key for this tenant
+  // replays the original booking instead of creating a duplicate.
+  string idempotency_key = 7 [(buf.validate.field).string.max_len = 255];
+  // Optional partner-side correlation id stored on the booking (<= 255).
+  string external_ref = 8 [(buf.validate.field).string.max_len = 255];
+}
+
+// CreateBookingResponse carries the created booking.
+message CreateBookingResponse {
+  // The created booking (DRAFT, or RESERVED when the tenant auto-accepts).
+  extremo.msg.external.v1.Booking booking = 1;
+}
+
+// UpdateBookingRequest changes a booking. Only the set fields are applied;
+// changing service_ids or start_at re-derives the end time.
+message UpdateBookingRequest {
+  // Tenant the booking belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Booking to update.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+  // Optional new start time.
+  google.protobuf.Timestamp start_at = 3;
+  // Optional new service set (opaque service ids).
+  repeated uint64 service_ids = 4;
+  // Optional new title.
+  string name = 5 [(buf.validate.field).string.max_len = 255];
+  // Optional new note.
+  string desc = 6 [(buf.validate.field).string.max_len = 1024];
+  // Optional new partner-side correlation id.
+  string external_ref = 7 [(buf.validate.field).string.max_len = 255];
+  // Optimistic-lock guard. When set, the update is rejected with ABORTED if the
+  // booking's current updated_at differs (echo Booking.updated_at here).
+  google.protobuf.Timestamp expected_updated_at = 8;
+}
+
+// UpdateBookingResponse carries the updated booking.
+message UpdateBookingResponse {
+  // The updated booking.
+  extremo.msg.external.v1.Booking booking = 1;
+}
+
+// CancelBookingRequest cancels a booking.
+message CancelBookingRequest {
+  // Tenant the booking belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Booking to cancel.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+  // Optional free-text cancellation reason (<= 512).
+  string reason = 3 [(buf.validate.field).string.max_len = 512];
+}
+
+// CancelBookingResponse carries the canceled booking.
+message CancelBookingResponse {
+  // The canceled booking (status CANCELED).
   extremo.msg.external.v1.Booking booking = 1;
 }

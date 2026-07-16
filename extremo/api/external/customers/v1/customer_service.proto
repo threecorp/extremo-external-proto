@@ -1,0 +1,166 @@
+syntax = "proto3";
+
+// Package extremo.api.external.customers.v1 is part of the Extremo external partner
+// API: an authenticated, per-tenant-API-key surface that lets a partner manage a
+// tenant's customers (CLIENT records) programmatically — the API-first equivalent
+// of the admin UI's customer management. A customer is referenced by its opaque
+// Extremo id (Customer.id, the tenant-scoped handle also used when booking); an
+// optional partner-side external_ref maps it back to the partner's own system.
+package extremo.api.external.customers.v1;
+
+import "buf/validate/validate.proto";
+import "extremo/msg/external/v1/dto.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/api/external/customers/v1;customers";
+
+// CustomerService manages a tenant's customers (CLIENT records) over the external
+// partner API. Reads require the customer.read scope; writes require customer.write.
+service CustomerService {
+  // CreateCustomer registers (or resolves) a tenant customer. Resolution is by
+  // email/phone: a returning customer resolves to the existing record. Rejected with
+  // AlreadyExists if the contact belongs to tenant staff (OWNER/MEMBER).
+  rpc CreateCustomer(CreateCustomerRequest) returns (CreateCustomerResponse) {
+    option (google.api.http) = {
+      post: "/api/external/v1/{tenant_id}/customers"
+      body: "*"
+    };
+  }
+  // GetCustomer returns a customer by its Extremo id.
+  rpc GetCustomer(GetCustomerRequest) returns (GetCustomerResponse) {
+    option (google.api.http) = {get: "/api/external/v1/{tenant_id}/customers/{id}"};
+  }
+  // GetCustomerByRef returns a customer by the partner's own external_ref.
+  rpc GetCustomerByRef(GetCustomerByRefRequest) returns (GetCustomerByRefResponse) {
+    option (google.api.http) = {get: "/api/external/v1/{tenant_id}/customers:byRef"};
+  }
+  // ListCustomers returns the tenant's customers, paginated.
+  rpc ListCustomers(ListCustomersRequest) returns (ListCustomersResponse) {
+    option (google.api.http) = {get: "/api/external/v1/{tenant_id}/customers"};
+  }
+  // UpdateCustomer updates a customer's mutable fields (display name, external_ref).
+  rpc UpdateCustomer(UpdateCustomerRequest) returns (UpdateCustomerResponse) {
+    option (google.api.http) = {
+      patch: "/api/external/v1/{tenant_id}/customers/{id}"
+      body: "*"
+    };
+  }
+  // DeleteCustomer deactivates the customer's CLIENT role for this tenant (soft; the
+  // underlying global user is never deleted).
+  rpc DeleteCustomer(DeleteCustomerRequest) returns (DeleteCustomerResponse) {
+    option (google.api.http) = {delete: "/api/external/v1/{tenant_id}/customers/{id}"};
+  }
+}
+
+// CreateCustomerRequest registers a customer under a tenant. Email or phone is
+// required (the customer's identity); at least one lets Extremo resolve a returning
+// customer rather than duplicate them.
+message CreateCustomerRequest {
+  option (buf.validate.message).cel = {
+    id: "customer.contact_required"
+    message: "customer email or phone must be set"
+    expression: "this.email != '' || this.phone != ''"
+  };
+
+  // Tenant to register the customer under (must match the API key's tenant).
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Customer display name (required).
+  string name = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 255
+  }];
+  // Customer email. Optional, but email or phone is required.
+  string email = 3 [(buf.validate.field).string.max_len = 255];
+  // Customer phone. Optional, but email or phone is required.
+  string phone = 4 [(buf.validate.field).string.max_len = 32];
+  // Optional partner-side id, recorded so the partner can later GetCustomerByRef.
+  string external_ref = 5 [(buf.validate.field).string.max_len = 255];
+}
+
+// CreateCustomerResponse carries the registered customer.
+message CreateCustomerResponse {
+  // The registered (or resolved) customer.
+  extremo.msg.external.v1.Customer customer = 1;
+}
+
+// GetCustomerRequest selects a customer by its Extremo id.
+message GetCustomerRequest {
+  // Tenant the customer belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Opaque Extremo id of the customer.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+}
+
+// GetCustomerResponse carries the customer.
+message GetCustomerResponse {
+  // The customer.
+  extremo.msg.external.v1.Customer customer = 1;
+}
+
+// GetCustomerByRefRequest selects a customer by the partner's own external_ref.
+message GetCustomerByRefRequest {
+  // Tenant the customer belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // The partner-side correlation id supplied at creation.
+  string external_ref = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 255
+  }];
+}
+
+// GetCustomerByRefResponse carries the customer.
+message GetCustomerByRefResponse {
+  // The customer.
+  extremo.msg.external.v1.Customer customer = 1;
+}
+
+// ListCustomersRequest pages a tenant's customers.
+message ListCustomersRequest {
+  // Tenant whose customers to list.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // 1-based page number.
+  int64 page = 2 [(buf.validate.field).int64.gt = 0];
+  // Page size (1..100).
+  int64 page_size = 3 [(buf.validate.field).int64 = {
+    gt: 0
+    lte: 100
+  }];
+}
+
+// ListCustomersResponse is a page of customers.
+message ListCustomersResponse {
+  // The customers on this page.
+  repeated extremo.msg.external.v1.Customer customers = 1;
+  // Total number of customers across all pages.
+  int64 total_size = 2 [(buf.validate.field).int64.gte = 0];
+}
+
+// UpdateCustomerRequest patches a customer's mutable fields. An empty field leaves
+// the current value unchanged.
+message UpdateCustomerRequest {
+  // Tenant the customer belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Opaque Extremo id of the customer.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+  // New display name (empty = unchanged).
+  string name = 3 [(buf.validate.field).string.max_len = 255];
+  // New partner-side external_ref (empty = unchanged).
+  string external_ref = 4 [(buf.validate.field).string.max_len = 255];
+}
+
+// UpdateCustomerResponse carries the updated customer.
+message UpdateCustomerResponse {
+  // The updated customer.
+  extremo.msg.external.v1.Customer customer = 1;
+}
+
+// DeleteCustomerRequest deactivates a customer for this tenant.
+message DeleteCustomerRequest {
+  // Tenant the customer belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Opaque Extremo id of the customer.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+}
+
+// DeleteCustomerResponse is empty.
+message DeleteCustomerResponse {}
