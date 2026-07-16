@@ -7,7 +7,7 @@
 // Package extremo.api.external.services.v1 is part of the Extremo external
 // partner API. Unlike the internal `public/` services (which are anonymous and
 // read-only for the booking page), the `external/` surface is authenticated via
-// OAuth2 client_credentials / API key and scoped. It returns public DTOs only.
+// OAuth2 consumer_credentials / API key and scoped. It returns public DTOs only.
 
 package services
 

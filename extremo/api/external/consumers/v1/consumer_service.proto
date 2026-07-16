@@ -1,0 +1,166 @@
+syntax = "proto3";
+
+// Package extremo.api.external.consumers.v1 is part of the Extremo external partner
+// API: an authenticated, per-tenant-API-key surface that lets a partner manage a
+// tenant's consumers (CONSUMER records) programmatically — the API-first equivalent
+// of the admin UI's consumer management. A consumer is referenced by its opaque
+// Extremo id (Consumer.id, the tenant-scoped handle also used when booking); an
+// optional partner-side external_ref maps it back to the partner's own system.
+package extremo.api.external.consumers.v1;
+
+import "buf/validate/validate.proto";
+import "extremo/msg/external/v1/dto.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/api/external/consumers/v1;consumers";
+
+// ConsumerService manages a tenant's consumers (CONSUMER records) over the external
+// partner API. Reads require the consumer.read scope; writes require consumer.write.
+service ConsumerService {
+  // CreateConsumer registers (or resolves) a tenant consumer. Resolution is by
+  // email/phone: a returning consumer resolves to the existing record. Rejected with
+  // AlreadyExists if the contact belongs to tenant staff (OWNER/MEMBER).
+  rpc CreateConsumer(CreateConsumerRequest) returns (CreateConsumerResponse) {
+    option (google.api.http) = {
+      post: "/api/external/v1/{tenant_id}/consumers"
+      body: "*"
+    };
+  }
+  // GetConsumer returns a consumer by its Extremo id.
+  rpc GetConsumer(GetConsumerRequest) returns (GetConsumerResponse) {
+    option (google.api.http) = {get: "/api/external/v1/{tenant_id}/consumers/{id}"};
+  }
+  // GetConsumerByRef returns a consumer by the partner's own external_ref.
+  rpc GetConsumerByRef(GetConsumerByRefRequest) returns (GetConsumerByRefResponse) {
+    option (google.api.http) = {get: "/api/external/v1/{tenant_id}/consumers:byRef"};
+  }
+  // ListConsumers returns the tenant's consumers, paginated.
+  rpc ListConsumers(ListConsumersRequest) returns (ListConsumersResponse) {
+    option (google.api.http) = {get: "/api/external/v1/{tenant_id}/consumers"};
+  }
+  // UpdateConsumer updates a consumer's mutable fields (display name, external_ref).
+  rpc UpdateConsumer(UpdateConsumerRequest) returns (UpdateConsumerResponse) {
+    option (google.api.http) = {
+      patch: "/api/external/v1/{tenant_id}/consumers/{id}"
+      body: "*"
+    };
+  }
+  // DeleteConsumer deactivates the consumer's CONSUMER role for this tenant (soft; the
+  // underlying global user is never deleted).
+  rpc DeleteConsumer(DeleteConsumerRequest) returns (DeleteConsumerResponse) {
+    option (google.api.http) = {delete: "/api/external/v1/{tenant_id}/consumers/{id}"};
+  }
+}
+
+// CreateConsumerRequest registers a consumer under a tenant. Email or phone is
+// required (the consumer's identity); at least one lets Extremo resolve a returning
+// consumer rather than duplicate them.
+message CreateConsumerRequest {
+  option (buf.validate.message).cel = {
+    id: "consumer.contact_required"
+    message: "consumer email or phone must be set"
+    expression: "this.email != '' || this.phone != ''"
+  };
+
+  // Tenant to register the consumer under (must match the API key's tenant).
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Consumer display name (required).
+  string name = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 255
+  }];
+  // Consumer email. Optional, but email or phone is required.
+  string email = 3 [(buf.validate.field).string.max_len = 255];
+  // Consumer phone. Optional, but email or phone is required.
+  string phone = 4 [(buf.validate.field).string.max_len = 32];
+  // Optional partner-side id, recorded so the partner can later GetConsumerByRef.
+  string external_ref = 5 [(buf.validate.field).string.max_len = 255];
+}
+
+// CreateConsumerResponse carries the registered consumer.
+message CreateConsumerResponse {
+  // The registered (or resolved) consumer.
+  extremo.msg.external.v1.Consumer consumer = 1;
+}
+
+// GetConsumerRequest selects a consumer by its Extremo id.
+message GetConsumerRequest {
+  // Tenant the consumer belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Opaque Extremo id of the consumer.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+}
+
+// GetConsumerResponse carries the consumer.
+message GetConsumerResponse {
+  // The consumer.
+  extremo.msg.external.v1.Consumer consumer = 1;
+}
+
+// GetConsumerByRefRequest selects a consumer by the partner's own external_ref.
+message GetConsumerByRefRequest {
+  // Tenant the consumer belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // The partner-side correlation id supplied at creation.
+  string external_ref = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 255
+  }];
+}
+
+// GetConsumerByRefResponse carries the consumer.
+message GetConsumerByRefResponse {
+  // The consumer.
+  extremo.msg.external.v1.Consumer consumer = 1;
+}
+
+// ListConsumersRequest pages a tenant's consumers.
+message ListConsumersRequest {
+  // Tenant whose consumers to list.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // 1-based page number.
+  int64 page = 2 [(buf.validate.field).int64.gt = 0];
+  // Page size (1..100).
+  int64 page_size = 3 [(buf.validate.field).int64 = {
+    gt: 0
+    lte: 100
+  }];
+}
+
+// ListConsumersResponse is a page of consumers.
+message ListConsumersResponse {
+  // The consumers on this page.
+  repeated extremo.msg.external.v1.Consumer consumers = 1;
+  // Total number of consumers across all pages.
+  int64 total_size = 2 [(buf.validate.field).int64.gte = 0];
+}
+
+// UpdateConsumerRequest patches a consumer's mutable fields. An empty field leaves
+// the current value unchanged.
+message UpdateConsumerRequest {
+  // Tenant the consumer belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Opaque Extremo id of the consumer.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+  // New display name (empty = unchanged).
+  string name = 3 [(buf.validate.field).string.max_len = 255];
+  // New partner-side external_ref (empty = unchanged).
+  string external_ref = 4 [(buf.validate.field).string.max_len = 255];
+}
+
+// UpdateConsumerResponse carries the updated consumer.
+message UpdateConsumerResponse {
+  // The updated consumer.
+  extremo.msg.external.v1.Consumer consumer = 1;
+}
+
+// DeleteConsumerRequest deactivates a consumer for this tenant.
+message DeleteConsumerRequest {
+  // Tenant the consumer belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Opaque Extremo id of the consumer.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+}
+
+// DeleteConsumerResponse is empty.
+message DeleteConsumerResponse {}

@@ -7,9 +7,9 @@
 // Package extremo.api.external.books.v1 is part of the Extremo external partner
 // API. Unlike the anonymous internal `public/` booking-page services, the
 // `external/` surface is authenticated via a per-tenant API key and scoped.
-// Bookings are customer-PII-adjacent, so the reads require the `book.read`
+// Bookings are consumer-PII-adjacent, so the reads require the `book.read`
 // scope (stricter than the public-grade services/tenants/availability reads) and
-// return the public Booking DTO only — no client identity, staff, internal
+// return the public Booking DTO only — no consumer identity, staff, internal
 // foreign keys, or pricing. The writes (CreateBooking / UpdateBooking /
 // CancelBooking) require the `book.create` / `book.update` scope; a created
 // booking is validated by the same availability rules as an in-store booking
@@ -52,8 +52,8 @@ type BookServiceClient interface {
 	// GetBooking returns a single booking by its opaque id, scoped to the tenant.
 	// Requires book.read.
 	GetBooking(ctx context.Context, in *GetBookingRequest, opts ...grpc.CallOption) (*GetBookingResponse, error)
-	// CreateBooking books a service for a customer. The API resolves (or creates)
-	// a CLIENT record for the tenant from the supplied customer contact, validates
+	// CreateBooking books a service for a consumer. The API resolves (or creates)
+	// a CONSUMER record for the tenant from the supplied consumer contact, validates
 	// the slot against the tenant's schedule (capacity / staff / no past times),
 	// and returns the new booking (DRAFT, or RESERVED when the tenant auto-accepts).
 	// Requires book.create. Supply idempotency_key to make retries safe: resending
@@ -140,8 +140,8 @@ type BookServiceServer interface {
 	// GetBooking returns a single booking by its opaque id, scoped to the tenant.
 	// Requires book.read.
 	GetBooking(context.Context, *GetBookingRequest) (*GetBookingResponse, error)
-	// CreateBooking books a service for a customer. The API resolves (or creates)
-	// a CLIENT record for the tenant from the supplied customer contact, validates
+	// CreateBooking books a service for a consumer. The API resolves (or creates)
+	// a CONSUMER record for the tenant from the supplied consumer contact, validates
 	// the slot against the tenant's schedule (capacity / staff / no past times),
 	// and returns the new booking (DRAFT, or RESERVED when the tenant auto-accepts).
 	// Requires book.create. Supply idempotency_key to make retries safe: resending

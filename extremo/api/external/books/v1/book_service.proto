@@ -3,9 +3,9 @@ syntax = "proto3";
 // Package extremo.api.external.books.v1 is part of the Extremo external partner
 // API. Unlike the anonymous internal `public/` booking-page services, the
 // `external/` surface is authenticated via a per-tenant API key and scoped.
-// Bookings are customer-PII-adjacent, so the reads require the `book.read`
+// Bookings are consumer-PII-adjacent, so the reads require the `book.read`
 // scope (stricter than the public-grade services/tenants/availability reads) and
-// return the public Booking DTO only — no client identity, staff, internal
+// return the public Booking DTO only — no consumer identity, staff, internal
 // foreign keys, or pricing. The writes (CreateBooking / UpdateBooking /
 // CancelBooking) require the `book.create` / `book.update` scope; a created
 // booking is validated by the same availability rules as an in-store booking
@@ -34,8 +34,8 @@ service BookService {
   rpc GetBooking(GetBookingRequest) returns (GetBookingResponse) {
     option (google.api.http) = {get: "/api/external/v1/{tenant_id}/books/{id}"};
   }
-  // CreateBooking books a service for a customer. The API resolves (or creates)
-  // a CLIENT record for the tenant from the supplied customer contact, validates
+  // CreateBooking books a service for a consumer. The API resolves (or creates)
+  // a CONSUMER record for the tenant from the supplied consumer contact, validates
   // the slot against the tenant's schedule (capacity / staff / no past times),
   // and returns the new booking (DRAFT, or RESERVED when the tenant auto-accepts).
   // Requires book.create. Supply idempotency_key to make retries safe: resending
@@ -110,27 +110,27 @@ message GetBookingResponse {
   extremo.msg.external.v1.Booking booking = 1;
 }
 
-// Customer identifies the end customer a partner books on behalf of. The API
-// resolves (or creates) a CLIENT record for the tenant from these details; the
-// customer is never echoed back in a Booking response (PII stays server-side).
-message Customer {
+// Consumer identifies the end consumer a partner books on behalf of. The API
+// resolves (or creates) a CONSUMER record for the tenant from these details; the
+// consumer is never echoed back in a Booking response (PII stays server-side).
+message Consumer {
   option (buf.validate.message).cel = {
-    id: "customer.contact_required"
-    message: "customer.email or customer.phone must be set"
+    id: "consumer.contact_required"
+    message: "consumer.email or consumer.phone must be set"
     expression: "this.email != '' || this.phone != ''"
   };
-  // Customer display name (required).
+  // Consumer display name (required).
   string name = 1 [(buf.validate.field).string = {
     min_len: 1
     max_len: 255
   }];
-  // Customer email. Optional, but email or phone is required.
+  // Consumer email. Optional, but email or phone is required.
   string email = 2 [(buf.validate.field).string.max_len = 255];
-  // Customer phone. Optional, but email or phone is required.
+  // Consumer phone. Optional, but email or phone is required.
   string phone = 3 [(buf.validate.field).string.max_len = 32];
 }
 
-// CreateBookingRequest books one or more services for a customer at a start
+// CreateBookingRequest books one or more services for a consumer at a start
 // time. The end time is derived server-side from the services' total duration,
 // so no end time is accepted.
 message CreateBookingRequest {
@@ -145,8 +145,8 @@ message CreateBookingRequest {
   }];
   // Requested start time (required).
   google.protobuf.Timestamp start_at = 3 [(buf.validate.field).required = true];
-  // The customer to book for.
-  Customer customer = 4 [(buf.validate.field).required = true];
+  // The consumer to book for.
+  Consumer consumer = 4 [(buf.validate.field).required = true];
   // Optional booking title.
   string name = 5 [(buf.validate.field).string.max_len = 255];
   // Optional booking note.
