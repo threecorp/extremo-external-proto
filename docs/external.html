@@ -284,10 +284,6 @@
                 </li>
               
                 <li>
-                  <a href="#extremo.api.external.books.v1.Consumer"><span class="badge">M</span>Consumer</a>
-                </li>
-              
-                <li>
                   <a href="#extremo.api.external.books.v1.CreateBookingRequest"><span class="badge">M</span>CreateBookingRequest</a>
                 </li>
               
@@ -1322,46 +1318,8 @@ incrementally by passing next_cursor back on each call.</p></td>
 
         
       
-        <h3 id="extremo.api.external.books.v1.Consumer">Consumer</h3>
-        <p>Consumer identifies the end consumer a partner books on behalf of. The API</p><p>resolves (or creates) a CONSUMER record for the tenant from these details; the</p><p>consumer is never echoed back in a Booking response (PII stays server-side).</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>name</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>Consumer display name (required). </p></td>
-                </tr>
-              
-                <tr>
-                  <td>email</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>Consumer email. Optional, but email or phone is required. </p></td>
-                </tr>
-              
-                <tr>
-                  <td>phone</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>Consumer phone. Optional, but email or phone is required. </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
         <h3 id="extremo.api.external.books.v1.CreateBookingRequest">CreateBookingRequest</h3>
-        <p>CreateBookingRequest books one or more services for a consumer at a start</p><p>time. The end time is derived server-side from the services' total duration,</p><p>so no end time is accepted.</p>
+        <p>CreateBookingRequest books one or more services for a consumer at a start</p><p>time. The end time is derived server-side from the services' total duration,</p><p>so no end time is accepted.</p><p>The consumer must already exist: register one through ConsumerService, keep</p><p>the returned Consumer.id, and pass it here. Booking never creates a consumer</p><p>as a side effect. A partner holding its own id instead of ours can translate</p><p>it with ConsumerService.GetConsumerByRef.</p>
 
         
           <table class="field-table">
@@ -1392,13 +1350,6 @@ incrementally by passing next_cursor back on each call.</p></td>
                 </tr>
               
                 <tr>
-                  <td>consumer</td>
-                  <td><a href="#extremo.api.external.books.v1.Consumer">Consumer</a></td>
-                  <td></td>
-                  <td><p>The consumer to book for. </p></td>
-                </tr>
-              
-                <tr>
                   <td>name</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
@@ -1425,6 +1376,13 @@ replays the original booking instead of creating a duplicate. </p></td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p>Optional partner-side correlation id stored on the booking (&lt;= 255). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>consumer_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>The consumer to book for (Consumer.id from ConsumerService). </p></td>
                 </tr>
               
             </tbody>
