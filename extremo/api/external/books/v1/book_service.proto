@@ -110,29 +110,14 @@ message GetBookingResponse {
   extremo.msg.external.v1.Booking booking = 1;
 }
 
-// Consumer identifies the end consumer a partner books on behalf of. The API
-// resolves (or creates) a CONSUMER record for the tenant from these details; the
-// consumer is never echoed back in a Booking response (PII stays server-side).
-message Consumer {
-  option (buf.validate.message).cel = {
-    id: "consumer.contact_required"
-    message: "consumer.email or consumer.phone must be set"
-    expression: "this.email != '' || this.phone != ''"
-  };
-  // Consumer display name (required).
-  string name = 1 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 255
-  }];
-  // Consumer email. Optional, but email or phone is required.
-  string email = 2 [(buf.validate.field).string.max_len = 255];
-  // Consumer phone. Optional, but email or phone is required.
-  string phone = 3 [(buf.validate.field).string.max_len = 32];
-}
-
 // CreateBookingRequest books one or more services for a consumer at a start
 // time. The end time is derived server-side from the services' total duration,
 // so no end time is accepted.
+//
+// The consumer must already exist: register one through ConsumerService, keep
+// the returned Consumer.id, and pass it here. Booking never creates a consumer
+// as a side effect. A partner holding its own id instead of ours can translate
+// it with ConsumerService.GetConsumerByRef.
 message CreateBookingRequest {
   // Tenant to book under (must match the API key's tenant).
   uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
@@ -145,8 +130,6 @@ message CreateBookingRequest {
   }];
   // Requested start time (required).
   google.protobuf.Timestamp start_at = 3 [(buf.validate.field).required = true];
-  // The consumer to book for.
-  Consumer consumer = 4 [(buf.validate.field).required = true];
   // Optional booking title.
   string name = 5 [(buf.validate.field).string.max_len = 255];
   // Optional booking note.
@@ -156,6 +139,14 @@ message CreateBookingRequest {
   string idempotency_key = 7 [(buf.validate.field).string.max_len = 255];
   // Optional partner-side correlation id stored on the booking (<= 255).
   string external_ref = 8 [(buf.validate.field).string.max_len = 255];
+  // The consumer to book for (Consumer.id from ConsumerService).
+  uint64 consumer_id = 9 [(buf.validate.field).uint64.gt = 0];
+
+  // 4 held `Consumer consumer`, an inline contact the API resolved-or-created a
+  // consumer from. Removed in favour of consumer_id: a booking write no longer
+  // provisions a consumer as a side effect.
+  reserved 4;
+  reserved "consumer";
 }
 
 // CreateBookingResponse carries the created booking.
