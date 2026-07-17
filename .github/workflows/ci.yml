@@ -1,0 +1,177 @@
+name: CI
+
+# CI for the published partner API spec: format, lint, build, breaking-change
+# detection, and a check that the committed generated code still matches the
+# .proto sources.
+#
+# Two things make this repo different from an internal proto module, and both
+# are why the last two jobs exist:
+#
+#   * It is a standalone Go module that partners `go get`. Generated code is
+#     committed, so a .proto edit without `make protocol` ships a spec whose
+#     Go bindings disagree with it. `generated` catches that.
+#   * `buf build` is what enforces the public/internal boundary: this module
+#     does not depend on the internal one, so importing an internal type fails
+#     to resolve. buf.yaml calls that a CI-enforced invariant — this workflow
+#     is the CI that enforces it.
+#
+# `ci-status` is the umbrella job branch protection should require — individual
+# jobs may legitimately skip when the diff doesn't touch their inputs, and
+# required-checks treat "skipped" as a block.
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  pre-check:
+    name: Pre-check (skip / paths-filter)
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    outputs:
+      should-skip: ${{ steps.skip.outputs.should_skip }}
+      proto: ${{ steps.filter.outputs.proto }}
+      workflows: ${{ steps.filter.outputs.workflows }}
+    steps:
+      - id: skip
+        name: Detect duplicate run
+        uses: fkirc/skip-duplicate-actions@v5.3.1
+        with:
+          skip_after_successful_duplicate: 'true'
+          paths_ignore: '["**.md", "LICENSE"]'
+          do_not_skip: '["push", "schedule", "workflow_dispatch"]'
+
+      - name: Checkout
+        if: steps.skip.outputs.should_skip != 'true'
+        uses: actions/checkout@v4
+
+      # docs/ and externalgo/ are generated output, not documentation — a hand
+      # edit to either is exactly the drift the `generated` job looks for, so
+      # they belong in the filter rather than in paths-ignore.
+      - name: Detect changed paths
+        if: steps.skip.outputs.should_skip != 'true'
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            proto:
+              - 'extremo/**'
+              - 'externalgo/**'
+              - 'docs/**'
+              - 'buf.yaml'
+              - 'buf.gen.yaml'
+              - 'buf.lock'
+              - 'go.mod'
+              - 'go.sum'
+              - 'Makefile'
+              - 'flake.nix'
+              - 'flake.lock'
+            workflows:
+              - '.github/workflows/**'
+
+  check:
+    name: Proto format + lint + breaking
+    needs: pre-check
+    if: needs.pre-check.outputs.should-skip != 'true' && (needs.pre-check.outputs.proto == 'true' || needs.pre-check.outputs.workflows == 'true')
+    runs-on: ubuntu-latest
+    steps:
+      # fetch-depth: 0 required for buf breaking --against ".git#ref=..."
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      # Check formatting: exits 1 and prints a diff if any file would change.
+      # Mirrors `buf format -w` (= make format) in check-only mode.
+      - name: Check formatting
+        run: nix develop .#ci --command buf format --diff --exit-code
+
+      - name: Lint
+        run: nix develop .#ci --command buf lint
+
+      # Also the boundary check: an internal import cannot resolve in this
+      # module, so it fails here rather than reaching a partner.
+      - name: Build
+        run: nix develop .#ci --command buf build
+
+      # Only run on PRs: compares the branch against its merge-target to catch
+      # wire-incompatible changes before they reach main. Uses the
+      # remote-tracking ref already present from the fetch-depth: 0 checkout.
+      #
+      # This gate is meant to be loud. Partners generate clients from these
+      # files, so a deliberate break needs a human to decide it is worth it —
+      # a red check here is the decision point, not a bug to route around.
+      - name: Breaking change detection
+        if: github.event_name == 'pull_request'
+        run: |
+          nix develop .#ci --command buf breaking \
+            --against ".git#ref=refs/remotes/origin/${{ github.base_ref }}"
+
+  generated:
+    name: Generated code is current
+    needs: pre-check
+    if: needs.pre-check.outputs.should-skip != 'true' && (needs.pre-check.outputs.proto == 'true' || needs.pre-check.outputs.workflows == 'true')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      # The bindings partners compile against must come from the .proto in the
+      # same commit. Regenerating and diffing is the only way to know.
+      - name: Regenerate
+        run: nix develop .#ci --command make protocol
+
+      - name: Fail if regeneration changed anything
+        run: |
+          if ! git diff --exit-code; then
+            echo "::error::Generated code is out of date — run 'make protocol' and commit the result."
+            exit 1
+          fi
+
+      # The module has to compile for `go get` to be worth anything.
+      - name: Go build
+        run: nix develop .#ci --command go build ./...
+
+  ci-status:
+    name: CI status
+    if: always()
+    needs: [pre-check, check, generated]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Aggregate job results
+        run: |
+          ok=1
+          for status in \
+            "${{ needs.pre-check.result }}" \
+            "${{ needs.check.result }}" \
+            "${{ needs.generated.result }}"; do
+            case "$status" in
+              success|skipped) ;;
+              *) echo "::error::A required job ended with $status"; ok=0 ;;
+            esac
+          done
+          [ "$ok" = "1" ]
