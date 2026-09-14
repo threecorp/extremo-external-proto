@@ -228,7 +228,7 @@ type Service struct {
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Description.
 	Desc string `protobuf:"bytes,3,opt,name=desc,proto3" json:"desc,omitempty"`
-	// Duration in minutes.
+	// Duration in seconds (3600 for a one-hour service).
 	Duration int32 `protobuf:"varint,4,opt,name=duration,proto3" json:"duration,omitempty"`
 	// Price in the tenant's minor currency unit (e.g. JPY).
 	Price int64 `protobuf:"varint,5,opt,name=price,proto3" json:"price,omitempty"`

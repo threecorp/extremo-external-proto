@@ -47,7 +47,7 @@ message Service {
   string name = 2;
   // Description.
   string desc = 3;
-  // Duration in minutes.
+  // Duration in seconds (3600 for a one-hour service).
   int32 duration = 4;
   // Price in the tenant's minor currency unit (e.g. JPY).
   int64 price = 5;
