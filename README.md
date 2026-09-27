@@ -2,7 +2,9 @@
 
 **Open gRPC / Protocol Buffer specification for the Extremo external partner API.**
 
-This repository is the source of truth for the **public, externally-published** surface of the [Extremo](https://github.com/orgs/threecorp/projects/1) booking platform — the API that third-party partners and integrations call. It is published as an open spec under **Apache-2.0**.
+This repository is the source of truth for the **public, externally-published** surface of the [Extremo](https://github.com/orgs/threecorp/projects/1) booking platform — the API that partners call. It is published as an open spec under **Apache-2.0**.
+
+A **partner** is the tenant (the shop) itself, integrating its own systems with Extremo — not a separate third party. The partner's customers are members of the partner's own system; Extremo is the booking engine behind it.
 
 > Status: **early / v1 in progress.** The surface is being built out under [`threecorp/extremo-proto#50`](https://github.com/threecorp/extremo-proto/issues/50) and the Phase E epic [`threecorp/extremo-proto#26`](https://github.com/threecorp/extremo-proto/issues/26).
 
@@ -30,7 +32,7 @@ Each API key is granted a subset of these scopes; every RPC checks the scope it 
 | `book.create` | **Create** a booking for a consumer (`CreateBooking`) |
 | `book.update` | **Mutate** a booking (`UpdateBooking` / `CancelBooking`) |
 
-Booking **writes** (`book.create` / `book.update`) let a partner create, reschedule, and cancel bookings on a consumer's behalf: `CreateBooking` takes a `Consumer{name, email?, phone?}` and the platform resolves (or creates) the tenant's consumer record from it, validates the slot against the tenant's schedule (capacity / staff / no past times), and returns the booking. Supply an `idempotency_key` to make retries safe, and echo a booking's `updated_at` as `expected_updated_at` on `UpdateBooking` for optimistic concurrency (a mismatch returns `ABORTED`). Consumer contact details are never echoed back in a `Booking` — PII stays server-side.
+Booking **writes** (`book.create` / `book.update`) let a partner create, reschedule, and cancel bookings on a consumer's behalf: `CreateBooking` takes the `consumer_id` of a consumer registered through `ConsumerService` (a booking never creates a consumer as a side effect), validates the slot against the tenant's schedule (capacity / staff / no past times), and returns the booking. Supply an `idempotency_key` to make retries safe, and echo a booking's `updated_at` as `expected_updated_at` on `UpdateBooking` for optimistic concurrency (a mismatch returns `ABORTED`). Consumer contact details are never echoed back in a `Booking` — PII stays server-side.
 
 ## Layout
 
