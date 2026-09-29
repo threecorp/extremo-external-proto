@@ -478,11 +478,11 @@ type UpdateBookingRequest struct {
 	StartAt *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start_at,json=startAt,proto3" json:"start_at,omitempty"`
 	// Optional new service set (opaque service ids).
 	ServiceIds []uint64 `protobuf:"varint,4,rep,packed,name=service_ids,json=serviceIds,proto3" json:"service_ids,omitempty"`
-	// Optional new title.
+	// New title (empty = unchanged).
 	Name string `protobuf:"bytes,5,opt,name=name,proto3" json:"name,omitempty"`
-	// Optional new note.
+	// New note (empty = unchanged).
 	Desc string `protobuf:"bytes,6,opt,name=desc,proto3" json:"desc,omitempty"`
-	// Optional new partner-side correlation id.
+	// New partner-side correlation id (empty = unchanged).
 	ExternalRef string `protobuf:"bytes,7,opt,name=external_ref,json=externalRef,proto3" json:"external_ref,omitempty"`
 	// Optimistic-lock guard. When set, the update is rejected with ABORTED if the
 	// booking's current updated_at differs (echo Booking.updated_at here).

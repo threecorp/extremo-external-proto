@@ -166,11 +166,11 @@ message UpdateBookingRequest {
   google.protobuf.Timestamp start_at = 3;
   // Optional new service set (opaque service ids).
   repeated uint64 service_ids = 4;
-  // Optional new title.
+  // New title (empty = unchanged).
   string name = 5 [(buf.validate.field).string.max_len = 255];
-  // Optional new note.
+  // New note (empty = unchanged).
   string desc = 6 [(buf.validate.field).string.max_len = 1024];
-  // Optional new partner-side correlation id.
+  // New partner-side correlation id (empty = unchanged).
   string external_ref = 7 [(buf.validate.field).string.max_len = 255];
   // Optimistic-lock guard. When set, the update is rejected with ABORTED if the
   // booking's current updated_at differs (echo Booking.updated_at here).
