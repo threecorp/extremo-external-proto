@@ -103,6 +103,9 @@ message Booking {
   // Last modification time (UTC). Echo this back as UpdateBookingRequest
   // .expected_updated_at for optimistic concurrency control.
   google.protobuf.Timestamp updated_at = 8;
+  // Opaque ids of the consumers on the booking (see Consumer.id). A booking made
+  // through CreateBooking has one; a booking made in the store may have several.
+  repeated uint64 consumer_ids = 9;
 }
 
 // Consumer is a tenant's consumer (a CONSUMER record) as managed over the external

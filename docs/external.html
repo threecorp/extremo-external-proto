@@ -552,6 +552,14 @@ bookings that predate service linkage. </p></td>
 .expected_updated_at for optimistic concurrency control. </p></td>
                 </tr>
               
+                <tr>
+                  <td>consumer_ids</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td>repeated</td>
+                  <td><p>Opaque ids of the consumers on the booking (see Consumer.id). A booking made
+through CreateBooking has one; a booking made in the store may have several. </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -1529,6 +1537,13 @@ replays the original booking instead of creating a duplicate. </p></td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p>When set, return only bookings whose external_ref equals this value. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>consumer_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>When set, return only bookings that include this consumer (see Consumer.id). </p></td>
                 </tr>
               
             </tbody>
