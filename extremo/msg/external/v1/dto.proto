@@ -106,12 +106,17 @@ message Booking {
   // Opaque ids of the consumers on the booking (see Consumer.id). A booking made
   // through CreateBooking has one; a booking made in the store may have several.
   repeated uint64 consumer_ids = 9;
+  // The partner's own id for this booking, if one was set (any string, unique per
+  // tenant among bookings).
+  string external_id = 10;
+  // Partner key-value pairs set on this booking (Stripe-style metadata).
+  map<string, string> metadata = 11;
 }
 
 // Consumer is a tenant's consumer (a CONSUMER record) as managed over the external
 // partner API. `id` is the opaque Extremo handle (tenant-scoped) — use it in future
-// booking calls; `external_ref` echoes the partner's own id when one was supplied
-// at registration. Contact fields echo what the partner registered.
+// booking calls; `external_id` is the partner's own id for the consumer, if one was
+// set. Contact fields echo what the partner registered.
 message Consumer {
   // Opaque Extremo identifier of the consumer (tenant-scoped).
   uint64 id = 1;
@@ -121,10 +126,13 @@ message Consumer {
   string email = 3;
   // Phone, if the consumer was registered with one.
   string phone = 4;
-  // Partner-side correlation id, if one was supplied at registration.
-  string external_ref = 5;
+  // The partner's own id for this consumer, if one was set (any string, unique per
+  // tenant among consumers).
+  string external_id = 5;
   // Registration time (UTC).
   google.protobuf.Timestamp created_at = 6;
+  // Partner key-value pairs set on this consumer (Stripe-style metadata).
+  map<string, string> metadata = 7;
 }
 
 // AvailabilitySlot is a single bookable time window with its resolved status.

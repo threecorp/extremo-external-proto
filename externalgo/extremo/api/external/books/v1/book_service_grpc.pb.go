@@ -11,7 +11,8 @@
 // scope (stricter than the public-grade services/tenants/availability reads) and
 // return the public Booking DTO only — no consumer identity, staff, internal
 // foreign keys, or pricing. The writes (CreateBooking / UpdateBooking /
-// CancelBooking) require the `book.create` / `book.update` scope; a created
+// CancelBooking / AcceptBooking / RejectBooking / NoShowBooking) require the
+// `book.create` / `book.update` scope; a created
 // booking is validated by the same availability rules as an in-store booking
 // (schedule capacity, staff coverage, no past times), returning InvalidArgument
 // when a slot is full or the time is in the past.
@@ -36,6 +37,9 @@ const (
 	BookService_CreateBooking_FullMethodName = "/extremo.api.external.books.v1.BookService/CreateBooking"
 	BookService_UpdateBooking_FullMethodName = "/extremo.api.external.books.v1.BookService/UpdateBooking"
 	BookService_CancelBooking_FullMethodName = "/extremo.api.external.books.v1.BookService/CancelBooking"
+	BookService_AcceptBooking_FullMethodName = "/extremo.api.external.books.v1.BookService/AcceptBooking"
+	BookService_RejectBooking_FullMethodName = "/extremo.api.external.books.v1.BookService/RejectBooking"
+	BookService_NoShowBooking_FullMethodName = "/extremo.api.external.books.v1.BookService/NoShowBooking"
 )
 
 // BookServiceClient is the client API for BookService service.
@@ -43,8 +47,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // BookService exposes a tenant's bookings to authenticated external API
-// consumers: reads (book.read) plus create / update / cancel (book.create,
-// book.update).
+// consumers: reads (book.read) plus create / update / status changes
+// (book.create, book.update). The status changes behave as in the admin UI.
 type BookServiceClient interface {
 	// ListBookings returns a tenant's bookings whose time window falls in
 	// [start_at, end_at], newest first, paginated. Requires book.read.
@@ -52,20 +56,30 @@ type BookServiceClient interface {
 	// GetBooking returns a single booking by its opaque id, scoped to the tenant.
 	// Requires book.read.
 	GetBooking(ctx context.Context, in *GetBookingRequest, opts ...grpc.CallOption) (*GetBookingResponse, error)
-	// CreateBooking books a service for a consumer. The API resolves (or creates)
-	// a CONSUMER record for the tenant from the supplied consumer contact, validates
-	// the slot against the tenant's schedule (capacity / staff / no past times),
-	// and returns the new booking (DRAFT, or RESERVED when the tenant auto-accepts).
+	// CreateBooking books a service for a registered consumer (consumer_id),
+	// validates the slot against the tenant's schedule (capacity / staff / no past
+	// times), sends the same notifications as an in-store booking, and returns the
+	// new booking (DRAFT, or RESERVED when the tenant auto-accepts).
 	// Requires book.create. Supply idempotency_key to make retries safe: resending
 	// the same key replays the original booking instead of creating a duplicate.
 	CreateBooking(ctx context.Context, in *CreateBookingRequest, opts ...grpc.CallOption) (*CreateBookingResponse, error)
-	// UpdateBooking changes a booking's time / services / metadata. Requires
-	// book.update. Pass expected_updated_at (from Booking.updated_at) for
-	// optimistic concurrency; a mismatch returns ABORTED.
+	// UpdateBooking changes a booking's time / services / name / desc, and its
+	// external_id / metadata. Requires book.update. Pass expected_updated_at (from
+	// Booking.updated_at) for optimistic concurrency; a mismatch returns ABORTED.
+	// Changing only external_id / metadata leaves the booking itself untouched.
 	UpdateBooking(ctx context.Context, in *UpdateBookingRequest, opts ...grpc.CallOption) (*UpdateBookingResponse, error)
 	// CancelBooking cancels a booking (DRAFT / RESERVED / ORDERED -> CANCELED).
 	// Requires book.update. There is no hard-delete on the external surface.
 	CancelBooking(ctx context.Context, in *CancelBookingRequest, opts ...grpc.CallOption) (*CancelBookingResponse, error)
+	// AcceptBooking confirms a DRAFT booking (DRAFT -> RESERVED), as the admin UI
+	// does. Requires book.update.
+	AcceptBooking(ctx context.Context, in *AcceptBookingRequest, opts ...grpc.CallOption) (*AcceptBookingResponse, error)
+	// RejectBooking declines a DRAFT booking (DRAFT -> CANCELED) of a tenant that
+	// does not auto-accept, as the admin UI does. Requires book.update.
+	RejectBooking(ctx context.Context, in *RejectBookingRequest, opts ...grpc.CallOption) (*RejectBookingResponse, error)
+	// NoShowBooking records that the consumer did not show up (RESERVED ->
+	// NO_SHOW), as the admin UI does. Requires book.update.
+	NoShowBooking(ctx context.Context, in *NoShowBookingRequest, opts ...grpc.CallOption) (*NoShowBookingResponse, error)
 }
 
 type bookServiceClient struct {
@@ -126,13 +140,43 @@ func (c *bookServiceClient) CancelBooking(ctx context.Context, in *CancelBooking
 	return out, nil
 }
 
+func (c *bookServiceClient) AcceptBooking(ctx context.Context, in *AcceptBookingRequest, opts ...grpc.CallOption) (*AcceptBookingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AcceptBookingResponse)
+	err := c.cc.Invoke(ctx, BookService_AcceptBooking_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bookServiceClient) RejectBooking(ctx context.Context, in *RejectBookingRequest, opts ...grpc.CallOption) (*RejectBookingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RejectBookingResponse)
+	err := c.cc.Invoke(ctx, BookService_RejectBooking_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bookServiceClient) NoShowBooking(ctx context.Context, in *NoShowBookingRequest, opts ...grpc.CallOption) (*NoShowBookingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NoShowBookingResponse)
+	err := c.cc.Invoke(ctx, BookService_NoShowBooking_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BookServiceServer is the server API for BookService service.
 // All implementations must embed UnimplementedBookServiceServer
 // for forward compatibility.
 //
 // BookService exposes a tenant's bookings to authenticated external API
-// consumers: reads (book.read) plus create / update / cancel (book.create,
-// book.update).
+// consumers: reads (book.read) plus create / update / status changes
+// (book.create, book.update). The status changes behave as in the admin UI.
 type BookServiceServer interface {
 	// ListBookings returns a tenant's bookings whose time window falls in
 	// [start_at, end_at], newest first, paginated. Requires book.read.
@@ -140,20 +184,30 @@ type BookServiceServer interface {
 	// GetBooking returns a single booking by its opaque id, scoped to the tenant.
 	// Requires book.read.
 	GetBooking(context.Context, *GetBookingRequest) (*GetBookingResponse, error)
-	// CreateBooking books a service for a consumer. The API resolves (or creates)
-	// a CONSUMER record for the tenant from the supplied consumer contact, validates
-	// the slot against the tenant's schedule (capacity / staff / no past times),
-	// and returns the new booking (DRAFT, or RESERVED when the tenant auto-accepts).
+	// CreateBooking books a service for a registered consumer (consumer_id),
+	// validates the slot against the tenant's schedule (capacity / staff / no past
+	// times), sends the same notifications as an in-store booking, and returns the
+	// new booking (DRAFT, or RESERVED when the tenant auto-accepts).
 	// Requires book.create. Supply idempotency_key to make retries safe: resending
 	// the same key replays the original booking instead of creating a duplicate.
 	CreateBooking(context.Context, *CreateBookingRequest) (*CreateBookingResponse, error)
-	// UpdateBooking changes a booking's time / services / metadata. Requires
-	// book.update. Pass expected_updated_at (from Booking.updated_at) for
-	// optimistic concurrency; a mismatch returns ABORTED.
+	// UpdateBooking changes a booking's time / services / name / desc, and its
+	// external_id / metadata. Requires book.update. Pass expected_updated_at (from
+	// Booking.updated_at) for optimistic concurrency; a mismatch returns ABORTED.
+	// Changing only external_id / metadata leaves the booking itself untouched.
 	UpdateBooking(context.Context, *UpdateBookingRequest) (*UpdateBookingResponse, error)
 	// CancelBooking cancels a booking (DRAFT / RESERVED / ORDERED -> CANCELED).
 	// Requires book.update. There is no hard-delete on the external surface.
 	CancelBooking(context.Context, *CancelBookingRequest) (*CancelBookingResponse, error)
+	// AcceptBooking confirms a DRAFT booking (DRAFT -> RESERVED), as the admin UI
+	// does. Requires book.update.
+	AcceptBooking(context.Context, *AcceptBookingRequest) (*AcceptBookingResponse, error)
+	// RejectBooking declines a DRAFT booking (DRAFT -> CANCELED) of a tenant that
+	// does not auto-accept, as the admin UI does. Requires book.update.
+	RejectBooking(context.Context, *RejectBookingRequest) (*RejectBookingResponse, error)
+	// NoShowBooking records that the consumer did not show up (RESERVED ->
+	// NO_SHOW), as the admin UI does. Requires book.update.
+	NoShowBooking(context.Context, *NoShowBookingRequest) (*NoShowBookingResponse, error)
 	mustEmbedUnimplementedBookServiceServer()
 }
 
@@ -178,6 +232,15 @@ func (UnimplementedBookServiceServer) UpdateBooking(context.Context, *UpdateBook
 }
 func (UnimplementedBookServiceServer) CancelBooking(context.Context, *CancelBookingRequest) (*CancelBookingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CancelBooking not implemented")
+}
+func (UnimplementedBookServiceServer) AcceptBooking(context.Context, *AcceptBookingRequest) (*AcceptBookingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AcceptBooking not implemented")
+}
+func (UnimplementedBookServiceServer) RejectBooking(context.Context, *RejectBookingRequest) (*RejectBookingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RejectBooking not implemented")
+}
+func (UnimplementedBookServiceServer) NoShowBooking(context.Context, *NoShowBookingRequest) (*NoShowBookingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NoShowBooking not implemented")
 }
 func (UnimplementedBookServiceServer) mustEmbedUnimplementedBookServiceServer() {}
 func (UnimplementedBookServiceServer) testEmbeddedByValue()                     {}
@@ -290,6 +353,60 @@ func _BookService_CancelBooking_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BookService_AcceptBooking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AcceptBookingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookServiceServer).AcceptBooking(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BookService_AcceptBooking_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookServiceServer).AcceptBooking(ctx, req.(*AcceptBookingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BookService_RejectBooking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RejectBookingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookServiceServer).RejectBooking(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BookService_RejectBooking_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookServiceServer).RejectBooking(ctx, req.(*RejectBookingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BookService_NoShowBooking_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NoShowBookingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookServiceServer).NoShowBooking(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BookService_NoShowBooking_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookServiceServer).NoShowBooking(ctx, req.(*NoShowBookingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BookService_ServiceDesc is the grpc.ServiceDesc for BookService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -316,6 +433,18 @@ var BookService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CancelBooking",
 			Handler:    _BookService_CancelBooking_Handler,
+		},
+		{
+			MethodName: "AcceptBooking",
+			Handler:    _BookService_AcceptBooking_Handler,
+		},
+		{
+			MethodName: "RejectBooking",
+			Handler:    _BookService_RejectBooking_Handler,
+		},
+		{
+			MethodName: "NoShowBooking",
+			Handler:    _BookService_NoShowBooking_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

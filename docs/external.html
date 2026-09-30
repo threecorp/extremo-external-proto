@@ -187,11 +187,19 @@
                 </li>
               
                 <li>
+                  <a href="#extremo.msg.external.v1.Booking.MetadataEntry"><span class="badge">M</span>Booking.MetadataEntry</a>
+                </li>
+              
+                <li>
                   <a href="#extremo.msg.external.v1.BookingEvent"><span class="badge">M</span>BookingEvent</a>
                 </li>
               
                 <li>
                   <a href="#extremo.msg.external.v1.Consumer"><span class="badge">M</span>Consumer</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.msg.external.v1.Consumer.MetadataEntry"><span class="badge">M</span>Consumer.MetadataEntry</a>
                 </li>
               
                 <li>
@@ -276,6 +284,14 @@
             <ul>
               
                 <li>
+                  <a href="#extremo.api.external.books.v1.AcceptBookingRequest"><span class="badge">M</span>AcceptBookingRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.AcceptBookingResponse"><span class="badge">M</span>AcceptBookingResponse</a>
+                </li>
+              
+                <li>
                   <a href="#extremo.api.external.books.v1.CancelBookingRequest"><span class="badge">M</span>CancelBookingRequest</a>
                 </li>
               
@@ -285,6 +301,10 @@
               
                 <li>
                   <a href="#extremo.api.external.books.v1.CreateBookingRequest"><span class="badge">M</span>CreateBookingRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.CreateBookingRequest.MetadataEntry"><span class="badge">M</span>CreateBookingRequest.MetadataEntry</a>
                 </li>
               
                 <li>
@@ -308,7 +328,27 @@
                 </li>
               
                 <li>
+                  <a href="#extremo.api.external.books.v1.NoShowBookingRequest"><span class="badge">M</span>NoShowBookingRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.NoShowBookingResponse"><span class="badge">M</span>NoShowBookingResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.RejectBookingRequest"><span class="badge">M</span>RejectBookingRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.RejectBookingResponse"><span class="badge">M</span>RejectBookingResponse</a>
+                </li>
+              
+                <li>
                   <a href="#extremo.api.external.books.v1.UpdateBookingRequest"><span class="badge">M</span>UpdateBookingRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.books.v1.UpdateBookingRequest.MetadataEntry"><span class="badge">M</span>UpdateBookingRequest.MetadataEntry</a>
                 </li>
               
                 <li>
@@ -335,6 +375,10 @@
                 </li>
               
                 <li>
+                  <a href="#extremo.api.external.consumers.v1.CreateConsumerRequest.MetadataEntry"><span class="badge">M</span>CreateConsumerRequest.MetadataEntry</a>
+                </li>
+              
+                <li>
                   <a href="#extremo.api.external.consumers.v1.CreateConsumerResponse"><span class="badge">M</span>CreateConsumerResponse</a>
                 </li>
               
@@ -344,14 +388,6 @@
               
                 <li>
                   <a href="#extremo.api.external.consumers.v1.DeleteConsumerResponse"><span class="badge">M</span>DeleteConsumerResponse</a>
-                </li>
-              
-                <li>
-                  <a href="#extremo.api.external.consumers.v1.GetConsumerByRefRequest"><span class="badge">M</span>GetConsumerByRefRequest</a>
-                </li>
-              
-                <li>
-                  <a href="#extremo.api.external.consumers.v1.GetConsumerByRefResponse"><span class="badge">M</span>GetConsumerByRefResponse</a>
                 </li>
               
                 <li>
@@ -372,6 +408,10 @@
               
                 <li>
                   <a href="#extremo.api.external.consumers.v1.UpdateConsumerRequest"><span class="badge">M</span>UpdateConsumerRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.api.external.consumers.v1.UpdateConsumerRequest.MetadataEntry"><span class="badge">M</span>UpdateConsumerRequest.MetadataEntry</a>
                 </li>
               
                 <li>
@@ -560,6 +600,52 @@ bookings that predate service linkage. </p></td>
 through CreateBooking has one; a booking made in the store may have several. </p></td>
                 </tr>
               
+                <tr>
+                  <td>external_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The partner&#39;s own id for this booking, if one was set (any string, unique per
+tenant among bookings). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>metadata</td>
+                  <td><a href="#extremo.msg.external.v1.Booking.MetadataEntry">Booking.MetadataEntry</a></td>
+                  <td>repeated</td>
+                  <td><p>Partner key-value pairs set on this booking (Stripe-style metadata). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.msg.external.v1.Booking.MetadataEntry">Booking.MetadataEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -622,7 +708,7 @@ been hard-deleted (the event type still records what happened). </p></td>
         
       
         <h3 id="extremo.msg.external.v1.Consumer">Consumer</h3>
-        <p>Consumer is a tenant's consumer (a CONSUMER record) as managed over the external</p><p>partner API. `id` is the opaque Extremo handle (tenant-scoped) — use it in future</p><p>booking calls; `external_ref` echoes the partner's own id when one was supplied</p><p>at registration. Contact fields echo what the partner registered.</p>
+        <p>Consumer is a tenant's consumer (a CONSUMER record) as managed over the external</p><p>partner API. `id` is the opaque Extremo handle (tenant-scoped) — use it in future</p><p>booking calls; `external_id` is the partner's own id for the consumer, if one was</p><p>set. Contact fields echo what the partner registered.</p>
 
         
           <table class="field-table">
@@ -660,10 +746,11 @@ been hard-deleted (the event type still records what happened). </p></td>
                 </tr>
               
                 <tr>
-                  <td>external_ref</td>
+                  <td>external_id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>Partner-side correlation id, if one was supplied at registration. </p></td>
+                  <td><p>The partner&#39;s own id for this consumer, if one was set (any string, unique per
+tenant among consumers). </p></td>
                 </tr>
               
                 <tr>
@@ -671,6 +758,44 @@ been hard-deleted (the event type still records what happened). </p></td>
                   <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
                   <td></td>
                   <td><p>Registration time (UTC). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>metadata</td>
+                  <td><a href="#extremo.msg.external.v1.Consumer.MetadataEntry">Consumer.MetadataEntry</a></td>
+                  <td>repeated</td>
+                  <td><p>Partner key-value pairs set on this consumer (Stripe-style metadata). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.msg.external.v1.Consumer.MetadataEntry">Consumer.MetadataEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -1264,6 +1389,61 @@ incrementally by passing next_cursor back on each call.</p></td>
       <p></p>
 
       
+        <h3 id="extremo.api.external.books.v1.AcceptBookingRequest">AcceptBookingRequest</h3>
+        <p>AcceptBookingRequest confirms a DRAFT booking.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant the booking belongs to. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Booking to accept. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.books.v1.AcceptBookingResponse">AcceptBookingResponse</h3>
+        <p>AcceptBookingResponse carries the accepted booking.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>booking</td>
+                  <td><a href="#extremo.msg.external.v1.Booking">extremo.msg.external.v1.Booking</a></td>
+                  <td></td>
+                  <td><p>The accepted booking (status RESERVED). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="extremo.api.external.books.v1.CancelBookingRequest">CancelBookingRequest</h3>
         <p>CancelBookingRequest cancels a booking.</p>
 
@@ -1327,7 +1507,7 @@ incrementally by passing next_cursor back on each call.</p></td>
         
       
         <h3 id="extremo.api.external.books.v1.CreateBookingRequest">CreateBookingRequest</h3>
-        <p>CreateBookingRequest books one or more services for a consumer at a start</p><p>time. The end time is derived server-side from the services' total duration,</p><p>so no end time is accepted.</p><p>The consumer must already exist: register one through ConsumerService, keep</p><p>the returned Consumer.id, and pass it here. Booking never creates a consumer</p><p>as a side effect. A partner holding its own id instead of ours can translate</p><p>it with ConsumerService.GetConsumerByRef.</p>
+        <p>CreateBookingRequest books one or more services for a consumer at a start</p><p>time. The end time is derived server-side from the services' total duration,</p><p>so no end time is accepted.</p><p>The consumer must already exist: register one through ConsumerService, keep</p><p>the returned Consumer.id, and pass it here. Booking never creates a consumer</p><p>as a side effect. A partner holding its own id instead of ours can translate</p><p>it with ConsumerService.ListConsumers (external_id filter).</p>
 
         
           <table class="field-table">
@@ -1380,10 +1560,10 @@ replays the original booking instead of creating a duplicate. </p></td>
                 </tr>
               
                 <tr>
-                  <td>external_ref</td>
+                  <td>external_id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>Optional partner-side correlation id stored on the booking (&lt;= 255). </p></td>
+                  <td><p>Optional partner&#39;s own id for the booking (any string, unique per tenant). </p></td>
                 </tr>
               
                 <tr>
@@ -1391,6 +1571,45 @@ replays the original booking instead of creating a duplicate. </p></td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
                   <td><p>The consumer to book for (Consumer.id from ConsumerService). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>metadata</td>
+                  <td><a href="#extremo.api.external.books.v1.CreateBookingRequest.MetadataEntry">CreateBookingRequest.MetadataEntry</a></td>
+                  <td>repeated</td>
+                  <td><p>Optional partner key-value pairs (up to 50 keys; key 1-40 chars without
+square brackets; value up to 500 chars). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.books.v1.CreateBookingRequest.MetadataEntry">CreateBookingRequest.MetadataEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -1533,10 +1752,10 @@ replays the original booking instead of creating a duplicate. </p></td>
                 </tr>
               
                 <tr>
-                  <td>external_ref</td>
+                  <td>external_id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>When set, return only bookings whose external_ref equals this value. </p></td>
+                  <td><p>When set, return only the booking whose external_id equals this value. </p></td>
                 </tr>
               
                 <tr>
@@ -1584,8 +1803,132 @@ replays the original booking instead of creating a duplicate. </p></td>
 
         
       
+        <h3 id="extremo.api.external.books.v1.NoShowBookingRequest">NoShowBookingRequest</h3>
+        <p>NoShowBookingRequest records that the consumer did not show up.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant the booking belongs to. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Booking to mark as a no-show. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>reason</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Optional free-text reason (&lt;= 512). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.books.v1.NoShowBookingResponse">NoShowBookingResponse</h3>
+        <p>NoShowBookingResponse carries the updated booking.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>booking</td>
+                  <td><a href="#extremo.msg.external.v1.Booking">extremo.msg.external.v1.Booking</a></td>
+                  <td></td>
+                  <td><p>The booking (status NO_SHOW). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.books.v1.RejectBookingRequest">RejectBookingRequest</h3>
+        <p>RejectBookingRequest declines a DRAFT booking.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>tenant_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Tenant the booking belongs to. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Booking to reject. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>reason</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Optional free-text rejection reason (&lt;= 512). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.books.v1.RejectBookingResponse">RejectBookingResponse</h3>
+        <p>RejectBookingResponse carries the rejected booking.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>booking</td>
+                  <td><a href="#extremo.msg.external.v1.Booking">extremo.msg.external.v1.Booking</a></td>
+                  <td></td>
+                  <td><p>The rejected booking (status CANCELED). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="extremo.api.external.books.v1.UpdateBookingRequest">UpdateBookingRequest</h3>
-        <p>UpdateBookingRequest changes a booking. Only the set fields are applied;</p><p>changing service_ids or start_at re-derives the end time.</p>
+        <p>UpdateBookingRequest changes a booking. Only the set fields are applied;</p><p>changing service_ids or start_at re-derives the end time. metadata merges into</p><p>the stored pairs: a key with an empty value is removed, and the merged result</p><p>may hold at most 50 keys.</p>
 
         
           <table class="field-table">
@@ -1637,10 +1980,10 @@ replays the original booking instead of creating a duplicate. </p></td>
                 </tr>
               
                 <tr>
-                  <td>external_ref</td>
+                  <td>external_id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>New partner-side correlation id (empty = unchanged). </p></td>
+                  <td><p>New partner&#39;s own id (empty = unchanged). </p></td>
                 </tr>
               
                 <tr>
@@ -1649,6 +1992,44 @@ replays the original booking instead of creating a duplicate. </p></td>
                   <td></td>
                   <td><p>Optimistic-lock guard. When set, the update is rejected with ABORTED if the
 booking&#39;s current updated_at differs (echo Booking.updated_at here). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>metadata</td>
+                  <td><a href="#extremo.api.external.books.v1.UpdateBookingRequest.MetadataEntry">UpdateBookingRequest.MetadataEntry</a></td>
+                  <td>repeated</td>
+                  <td><p>Key-value pairs to merge into the stored metadata (empty value = remove key). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.books.v1.UpdateBookingRequest.MetadataEntry">UpdateBookingRequest.MetadataEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -1689,7 +2070,7 @@ booking&#39;s current updated_at differs (echo Booking.updated_at here). </p></t
 
       
         <h3 id="extremo.api.external.books.v1.BookService">BookService</h3>
-        <p>BookService exposes a tenant's bookings to authenticated external API</p><p>consumers: reads (book.read) plus create / update / cancel (book.create,</p><p>book.update).</p>
+        <p>BookService exposes a tenant's bookings to authenticated external API</p><p>consumers: reads (book.read) plus create / update / status changes</p><p>(book.create, book.update). The status changes behave as in the admin UI.</p>
         <table class="enum-table">
           <thead>
             <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
@@ -1716,10 +2097,10 @@ Requires book.read.</p></td>
                 <td>CreateBooking</td>
                 <td><a href="#extremo.api.external.books.v1.CreateBookingRequest">CreateBookingRequest</a></td>
                 <td><a href="#extremo.api.external.books.v1.CreateBookingResponse">CreateBookingResponse</a></td>
-                <td><p>CreateBooking books a service for a consumer. The API resolves (or creates)
-a CONSUMER record for the tenant from the supplied consumer contact, validates
-the slot against the tenant&#39;s schedule (capacity / staff / no past times),
-and returns the new booking (DRAFT, or RESERVED when the tenant auto-accepts).
+                <td><p>CreateBooking books a service for a registered consumer (consumer_id),
+validates the slot against the tenant&#39;s schedule (capacity / staff / no past
+times), sends the same notifications as an in-store booking, and returns the
+new booking (DRAFT, or RESERVED when the tenant auto-accepts).
 Requires book.create. Supply idempotency_key to make retries safe: resending
 the same key replays the original booking instead of creating a duplicate.</p></td>
               </tr>
@@ -1728,9 +2109,10 @@ the same key replays the original booking instead of creating a duplicate.</p></
                 <td>UpdateBooking</td>
                 <td><a href="#extremo.api.external.books.v1.UpdateBookingRequest">UpdateBookingRequest</a></td>
                 <td><a href="#extremo.api.external.books.v1.UpdateBookingResponse">UpdateBookingResponse</a></td>
-                <td><p>UpdateBooking changes a booking&#39;s time / services / metadata. Requires
-book.update. Pass expected_updated_at (from Booking.updated_at) for
-optimistic concurrency; a mismatch returns ABORTED.</p></td>
+                <td><p>UpdateBooking changes a booking&#39;s time / services / name / desc, and its
+external_id / metadata. Requires book.update. Pass expected_updated_at (from
+Booking.updated_at) for optimistic concurrency; a mismatch returns ABORTED.
+Changing only external_id / metadata leaves the booking itself untouched.</p></td>
               </tr>
             
               <tr>
@@ -1739,6 +2121,30 @@ optimistic concurrency; a mismatch returns ABORTED.</p></td>
                 <td><a href="#extremo.api.external.books.v1.CancelBookingResponse">CancelBookingResponse</a></td>
                 <td><p>CancelBooking cancels a booking (DRAFT / RESERVED / ORDERED -&gt; CANCELED).
 Requires book.update. There is no hard-delete on the external surface.</p></td>
+              </tr>
+            
+              <tr>
+                <td>AcceptBooking</td>
+                <td><a href="#extremo.api.external.books.v1.AcceptBookingRequest">AcceptBookingRequest</a></td>
+                <td><a href="#extremo.api.external.books.v1.AcceptBookingResponse">AcceptBookingResponse</a></td>
+                <td><p>AcceptBooking confirms a DRAFT booking (DRAFT -&gt; RESERVED), as the admin UI
+does. Requires book.update.</p></td>
+              </tr>
+            
+              <tr>
+                <td>RejectBooking</td>
+                <td><a href="#extremo.api.external.books.v1.RejectBookingRequest">RejectBookingRequest</a></td>
+                <td><a href="#extremo.api.external.books.v1.RejectBookingResponse">RejectBookingResponse</a></td>
+                <td><p>RejectBooking declines a DRAFT booking (DRAFT -&gt; CANCELED) of a tenant that
+does not auto-accept, as the admin UI does. Requires book.update.</p></td>
+              </tr>
+            
+              <tr>
+                <td>NoShowBooking</td>
+                <td><a href="#extremo.api.external.books.v1.NoShowBookingRequest">NoShowBookingRequest</a></td>
+                <td><a href="#extremo.api.external.books.v1.NoShowBookingResponse">NoShowBookingResponse</a></td>
+                <td><p>NoShowBooking records that the consumer did not show up (RESERVED -&gt;
+NO_SHOW), as the admin UI does. Requires book.update.</p></td>
               </tr>
             
           </tbody>
@@ -1809,6 +2215,36 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
               </tr>
               
             
+              
+              
+              <tr>
+                <td>AcceptBooking</td>
+                <td>POST</td>
+                <td>/api/external/v1/{tenant_id}/books/{id}:accept</td>
+                <td>*</td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>RejectBooking</td>
+                <td>POST</td>
+                <td>/api/external/v1/{tenant_id}/books/{id}:reject</td>
+                <td>*</td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>NoShowBooking</td>
+                <td>POST</td>
+                <td>/api/external/v1/{tenant_id}/books/{id}:noShow</td>
+                <td>*</td>
+              </tr>
+              
+            
             </tbody>
           </table>
           
@@ -1860,10 +2296,50 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
                 </tr>
               
                 <tr>
-                  <td>external_ref</td>
+                  <td>external_id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>Optional partner-side id, recorded so the partner can later GetConsumerByRef. </p></td>
+                  <td><p>Optional partner&#39;s own id for the consumer (any string, unique per tenant).
+Look the consumer up later with ListConsumers.external_id. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>metadata</td>
+                  <td><a href="#extremo.api.external.consumers.v1.CreateConsumerRequest.MetadataEntry">CreateConsumerRequest.MetadataEntry</a></td>
+                  <td>repeated</td>
+                  <td><p>Optional partner key-value pairs (up to 50 keys; key 1-40 chars without
+square brackets; value up to 500 chars). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.consumers.v1.CreateConsumerRequest.MetadataEntry">CreateConsumerRequest.MetadataEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -1932,61 +2408,6 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
         <p>DeleteConsumerResponse is empty.</p>
 
         
-
-        
-      
-        <h3 id="extremo.api.external.consumers.v1.GetConsumerByRefRequest">GetConsumerByRefRequest</h3>
-        <p>GetConsumerByRefRequest selects a consumer by the partner's own external_ref.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>tenant_id</td>
-                  <td><a href="#uint64">uint64</a></td>
-                  <td></td>
-                  <td><p>Tenant the consumer belongs to. </p></td>
-                </tr>
-              
-                <tr>
-                  <td>external_ref</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>The partner-side correlation id supplied at creation. </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="extremo.api.external.consumers.v1.GetConsumerByRefResponse">GetConsumerByRefResponse</h3>
-        <p>GetConsumerByRefResponse carries the consumer.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>consumer</td>
-                  <td><a href="#extremo.msg.external.v1.Consumer">extremo.msg.external.v1.Consumer</a></td>
-                  <td></td>
-                  <td><p>The consumer. </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
 
         
       
@@ -2076,6 +2497,13 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
                   <td><p>Page size (1..100). </p></td>
                 </tr>
               
+                <tr>
+                  <td>external_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>When set, return only the consumer whose external_id equals this value. </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -2115,7 +2543,7 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
         
       
         <h3 id="extremo.api.external.consumers.v1.UpdateConsumerRequest">UpdateConsumerRequest</h3>
-        <p>UpdateConsumerRequest patches a consumer's mutable fields. An empty field leaves</p><p>the current value unchanged.</p>
+        <p>UpdateConsumerRequest patches a consumer's mutable fields. An empty field leaves</p><p>the current value unchanged. metadata merges into the stored pairs: a key with</p><p>an empty value is removed, and the merged result may hold at most 50 keys.</p>
 
         
           <table class="field-table">
@@ -2146,10 +2574,48 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
                 </tr>
               
                 <tr>
-                  <td>external_ref</td>
+                  <td>external_id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>New partner-side external_ref (empty = unchanged). </p></td>
+                  <td><p>New partner&#39;s own id (empty = unchanged). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>metadata</td>
+                  <td><a href="#extremo.api.external.consumers.v1.UpdateConsumerRequest.MetadataEntry">UpdateConsumerRequest.MetadataEntry</a></td>
+                  <td>repeated</td>
+                  <td><p>Key-value pairs to merge into the stored metadata (empty value = remove key). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.api.external.consumers.v1.UpdateConsumerRequest.MetadataEntry">UpdateConsumerRequest.MetadataEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -2201,9 +2667,10 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
                 <td>CreateConsumer</td>
                 <td><a href="#extremo.api.external.consumers.v1.CreateConsumerRequest">CreateConsumerRequest</a></td>
                 <td><a href="#extremo.api.external.consumers.v1.CreateConsumerResponse">CreateConsumerResponse</a></td>
-                <td><p>CreateConsumer registers (or resolves) a tenant consumer. Resolution is by
-email/phone: a returning consumer resolves to the existing record. Rejected with
-AlreadyExists if the contact belongs to tenant staff (OWNER/MEMBER).</p></td>
+                <td><p>CreateConsumer registers a tenant consumer. Registering a contact that is
+already a consumer of this tenant returns that consumer. Rejected with
+AlreadyExists if the contact belongs to tenant staff (OWNER/MEMBER) or to a
+person registered elsewhere, or if external_id is used by another consumer.</p></td>
               </tr>
             
               <tr>
@@ -2214,24 +2681,19 @@ AlreadyExists if the contact belongs to tenant staff (OWNER/MEMBER).</p></td>
               </tr>
             
               <tr>
-                <td>GetConsumerByRef</td>
-                <td><a href="#extremo.api.external.consumers.v1.GetConsumerByRefRequest">GetConsumerByRefRequest</a></td>
-                <td><a href="#extremo.api.external.consumers.v1.GetConsumerByRefResponse">GetConsumerByRefResponse</a></td>
-                <td><p>GetConsumerByRef returns a consumer by the partner&#39;s own external_ref.</p></td>
-              </tr>
-            
-              <tr>
                 <td>ListConsumers</td>
                 <td><a href="#extremo.api.external.consumers.v1.ListConsumersRequest">ListConsumersRequest</a></td>
                 <td><a href="#extremo.api.external.consumers.v1.ListConsumersResponse">ListConsumersResponse</a></td>
-                <td><p>ListConsumers returns the tenant&#39;s consumers, paginated.</p></td>
+                <td><p>ListConsumers returns the tenant&#39;s consumers, paginated. Filter by external_id
+to look a consumer up by the partner&#39;s own id.</p></td>
               </tr>
             
               <tr>
                 <td>UpdateConsumer</td>
                 <td><a href="#extremo.api.external.consumers.v1.UpdateConsumerRequest">UpdateConsumerRequest</a></td>
                 <td><a href="#extremo.api.external.consumers.v1.UpdateConsumerResponse">UpdateConsumerResponse</a></td>
-                <td><p>UpdateConsumer updates a consumer&#39;s mutable fields (display name, external_ref).</p></td>
+                <td><p>UpdateConsumer updates a consumer&#39;s mutable fields (display name, external_id,
+metadata).</p></td>
               </tr>
             
               <tr>
@@ -2276,16 +2738,6 @@ underlying global user is never deleted).</p></td>
                 <td>GetConsumer</td>
                 <td>GET</td>
                 <td>/api/external/v1/{tenant_id}/consumers/{id}</td>
-                <td></td>
-              </tr>
-              
-            
-              
-              
-              <tr>
-                <td>GetConsumerByRef</td>
-                <td>GET</td>
-                <td>/api/external/v1/{tenant_id}/consumers:byRef</td>
                 <td></td>
               </tr>
               

@@ -7,7 +7,8 @@ syntax = "proto3";
 // scope (stricter than the public-grade services/tenants/availability reads) and
 // return the public Booking DTO only — no consumer identity, staff, internal
 // foreign keys, or pricing. The writes (CreateBooking / UpdateBooking /
-// CancelBooking) require the `book.create` / `book.update` scope; a created
+// CancelBooking / AcceptBooking / RejectBooking / NoShowBooking) require the
+// `book.create` / `book.update` scope; a created
 // booking is validated by the same availability rules as an in-store booking
 // (schedule capacity, staff coverage, no past times), returning InvalidArgument
 // when a slot is full or the time is in the past.
@@ -21,8 +22,8 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/api/external/books/v1;books";
 
 // BookService exposes a tenant's bookings to authenticated external API
-// consumers: reads (book.read) plus create / update / cancel (book.create,
-// book.update).
+// consumers: reads (book.read) plus create / update / status changes
+// (book.create, book.update). The status changes behave as in the admin UI.
 service BookService {
   // ListBookings returns a tenant's bookings whose time window falls in
   // [start_at, end_at], newest first, paginated. Requires book.read.
@@ -34,10 +35,10 @@ service BookService {
   rpc GetBooking(GetBookingRequest) returns (GetBookingResponse) {
     option (google.api.http) = {get: "/api/external/v1/{tenant_id}/books/{id}"};
   }
-  // CreateBooking books a service for a consumer. The API resolves (or creates)
-  // a CONSUMER record for the tenant from the supplied consumer contact, validates
-  // the slot against the tenant's schedule (capacity / staff / no past times),
-  // and returns the new booking (DRAFT, or RESERVED when the tenant auto-accepts).
+  // CreateBooking books a service for a registered consumer (consumer_id),
+  // validates the slot against the tenant's schedule (capacity / staff / no past
+  // times), sends the same notifications as an in-store booking, and returns the
+  // new booking (DRAFT, or RESERVED when the tenant auto-accepts).
   // Requires book.create. Supply idempotency_key to make retries safe: resending
   // the same key replays the original booking instead of creating a duplicate.
   rpc CreateBooking(CreateBookingRequest) returns (CreateBookingResponse) {
@@ -46,9 +47,10 @@ service BookService {
       body: "*"
     };
   }
-  // UpdateBooking changes a booking's time / services / metadata. Requires
-  // book.update. Pass expected_updated_at (from Booking.updated_at) for
-  // optimistic concurrency; a mismatch returns ABORTED.
+  // UpdateBooking changes a booking's time / services / name / desc, and its
+  // external_id / metadata. Requires book.update. Pass expected_updated_at (from
+  // Booking.updated_at) for optimistic concurrency; a mismatch returns ABORTED.
+  // Changing only external_id / metadata leaves the booking itself untouched.
   rpc UpdateBooking(UpdateBookingRequest) returns (UpdateBookingResponse) {
     option (google.api.http) = {
       patch: "/api/external/v1/{tenant_id}/books/{id}"
@@ -60,6 +62,30 @@ service BookService {
   rpc CancelBooking(CancelBookingRequest) returns (CancelBookingResponse) {
     option (google.api.http) = {
       post: "/api/external/v1/{tenant_id}/books/{id}:cancel"
+      body: "*"
+    };
+  }
+  // AcceptBooking confirms a DRAFT booking (DRAFT -> RESERVED), as the admin UI
+  // does. Requires book.update.
+  rpc AcceptBooking(AcceptBookingRequest) returns (AcceptBookingResponse) {
+    option (google.api.http) = {
+      post: "/api/external/v1/{tenant_id}/books/{id}:accept"
+      body: "*"
+    };
+  }
+  // RejectBooking declines a DRAFT booking (DRAFT -> CANCELED) of a tenant that
+  // does not auto-accept, as the admin UI does. Requires book.update.
+  rpc RejectBooking(RejectBookingRequest) returns (RejectBookingResponse) {
+    option (google.api.http) = {
+      post: "/api/external/v1/{tenant_id}/books/{id}:reject"
+      body: "*"
+    };
+  }
+  // NoShowBooking records that the consumer did not show up (RESERVED ->
+  // NO_SHOW), as the admin UI does. Requires book.update.
+  rpc NoShowBooking(NoShowBookingRequest) returns (NoShowBookingResponse) {
+    option (google.api.http) = {
+      post: "/api/external/v1/{tenant_id}/books/{id}:noShow"
       body: "*"
     };
   }
@@ -84,8 +110,8 @@ message ListBookingsRequest {
   // When true, return only bookings created through the external partner API
   // (partner origin), excluding in-store / mypage bookings.
   bool only_external = 6;
-  // When set, return only bookings whose external_ref equals this value.
-  string external_ref = 7 [(buf.validate.field).string.max_len = 255];
+  // When set, return only the booking whose external_id equals this value.
+  string external_id = 7 [(buf.validate.field).string.max_len = 255];
   // When set, return only bookings that include this consumer (see Consumer.id).
   uint64 consumer_id = 8;
 }
@@ -119,7 +145,7 @@ message GetBookingResponse {
 // The consumer must already exist: register one through ConsumerService, keep
 // the returned Consumer.id, and pass it here. Booking never creates a consumer
 // as a side effect. A partner holding its own id instead of ours can translate
-// it with ConsumerService.GetConsumerByRef.
+// it with ConsumerService.ListConsumers (external_id filter).
 message CreateBookingRequest {
   // Tenant to book under (must match the API key's tenant).
   uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
@@ -139,10 +165,25 @@ message CreateBookingRequest {
   // Optional idempotency key (<= 255). Resending the same key for this tenant
   // replays the original booking instead of creating a duplicate.
   string idempotency_key = 7 [(buf.validate.field).string.max_len = 255];
-  // Optional partner-side correlation id stored on the booking (<= 255).
-  string external_ref = 8 [(buf.validate.field).string.max_len = 255];
+  // Optional partner's own id for the booking (any string, unique per tenant).
+  string external_id = 8 [(buf.validate.field).string.max_len = 255];
   // The consumer to book for (Consumer.id from ConsumerService).
   uint64 consumer_id = 9 [(buf.validate.field).uint64.gt = 0];
+  // Optional partner key-value pairs (up to 50 keys; key 1-40 chars without
+  // square brackets; value up to 500 chars).
+  map<string, string> metadata = 10 [(buf.validate.field).map = {
+    max_pairs: 50
+    keys: {
+      string: {
+        min_len: 1
+        max_len: 40
+        pattern: "^[^\\[\\]]+$"
+      }
+    }
+    values: {
+      string: {max_len: 500}
+    }
+  }];
 
   // 4 held `Consumer consumer`, an inline contact the API resolved-or-created a
   // consumer from. Removed in favour of consumer_id: a booking write no longer
@@ -158,7 +199,9 @@ message CreateBookingResponse {
 }
 
 // UpdateBookingRequest changes a booking. Only the set fields are applied;
-// changing service_ids or start_at re-derives the end time.
+// changing service_ids or start_at re-derives the end time. metadata merges into
+// the stored pairs: a key with an empty value is removed, and the merged result
+// may hold at most 50 keys.
 message UpdateBookingRequest {
   // Tenant the booking belongs to.
   uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
@@ -172,11 +215,25 @@ message UpdateBookingRequest {
   string name = 5 [(buf.validate.field).string.max_len = 255];
   // New note (empty = unchanged).
   string desc = 6 [(buf.validate.field).string.max_len = 1024];
-  // New partner-side correlation id (empty = unchanged).
-  string external_ref = 7 [(buf.validate.field).string.max_len = 255];
+  // New partner's own id (empty = unchanged).
+  string external_id = 7 [(buf.validate.field).string.max_len = 255];
   // Optimistic-lock guard. When set, the update is rejected with ABORTED if the
   // booking's current updated_at differs (echo Booking.updated_at here).
   google.protobuf.Timestamp expected_updated_at = 8;
+  // Key-value pairs to merge into the stored metadata (empty value = remove key).
+  map<string, string> metadata = 9 [(buf.validate.field).map = {
+    max_pairs: 50
+    keys: {
+      string: {
+        min_len: 1
+        max_len: 40
+        pattern: "^[^\\[\\]]+$"
+      }
+    }
+    values: {
+      string: {max_len: 500}
+    }
+  }];
 }
 
 // UpdateBookingResponse carries the updated booking.
@@ -198,5 +255,51 @@ message CancelBookingRequest {
 // CancelBookingResponse carries the canceled booking.
 message CancelBookingResponse {
   // The canceled booking (status CANCELED).
+  extremo.msg.external.v1.Booking booking = 1;
+}
+
+// AcceptBookingRequest confirms a DRAFT booking.
+message AcceptBookingRequest {
+  // Tenant the booking belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Booking to accept.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+}
+
+// AcceptBookingResponse carries the accepted booking.
+message AcceptBookingResponse {
+  // The accepted booking (status RESERVED).
+  extremo.msg.external.v1.Booking booking = 1;
+}
+
+// RejectBookingRequest declines a DRAFT booking.
+message RejectBookingRequest {
+  // Tenant the booking belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Booking to reject.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+  // Optional free-text rejection reason (<= 512).
+  string reason = 3 [(buf.validate.field).string.max_len = 512];
+}
+
+// RejectBookingResponse carries the rejected booking.
+message RejectBookingResponse {
+  // The rejected booking (status CANCELED).
+  extremo.msg.external.v1.Booking booking = 1;
+}
+
+// NoShowBookingRequest records that the consumer did not show up.
+message NoShowBookingRequest {
+  // Tenant the booking belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Booking to mark as a no-show.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+  // Optional free-text reason (<= 512).
+  string reason = 3 [(buf.validate.field).string.max_len = 512];
+}
+
+// NoShowBookingResponse carries the updated booking.
+message NoShowBookingResponse {
+  // The booking (status NO_SHOW).
   extremo.msg.external.v1.Booking booking = 1;
 }
