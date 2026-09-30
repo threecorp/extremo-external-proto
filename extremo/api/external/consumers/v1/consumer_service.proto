@@ -149,8 +149,10 @@ message UpdateConsumerRequest {
   // New partner's own id (empty = unchanged).
   string external_id = 4 [(buf.validate.field).string.max_len = 255];
   // Key-value pairs to merge into the stored metadata (empty value = remove key).
+  // Up to 100 entries per request, so removals and additions fit in one call; the
+  // merged result may hold at most 50 keys.
   map<string, string> metadata = 5 [(buf.validate.field).map = {
-    max_pairs: 50
+    max_pairs: 100
     keys: {
       string: {
         min_len: 1

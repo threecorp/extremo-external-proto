@@ -221,8 +221,10 @@ message UpdateBookingRequest {
   // booking's current updated_at differs (echo Booking.updated_at here).
   google.protobuf.Timestamp expected_updated_at = 8;
   // Key-value pairs to merge into the stored metadata (empty value = remove key).
+  // Up to 100 entries per request, so removals and additions fit in one call; the
+  // merged result may hold at most 50 keys.
   map<string, string> metadata = 9 [(buf.validate.field).map = {
-    max_pairs: 50
+    max_pairs: 100
     keys: {
       string: {
         min_len: 1

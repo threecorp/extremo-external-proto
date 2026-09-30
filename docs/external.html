@@ -1998,7 +1998,9 @@ booking&#39;s current updated_at differs (echo Booking.updated_at here). </p></t
                   <td>metadata</td>
                   <td><a href="#extremo.api.external.books.v1.UpdateBookingRequest.MetadataEntry">UpdateBookingRequest.MetadataEntry</a></td>
                   <td>repeated</td>
-                  <td><p>Key-value pairs to merge into the stored metadata (empty value = remove key). </p></td>
+                  <td><p>Key-value pairs to merge into the stored metadata (empty value = remove key).
+Up to 100 entries per request, so removals and additions fit in one call; the
+merged result may hold at most 50 keys. </p></td>
                 </tr>
               
             </tbody>
@@ -2584,7 +2586,9 @@ square brackets; value up to 500 chars). </p></td>
                   <td>metadata</td>
                   <td><a href="#extremo.api.external.consumers.v1.UpdateConsumerRequest.MetadataEntry">UpdateConsumerRequest.MetadataEntry</a></td>
                   <td>repeated</td>
-                  <td><p>Key-value pairs to merge into the stored metadata (empty value = remove key). </p></td>
+                  <td><p>Key-value pairs to merge into the stored metadata (empty value = remove key).
+Up to 100 entries per request, so removals and additions fit in one call; the
+merged result may hold at most 50 keys. </p></td>
                 </tr>
               
             </tbody>
