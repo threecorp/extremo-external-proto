@@ -86,6 +86,8 @@ message ListBookingsRequest {
   bool only_external = 6;
   // When set, return only bookings whose external_ref equals this value.
   string external_ref = 7 [(buf.validate.field).string.max_len = 255];
+  // When set, return only bookings that include this consumer (see Consumer.id).
+  uint64 consumer_id = 8;
 }
 
 // ListBookingsResponse is a page of public bookings.
