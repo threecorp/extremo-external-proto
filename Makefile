@@ -18,7 +18,7 @@ lint:  ## Lint proto files and validate build
 protocol:  ## Generate code (go, ts, dart) from .proto schema
 	@make clean
 	@buf build --path extremo
-	# NOTE: unlike the internal extremo-proto monorepo, this is a STANDALONE Go
+	# NOTE: this is a STANDALONE Go
 	# module that external consumers `go get`. We do NOT `--include-imports
 	# --include-wkt`: generated code references upstream Go packages for
 	# google.* / buf.validate.* (see go.mod), so `externalgo/` contains only our

@@ -16,11 +16,10 @@ plugins:
       - generate_unbound_methods=true
       - logtostderr=true
 
-  # ----- Docs (protoc-gen-doc, self-hosted gRPC API reference, E-6) -----
+  # ----- Docs (protoc-gen-doc, self-hosted gRPC API reference) -----
   # Renders every external service / method / message — with its proto comments —
   # into one self-contained docs/external.html. gRPC-native (does NOT assume
-  # REST); because this module excludes extremo.msg.db.v1 from its dependency
-  # closure, no internal types can appear in the published reference.
+  # REST); internal types are excluded from the published reference.
   - remote: buf.build/community/pseudomuto-doc:v1.5.1
     out: docs
     opt:
@@ -30,9 +29,8 @@ plugins:
   # TODO(external-proto): re-enable Dart + TS SDK generation once the plugin
   # versions are reconciled with the pinned buf (1.59.0) edition output —
   # protoc-gen-es:v2.3.0 / protocolbuffers/dart:v21.1.2 reject `Edition 9999`
-  # from `--include-wkt`. The Go SDK (below) is all the API server needs for the
-  # foundation; TS is needed by extremo-view (E-6/E-7) and Ruby/Python by the
-  # reference client (E-8), tracked separately.
+  # from `--include-wkt`. Go SDK generation remains enabled; additional SDKs
+  # are planned for web integrations and reference clients.
   # - remote: buf.build/protocolbuffers/dart:v21.1.2
   #   out: lib
   #   opt:

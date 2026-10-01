@@ -10,8 +10,7 @@
 // confirm / cancel / no-show) so an authenticated external consumer can poll
 // for changes incrementally. It requires the `book_event.read` scope and
 // returns public BookingEvent DTOs only — no actor identity or raw internal
-// field diffs. This same feed is the substrate the future webhook delivery
-// worker consumes (extremo-db#24).
+// field diffs. This same feed supports future webhook delivery.
 
 package books
 
