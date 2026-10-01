@@ -87,6 +87,9 @@ jobs:
 
   check:
     name: Proto format + lint + breaking
+    permissions:
+      contents: read
+      pull-requests: read
     needs: pre-check
     if: needs.pre-check.outputs.should-skip != 'true' && (needs.pre-check.outputs.proto == 'true' || needs.pre-check.outputs.workflows == 'true')
     runs-on: ubuntu-latest
@@ -122,14 +125,18 @@ jobs:
       # Partners generate clients from these files; a deliberate break needs
       # human approval via the breaking-change-approved label.
       - name: Breaking change detection
-        if: github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'breaking-change-approved')
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
+          labels=$(gh api --paginate "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/labels" --jq '.[].name')
+          if grep -Fxq 'breaking-change-approved' <<< "$labels"; then
+            echo "::notice::Breaking change detection skipped because the breaking-change-approved approval label is present."
+            exit 0
+          fi
           nix develop .#ci --command buf breaking \
             --against ".git#ref=refs/remotes/origin/${{ github.base_ref }}"
-
-      - name: Report approved breaking change
-        if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'breaking-change-approved')
-        run: echo "::notice::Breaking change detection skipped because the breaking-change-approved approval label is present."
 
   generated:
     name: Generated code is current
