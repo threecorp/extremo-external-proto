@@ -21,6 +21,7 @@ name: CI
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - main
     paths-ignore:
@@ -53,7 +54,8 @@ jobs:
         with:
           skip_after_successful_duplicate: 'true'
           paths_ignore: '["**.md", "LICENSE"]'
-          do_not_skip: '["push", "schedule", "workflow_dispatch"]'
+          # PR results depend on approval labels, not just identical files.
+          do_not_skip: '["pull_request", "push", "schedule", "workflow_dispatch"]'
 
       - name: Checkout
         if: steps.skip.outputs.should_skip != 'true'
@@ -117,14 +119,17 @@ jobs:
       # wire-incompatible changes before they reach main. Uses the
       # remote-tracking ref already present from the fetch-depth: 0 checkout.
       #
-      # This gate is meant to be loud. Partners generate clients from these
-      # files, so a deliberate break needs a human to decide it is worth it —
-      # a red check here is the decision point, not a bug to route around.
+      # Partners generate clients from these files; a deliberate break needs
+      # human approval via the breaking-change-approved label.
       - name: Breaking change detection
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'breaking-change-approved')
         run: |
           nix develop .#ci --command buf breaking \
             --against ".git#ref=refs/remotes/origin/${{ github.base_ref }}"
+
+      - name: Report approved breaking change
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'breaking-change-approved')
+        run: echo "::notice::Breaking change detection skipped because the breaking-change-approved approval label is present."
 
   generated:
     name: Generated code is current
