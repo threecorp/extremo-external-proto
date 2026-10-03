@@ -12,7 +12,7 @@ The Extremo internal protos live in a private monorepo. The external API is deli
 
 1. **Anti-corruption boundary.** This module has **no dependency on internal proto modules**, so internal types cannot be imported from these files — `buf build` fails on an unknown import. Internal database shapes (foreign keys, soft-delete flags, audit timestamps, nested internal relations) can never leak into the public contract. The boundary is a CI-enforced invariant, not a convention.
 2. **Open spec.** Partners can read the entire contract from one public repo, and Extremo ships the reference implementation (the "open core" / open-protocol playbook).
-3. **Independent stability.** `buf breaking` on this repo gates the external API's v1 compatibility.
+3. **Independent stability.** `buf breaking` on this repo checks the external API's v1 compatibility (report-only until v1 is released).
 
 The external surface is **authenticated** (per-tenant API key + scopes) and distinct from the internal anonymous `public/` booking-page services.
 

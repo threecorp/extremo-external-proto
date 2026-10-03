@@ -117,14 +117,19 @@ jobs:
       # wire-incompatible changes before they reach main. Uses the
       # remote-tracking ref already present from the fetch-depth: 0 checkout.
       #
-      # Report-only while v1 is unreleased: a break shows as a failed step in
-      # the log but does not fail the job.
+      # Report-only while v1 is unreleased: a break does not fail the job, and
+      # is raised as a warning annotation so it shows on the PR, not only in the log.
       - name: Breaking change detection
+        id: breaking
         if: github.event_name == 'pull_request'
         continue-on-error: true
         run: |
           nix develop .#ci --command buf breaking \
             --against ".git#ref=refs/remotes/origin/${{ github.base_ref }}"
+
+      - name: Report breaking changes
+        if: github.event_name == 'pull_request' && steps.breaking.outcome == 'failure'
+        run: echo "::warning::buf breaking reported wire-incompatible changes against ${{ github.base_ref }}; see the Breaking change detection step."
 
   generated:
     name: Generated code is current
