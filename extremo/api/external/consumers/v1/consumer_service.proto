@@ -4,8 +4,9 @@ syntax = "proto3";
 // API: an authenticated, per-tenant-API-key surface that lets a partner manage a
 // tenant's consumers (CONSUMER records) programmatically — the API-first equivalent
 // of the admin UI's consumer management. A consumer is referenced by its opaque
-// Extremo id (Consumer.id, the tenant-scoped handle also used when booking); an
-// optional partner-side external_ref maps it back to the partner's own system.
+// Extremo id (Consumer.id, the tenant-scoped handle also used when booking); the
+// optional external_id is the partner's own id for it, and metadata holds any
+// partner key-value pairs.
 package extremo.api.external.consumers.v1;
 
 import "buf/validate/validate.proto";
@@ -17,9 +18,10 @@ option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extr
 // ConsumerService manages a tenant's consumers (CONSUMER records) over the external
 // partner API. Reads require the consumer.read scope; writes require consumer.write.
 service ConsumerService {
-  // CreateConsumer registers (or resolves) a tenant consumer. Resolution is by
-  // email/phone: a returning consumer resolves to the existing record. Rejected with
-  // AlreadyExists if the contact belongs to tenant staff (OWNER/MEMBER).
+  // CreateConsumer registers a tenant consumer. Registering a contact that is
+  // already a consumer of this tenant returns that consumer. Rejected with
+  // AlreadyExists if the contact belongs to tenant staff (OWNER/MEMBER) or to a
+  // person registered elsewhere, or if external_id is used by another consumer.
   rpc CreateConsumer(CreateConsumerRequest) returns (CreateConsumerResponse) {
     option (google.api.http) = {
       post: "/api/external/v1/{tenant_id}/consumers"
@@ -30,15 +32,13 @@ service ConsumerService {
   rpc GetConsumer(GetConsumerRequest) returns (GetConsumerResponse) {
     option (google.api.http) = {get: "/api/external/v1/{tenant_id}/consumers/{id}"};
   }
-  // GetConsumerByRef returns a consumer by the partner's own external_ref.
-  rpc GetConsumerByRef(GetConsumerByRefRequest) returns (GetConsumerByRefResponse) {
-    option (google.api.http) = {get: "/api/external/v1/{tenant_id}/consumers:byRef"};
-  }
-  // ListConsumers returns the tenant's consumers, paginated.
+  // ListConsumers returns the tenant's consumers, paginated. Filter by external_id
+  // to look a consumer up by the partner's own id.
   rpc ListConsumers(ListConsumersRequest) returns (ListConsumersResponse) {
     option (google.api.http) = {get: "/api/external/v1/{tenant_id}/consumers"};
   }
-  // UpdateConsumer updates a consumer's mutable fields (display name, external_ref).
+  // UpdateConsumer updates a consumer's mutable fields (display name, external_id,
+  // metadata).
   rpc UpdateConsumer(UpdateConsumerRequest) returns (UpdateConsumerResponse) {
     option (google.api.http) = {
       patch: "/api/external/v1/{tenant_id}/consumers/{id}"
@@ -73,8 +73,24 @@ message CreateConsumerRequest {
   string email = 3 [(buf.validate.field).string.max_len = 255];
   // Consumer phone. Optional, but email or phone is required.
   string phone = 4 [(buf.validate.field).string.max_len = 32];
-  // Optional partner-side id, recorded so the partner can later GetConsumerByRef.
-  string external_ref = 5 [(buf.validate.field).string.max_len = 255];
+  // Optional partner's own id for the consumer (any string, unique per tenant).
+  // Look the consumer up later with ListConsumers.external_id.
+  string external_id = 5 [(buf.validate.field).string.max_len = 255];
+  // Optional partner key-value pairs (up to 50 keys; key 1-40 chars without
+  // square brackets; value up to 500 chars).
+  map<string, string> metadata = 6 [(buf.validate.field).map = {
+    max_pairs: 50
+    keys: {
+      string: {
+        min_len: 1
+        max_len: 40
+        pattern: "^[^\\[\\]]+$"
+      }
+    }
+    values: {
+      string: {max_len: 500}
+    }
+  }];
 }
 
 // CreateConsumerResponse carries the registered consumer.
@@ -97,23 +113,6 @@ message GetConsumerResponse {
   extremo.msg.external.v1.Consumer consumer = 1;
 }
 
-// GetConsumerByRefRequest selects a consumer by the partner's own external_ref.
-message GetConsumerByRefRequest {
-  // Tenant the consumer belongs to.
-  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
-  // The partner-side correlation id supplied at creation.
-  string external_ref = 2 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 255
-  }];
-}
-
-// GetConsumerByRefResponse carries the consumer.
-message GetConsumerByRefResponse {
-  // The consumer.
-  extremo.msg.external.v1.Consumer consumer = 1;
-}
-
 // ListConsumersRequest pages a tenant's consumers.
 message ListConsumersRequest {
   // Tenant whose consumers to list.
@@ -125,6 +124,8 @@ message ListConsumersRequest {
     gt: 0
     lte: 100
   }];
+  // When set, return only the consumer whose external_id equals this value.
+  string external_id = 4 [(buf.validate.field).string.max_len = 255];
 }
 
 // ListConsumersResponse is a page of consumers.
@@ -136,7 +137,8 @@ message ListConsumersResponse {
 }
 
 // UpdateConsumerRequest patches a consumer's mutable fields. An empty field leaves
-// the current value unchanged.
+// the current value unchanged. metadata merges into the stored pairs: a key with
+// an empty value is removed, and the merged result may hold at most 50 keys.
 message UpdateConsumerRequest {
   // Tenant the consumer belongs to.
   uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
@@ -144,8 +146,24 @@ message UpdateConsumerRequest {
   uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
   // New display name (empty = unchanged).
   string name = 3 [(buf.validate.field).string.max_len = 255];
-  // New partner-side external_ref (empty = unchanged).
-  string external_ref = 4 [(buf.validate.field).string.max_len = 255];
+  // New partner's own id (empty = unchanged).
+  string external_id = 4 [(buf.validate.field).string.max_len = 255];
+  // Key-value pairs to merge into the stored metadata (empty value = remove key).
+  // Up to 100 entries per request, so removals and additions fit in one call; the
+  // merged result may hold at most 50 keys.
+  map<string, string> metadata = 5 [(buf.validate.field).map = {
+    max_pairs: 100
+    keys: {
+      string: {
+        min_len: 1
+        max_len: 40
+        pattern: "^[^\\[\\]]+$"
+      }
+    }
+    values: {
+      string: {max_len: 500}
+    }
+  }];
 }
 
 // UpdateConsumerResponse carries the updated consumer.

@@ -1,9 +1,7 @@
 version: v2
 # Standalone module for the Extremo EXTERNAL partner API.
-# It deliberately does NOT depend on the internal extremo-proto module, so it is
-# impossible to `import "extremo/msg/db/v1/db.proto"` (or any internal type) from
-# here — `buf build` fails on an unknown import. That makes the public/internal
-# anti-corruption boundary a CI-enforced invariant, not a convention.
+# No internal proto dependencies: `buf build` rejects internal type imports,
+# keeping internal database shapes out of the public contract.
 modules:
   - path: .
     excludes:

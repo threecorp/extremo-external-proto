@@ -8,8 +8,9 @@
 // API: an authenticated, per-tenant-API-key surface that lets a partner manage a
 // tenant's consumers (CONSUMER records) programmatically — the API-first equivalent
 // of the admin UI's consumer management. A consumer is referenced by its opaque
-// Extremo id (Consumer.id, the tenant-scoped handle also used when booking); an
-// optional partner-side external_ref maps it back to the partner's own system.
+// Extremo id (Consumer.id, the tenant-scoped handle also used when booking); the
+// optional external_id is the partner's own id for it, and metadata holds any
+// partner key-value pairs.
 
 package consumers
 
@@ -26,12 +27,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ConsumerService_CreateConsumer_FullMethodName   = "/extremo.api.external.consumers.v1.ConsumerService/CreateConsumer"
-	ConsumerService_GetConsumer_FullMethodName      = "/extremo.api.external.consumers.v1.ConsumerService/GetConsumer"
-	ConsumerService_GetConsumerByRef_FullMethodName = "/extremo.api.external.consumers.v1.ConsumerService/GetConsumerByRef"
-	ConsumerService_ListConsumers_FullMethodName    = "/extremo.api.external.consumers.v1.ConsumerService/ListConsumers"
-	ConsumerService_UpdateConsumer_FullMethodName   = "/extremo.api.external.consumers.v1.ConsumerService/UpdateConsumer"
-	ConsumerService_DeleteConsumer_FullMethodName   = "/extremo.api.external.consumers.v1.ConsumerService/DeleteConsumer"
+	ConsumerService_CreateConsumer_FullMethodName = "/extremo.api.external.consumers.v1.ConsumerService/CreateConsumer"
+	ConsumerService_GetConsumer_FullMethodName    = "/extremo.api.external.consumers.v1.ConsumerService/GetConsumer"
+	ConsumerService_ListConsumers_FullMethodName  = "/extremo.api.external.consumers.v1.ConsumerService/ListConsumers"
+	ConsumerService_UpdateConsumer_FullMethodName = "/extremo.api.external.consumers.v1.ConsumerService/UpdateConsumer"
+	ConsumerService_DeleteConsumer_FullMethodName = "/extremo.api.external.consumers.v1.ConsumerService/DeleteConsumer"
 )
 
 // ConsumerServiceClient is the client API for ConsumerService service.
@@ -41,17 +41,18 @@ const (
 // ConsumerService manages a tenant's consumers (CONSUMER records) over the external
 // partner API. Reads require the consumer.read scope; writes require consumer.write.
 type ConsumerServiceClient interface {
-	// CreateConsumer registers (or resolves) a tenant consumer. Resolution is by
-	// email/phone: a returning consumer resolves to the existing record. Rejected with
-	// AlreadyExists if the contact belongs to tenant staff (OWNER/MEMBER).
+	// CreateConsumer registers a tenant consumer. Registering a contact that is
+	// already a consumer of this tenant returns that consumer. Rejected with
+	// AlreadyExists if the contact belongs to tenant staff (OWNER/MEMBER) or to a
+	// person registered elsewhere, or if external_id is used by another consumer.
 	CreateConsumer(ctx context.Context, in *CreateConsumerRequest, opts ...grpc.CallOption) (*CreateConsumerResponse, error)
 	// GetConsumer returns a consumer by its Extremo id.
 	GetConsumer(ctx context.Context, in *GetConsumerRequest, opts ...grpc.CallOption) (*GetConsumerResponse, error)
-	// GetConsumerByRef returns a consumer by the partner's own external_ref.
-	GetConsumerByRef(ctx context.Context, in *GetConsumerByRefRequest, opts ...grpc.CallOption) (*GetConsumerByRefResponse, error)
-	// ListConsumers returns the tenant's consumers, paginated.
+	// ListConsumers returns the tenant's consumers, paginated. Filter by external_id
+	// to look a consumer up by the partner's own id.
 	ListConsumers(ctx context.Context, in *ListConsumersRequest, opts ...grpc.CallOption) (*ListConsumersResponse, error)
-	// UpdateConsumer updates a consumer's mutable fields (display name, external_ref).
+	// UpdateConsumer updates a consumer's mutable fields (display name, external_id,
+	// metadata).
 	UpdateConsumer(ctx context.Context, in *UpdateConsumerRequest, opts ...grpc.CallOption) (*UpdateConsumerResponse, error)
 	// DeleteConsumer deactivates the consumer's CONSUMER role for this tenant (soft; the
 	// underlying global user is never deleted).
@@ -80,16 +81,6 @@ func (c *consumerServiceClient) GetConsumer(ctx context.Context, in *GetConsumer
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetConsumerResponse)
 	err := c.cc.Invoke(ctx, ConsumerService_GetConsumer_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *consumerServiceClient) GetConsumerByRef(ctx context.Context, in *GetConsumerByRefRequest, opts ...grpc.CallOption) (*GetConsumerByRefResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetConsumerByRefResponse)
-	err := c.cc.Invoke(ctx, ConsumerService_GetConsumerByRef_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -133,17 +124,18 @@ func (c *consumerServiceClient) DeleteConsumer(ctx context.Context, in *DeleteCo
 // ConsumerService manages a tenant's consumers (CONSUMER records) over the external
 // partner API. Reads require the consumer.read scope; writes require consumer.write.
 type ConsumerServiceServer interface {
-	// CreateConsumer registers (or resolves) a tenant consumer. Resolution is by
-	// email/phone: a returning consumer resolves to the existing record. Rejected with
-	// AlreadyExists if the contact belongs to tenant staff (OWNER/MEMBER).
+	// CreateConsumer registers a tenant consumer. Registering a contact that is
+	// already a consumer of this tenant returns that consumer. Rejected with
+	// AlreadyExists if the contact belongs to tenant staff (OWNER/MEMBER) or to a
+	// person registered elsewhere, or if external_id is used by another consumer.
 	CreateConsumer(context.Context, *CreateConsumerRequest) (*CreateConsumerResponse, error)
 	// GetConsumer returns a consumer by its Extremo id.
 	GetConsumer(context.Context, *GetConsumerRequest) (*GetConsumerResponse, error)
-	// GetConsumerByRef returns a consumer by the partner's own external_ref.
-	GetConsumerByRef(context.Context, *GetConsumerByRefRequest) (*GetConsumerByRefResponse, error)
-	// ListConsumers returns the tenant's consumers, paginated.
+	// ListConsumers returns the tenant's consumers, paginated. Filter by external_id
+	// to look a consumer up by the partner's own id.
 	ListConsumers(context.Context, *ListConsumersRequest) (*ListConsumersResponse, error)
-	// UpdateConsumer updates a consumer's mutable fields (display name, external_ref).
+	// UpdateConsumer updates a consumer's mutable fields (display name, external_id,
+	// metadata).
 	UpdateConsumer(context.Context, *UpdateConsumerRequest) (*UpdateConsumerResponse, error)
 	// DeleteConsumer deactivates the consumer's CONSUMER role for this tenant (soft; the
 	// underlying global user is never deleted).
@@ -163,9 +155,6 @@ func (UnimplementedConsumerServiceServer) CreateConsumer(context.Context, *Creat
 }
 func (UnimplementedConsumerServiceServer) GetConsumer(context.Context, *GetConsumerRequest) (*GetConsumerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetConsumer not implemented")
-}
-func (UnimplementedConsumerServiceServer) GetConsumerByRef(context.Context, *GetConsumerByRefRequest) (*GetConsumerByRefResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetConsumerByRef not implemented")
 }
 func (UnimplementedConsumerServiceServer) ListConsumers(context.Context, *ListConsumersRequest) (*ListConsumersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListConsumers not implemented")
@@ -229,24 +218,6 @@ func _ConsumerService_GetConsumer_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ConsumerServiceServer).GetConsumer(ctx, req.(*GetConsumerRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ConsumerService_GetConsumerByRef_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetConsumerByRefRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ConsumerServiceServer).GetConsumerByRef(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ConsumerService_GetConsumerByRef_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConsumerServiceServer).GetConsumerByRef(ctx, req.(*GetConsumerByRefRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -319,10 +290,6 @@ var ConsumerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetConsumer",
 			Handler:    _ConsumerService_GetConsumer_Handler,
-		},
-		{
-			MethodName: "GetConsumerByRef",
-			Handler:    _ConsumerService_GetConsumerByRef_Handler,
 		},
 		{
 			MethodName: "ListConsumers",
