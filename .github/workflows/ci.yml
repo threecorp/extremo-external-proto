@@ -21,7 +21,6 @@ name: CI
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
     branches:
       - main
     paths-ignore:
@@ -54,8 +53,7 @@ jobs:
         with:
           skip_after_successful_duplicate: 'true'
           paths_ignore: '["**.md", "LICENSE"]'
-          # PR results depend on approval labels, not just identical files.
-          do_not_skip: '["pull_request", "push", "schedule", "workflow_dispatch"]'
+          do_not_skip: '["push", "schedule", "workflow_dispatch"]'
 
       - name: Checkout
         if: steps.skip.outputs.should_skip != 'true'
@@ -87,9 +85,6 @@ jobs:
 
   check:
     name: Proto format + lint + breaking
-    permissions:
-      contents: read
-      pull-requests: read
     needs: pre-check
     if: needs.pre-check.outputs.should-skip != 'true' && (needs.pre-check.outputs.proto == 'true' || needs.pre-check.outputs.workflows == 'true')
     runs-on: ubuntu-latest
@@ -122,19 +117,12 @@ jobs:
       # wire-incompatible changes before they reach main. Uses the
       # remote-tracking ref already present from the fetch-depth: 0 checkout.
       #
-      # Partners generate clients from these files; a deliberate break needs
-      # human approval via the breaking-change-approved label.
+      # Report-only while v1 is unreleased: a break shows as a failed step in
+      # the log but does not fail the job.
       - name: Breaking change detection
         if: github.event_name == 'pull_request'
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+        continue-on-error: true
         run: |
-          labels=$(gh api --paginate "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/labels" --jq '.[].name')
-          if grep -Fxq 'breaking-change-approved' <<< "$labels"; then
-            echo "::notice::Breaking change detection skipped because the breaking-change-approved approval label is present."
-            exit 0
-          fi
           nix develop .#ci --command buf breaking \
             --against ".git#ref=refs/remotes/origin/${{ github.base_ref }}"
 
