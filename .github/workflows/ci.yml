@@ -129,7 +129,7 @@ jobs:
 
       - name: Report breaking changes
         if: github.event_name == 'pull_request' && steps.breaking.outcome == 'failure'
-        run: echo "::warning::buf breaking reported wire-incompatible changes against ${{ github.base_ref }}; see the Breaking change detection step."
+        run: echo "::warning::Breaking change detection against ${{ github.base_ref }} failed (a wire-incompatible change, or the check itself could not run); see that step's log."
 
   generated:
     name: Generated code is current
