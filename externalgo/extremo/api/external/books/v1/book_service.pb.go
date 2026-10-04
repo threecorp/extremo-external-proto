@@ -54,8 +54,8 @@ type ListBookingsRequest struct {
 	Page int64 `protobuf:"varint,4,opt,name=page,proto3" json:"page,omitempty"`
 	// Page size (1..100).
 	PageSize int64 `protobuf:"varint,5,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	// When true, return only bookings created through the external partner API
-	// (partner origin), excluding in-store / mypage bookings.
+	// When true, return only bookings created through the external partner API or
+	// tagged with an external_id / metadata through it; other bookings are excluded.
 	OnlyExternal bool `protobuf:"varint,6,opt,name=only_external,json=onlyExternal,proto3" json:"only_external,omitempty"`
 	// When set, return only the booking whose external_id equals this value.
 	ExternalId string `protobuf:"bytes,7,opt,name=external_id,json=externalId,proto3" json:"external_id,omitempty"`
