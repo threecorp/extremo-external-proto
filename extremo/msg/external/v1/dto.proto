@@ -141,7 +141,7 @@ enum BookingConflictReason {
   BOOKING_CONFLICT_REASON_STAFF_BOOKED = 3;
   // Every seat or staff member is taken for the requested time.
   BOOKING_CONFLICT_REASON_CAPACITY_FULL = 4;
-  // The requested time has passed or starts too soon to book.
+  // The requested time has passed or starts within 30 minutes.
   BOOKING_CONFLICT_REASON_TOO_SOON = 5;
   // The requested time is outside the shop's business hours.
   BOOKING_CONFLICT_REASON_OUTSIDE_BUSINESS_HOURS = 6;

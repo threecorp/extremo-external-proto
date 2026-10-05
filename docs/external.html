@@ -1185,7 +1185,7 @@ accepts it. </p></td>
               <tr>
                 <td>BOOKING_CONFLICT_REASON_TOO_SOON</td>
                 <td>5</td>
-                <td><p>The requested time has passed or starts too soon to book.</p></td>
+                <td><p>The requested time has passed or starts within 30 minutes.</p></td>
               </tr>
             
               <tr>
@@ -2328,7 +2328,7 @@ merged result may hold at most 50 keys. </p></td>
 
       
         <h3 id="extremo.api.external.books.v1.BookService">BookService</h3>
-        <p>BookService exposes a tenant's bookings to authenticated external API</p><p>consumers: reads (book.read) plus create / update / status changes</p><p>(book.create, book.update). The status changes behave as in the admin UI.</p>
+        <p>BookService exposes a tenant's bookings to authenticated external API</p><p>consumers: reads (book.read) plus create / update / cancel (book.create,</p><p>book.update) and the shop's decisions (book.moderate). The status changes</p><p>behave as in the admin UI.</p>
         <table class="enum-table">
           <thead>
             <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
@@ -2364,7 +2364,9 @@ times), sends the same notifications as an in-store booking, and returns the
 new booking (DRAFT, or RESERVED when the tenant auto-accepts).
 A slot the schedule cannot take returns INVALID_ARGUMENT with a
 google.rpc.ErrorInfo detail (domain &#34;extremo.api.external&#34;) whose reason is a
-BookingConflictReason name.
+BookingConflictReason name: outside business hours, starting within 30
+minutes, or no free staff / seat. When two bookings race for the same free
+time, one may return ABORTED; retry it with the same idempotency_key.
 Requires book.create. Supply idempotency_key to make retries safe: resending
 the same key replays the original booking instead of creating a duplicate.</p></td>
               </tr>
@@ -2378,7 +2380,11 @@ external_id / metadata. Requires book.update. Pass expected_updated_at (from
 Booking.updated_at) for optimistic concurrency; a mismatch returns ABORTED.
 Changing only external_id / metadata leaves the booking itself untouched.
 A new time or service set the schedule cannot take is rejected the same way
-as CreateBooking (INVALID_ARGUMENT &#43; google.rpc.ErrorInfo).</p></td>
+as CreateBooking (INVALID_ARGUMENT &#43; google.rpc.ErrorInfo); a new start needs
+the same 30 minutes&#39; notice (BOOKING_CONFLICT_REASON_TOO_SOON). A booking that
+starts within 30 minutes keeps its time and services: changing them returns
+INVALID_ARGUMENT without ErrorInfo. Without expected_updated_at, a change
+committed after this call read the booking returns ABORTED too.</p></td>
               </tr>
             
               <tr>

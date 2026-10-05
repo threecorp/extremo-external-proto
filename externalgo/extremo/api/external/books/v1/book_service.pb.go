@@ -10,12 +10,12 @@
 // Bookings are consumer-PII-adjacent, so the reads require the `book.read`
 // scope (stricter than the public-grade services/tenants/availability reads) and
 // return the public Booking DTO only — no consumer identity, staff, internal
-// foreign keys, or pricing. The writes (CreateBooking / UpdateBooking /
-// CancelBooking / AcceptBooking / RejectBooking / NoShowBooking) require the
-// `book.create` / `book.update` scope; a created
-// booking is validated by the same availability rules as an in-store booking
-// (schedule capacity, staff coverage, no past times), returning InvalidArgument
-// when a slot is full or the time is in the past.
+// foreign keys, or pricing. The writes require `book.create` (CreateBooking),
+// `book.update` (UpdateBooking / CancelBooking) or `book.moderate` (AcceptBooking /
+// RejectBooking / NoShowBooking); a created booking is validated by the same
+// availability rules as an in-store booking (schedule capacity, staff coverage,
+// business hours, 30 minutes' notice), returning InvalidArgument when the slot
+// cannot be taken.
 
 package books
 

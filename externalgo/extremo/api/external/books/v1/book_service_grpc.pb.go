@@ -10,12 +10,12 @@
 // Bookings are consumer-PII-adjacent, so the reads require the `book.read`
 // scope (stricter than the public-grade services/tenants/availability reads) and
 // return the public Booking DTO only — no consumer identity, staff, internal
-// foreign keys, or pricing. The writes (CreateBooking / UpdateBooking /
-// CancelBooking / AcceptBooking / RejectBooking / NoShowBooking) require the
-// `book.create` / `book.update` scope; a created
-// booking is validated by the same availability rules as an in-store booking
-// (schedule capacity, staff coverage, no past times), returning InvalidArgument
-// when a slot is full or the time is in the past.
+// foreign keys, or pricing. The writes require `book.create` (CreateBooking),
+// `book.update` (UpdateBooking / CancelBooking) or `book.moderate` (AcceptBooking /
+// RejectBooking / NoShowBooking); a created booking is validated by the same
+// availability rules as an in-store booking (schedule capacity, staff coverage,
+// business hours, 30 minutes' notice), returning InvalidArgument when the slot
+// cannot be taken.
 
 package books
 
@@ -47,8 +47,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // BookService exposes a tenant's bookings to authenticated external API
-// consumers: reads (book.read) plus create / update / status changes
-// (book.create, book.update). The status changes behave as in the admin UI.
+// consumers: reads (book.read) plus create / update / cancel (book.create,
+// book.update) and the shop's decisions (book.moderate). The status changes
+// behave as in the admin UI.
 type BookServiceClient interface {
 	// ListBookings returns a tenant's bookings overlapping [start_at, end_at),
 	// newest first, paginated: a booking crossing either edge of the window is
@@ -65,7 +66,9 @@ type BookServiceClient interface {
 	// new booking (DRAFT, or RESERVED when the tenant auto-accepts).
 	// A slot the schedule cannot take returns INVALID_ARGUMENT with a
 	// google.rpc.ErrorInfo detail (domain "extremo.api.external") whose reason is a
-	// BookingConflictReason name.
+	// BookingConflictReason name: outside business hours, starting within 30
+	// minutes, or no free staff / seat. When two bookings race for the same free
+	// time, one may return ABORTED; retry it with the same idempotency_key.
 	// Requires book.create. Supply idempotency_key to make retries safe: resending
 	// the same key replays the original booking instead of creating a duplicate.
 	CreateBooking(ctx context.Context, in *CreateBookingRequest, opts ...grpc.CallOption) (*CreateBookingResponse, error)
@@ -74,7 +77,11 @@ type BookServiceClient interface {
 	// Booking.updated_at) for optimistic concurrency; a mismatch returns ABORTED.
 	// Changing only external_id / metadata leaves the booking itself untouched.
 	// A new time or service set the schedule cannot take is rejected the same way
-	// as CreateBooking (INVALID_ARGUMENT + google.rpc.ErrorInfo).
+	// as CreateBooking (INVALID_ARGUMENT + google.rpc.ErrorInfo); a new start needs
+	// the same 30 minutes' notice (BOOKING_CONFLICT_REASON_TOO_SOON). A booking that
+	// starts within 30 minutes keeps its time and services: changing them returns
+	// INVALID_ARGUMENT without ErrorInfo. Without expected_updated_at, a change
+	// committed after this call read the booking returns ABORTED too.
 	UpdateBooking(ctx context.Context, in *UpdateBookingRequest, opts ...grpc.CallOption) (*UpdateBookingResponse, error)
 	// CancelBooking cancels a booking (DRAFT / RESERVED / ORDERED -> CANCELED).
 	// Requires book.update. There is no hard-delete on the external surface.
@@ -183,8 +190,9 @@ func (c *bookServiceClient) NoShowBooking(ctx context.Context, in *NoShowBooking
 // for forward compatibility.
 //
 // BookService exposes a tenant's bookings to authenticated external API
-// consumers: reads (book.read) plus create / update / status changes
-// (book.create, book.update). The status changes behave as in the admin UI.
+// consumers: reads (book.read) plus create / update / cancel (book.create,
+// book.update) and the shop's decisions (book.moderate). The status changes
+// behave as in the admin UI.
 type BookServiceServer interface {
 	// ListBookings returns a tenant's bookings overlapping [start_at, end_at),
 	// newest first, paginated: a booking crossing either edge of the window is
@@ -201,7 +209,9 @@ type BookServiceServer interface {
 	// new booking (DRAFT, or RESERVED when the tenant auto-accepts).
 	// A slot the schedule cannot take returns INVALID_ARGUMENT with a
 	// google.rpc.ErrorInfo detail (domain "extremo.api.external") whose reason is a
-	// BookingConflictReason name.
+	// BookingConflictReason name: outside business hours, starting within 30
+	// minutes, or no free staff / seat. When two bookings race for the same free
+	// time, one may return ABORTED; retry it with the same idempotency_key.
 	// Requires book.create. Supply idempotency_key to make retries safe: resending
 	// the same key replays the original booking instead of creating a duplicate.
 	CreateBooking(context.Context, *CreateBookingRequest) (*CreateBookingResponse, error)
@@ -210,7 +220,11 @@ type BookServiceServer interface {
 	// Booking.updated_at) for optimistic concurrency; a mismatch returns ABORTED.
 	// Changing only external_id / metadata leaves the booking itself untouched.
 	// A new time or service set the schedule cannot take is rejected the same way
-	// as CreateBooking (INVALID_ARGUMENT + google.rpc.ErrorInfo).
+	// as CreateBooking (INVALID_ARGUMENT + google.rpc.ErrorInfo); a new start needs
+	// the same 30 minutes' notice (BOOKING_CONFLICT_REASON_TOO_SOON). A booking that
+	// starts within 30 minutes keeps its time and services: changing them returns
+	// INVALID_ARGUMENT without ErrorInfo. Without expected_updated_at, a change
+	// committed after this call read the booking returns ABORTED too.
 	UpdateBooking(context.Context, *UpdateBookingRequest) (*UpdateBookingResponse, error)
 	// CancelBooking cancels a booking (DRAFT / RESERVED / ORDERED -> CANCELED).
 	// Requires book.update. There is no hard-delete on the external surface.

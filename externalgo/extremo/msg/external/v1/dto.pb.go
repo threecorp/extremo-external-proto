@@ -167,7 +167,7 @@ const (
 	BookingConflictReason_BOOKING_CONFLICT_REASON_STAFF_BOOKED BookingConflictReason = 3
 	// Every seat or staff member is taken for the requested time.
 	BookingConflictReason_BOOKING_CONFLICT_REASON_CAPACITY_FULL BookingConflictReason = 4
-	// The requested time has passed or starts too soon to book.
+	// The requested time has passed or starts within 30 minutes.
 	BookingConflictReason_BOOKING_CONFLICT_REASON_TOO_SOON BookingConflictReason = 5
 	// The requested time is outside the shop's business hours.
 	BookingConflictReason_BOOKING_CONFLICT_REASON_OUTSIDE_BUSINESS_HOURS BookingConflictReason = 6
