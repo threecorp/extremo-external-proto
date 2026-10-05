@@ -2346,7 +2346,8 @@ NO_SHOW), as the admin UI does. Requires book.update.</p></td>
                   <td>phone</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>Consumer phone. Optional, but email or phone is required. </p></td>
+                  <td><p>Consumer phone. Optional, but email or phone is required. Used only when no
+email is given; then a phone longer than 20 characters is InvalidArgument. </p></td>
                 </tr>
               
                 <tr>
@@ -2723,10 +2724,14 @@ merged result may hold at most 50 keys. </p></td>
                 <td>CreateConsumer</td>
                 <td><a href="#extremo.api.external.consumers.v1.CreateConsumerRequest">CreateConsumerRequest</a></td>
                 <td><a href="#extremo.api.external.consumers.v1.CreateConsumerResponse">CreateConsumerResponse</a></td>
-                <td><p>CreateConsumer registers a tenant consumer. Registering a contact that is
-already a consumer of this tenant returns that consumer. Rejected with
-AlreadyExists if the contact belongs to tenant staff (OWNER/MEMBER) or to a
-person registered elsewhere, or if external_id is used by another consumer.</p></td>
+                <td><p>CreateConsumer registers a tenant consumer; it creates no sign-in for them.
+One contact identifies the consumer and is the only one stored: with both, the
+email identifies them and the phone is not stored (keep it in metadata if you
+need it). Registering a contact that is already a consumer of this tenant
+returns that consumer; a consumer removed with DeleteConsumer is restored.
+Rejected with AlreadyExists if the contact belongs to tenant staff
+(OWNER/MEMBER) or to a person registered only at another tenant, or if
+external_id is used by another consumer.</p></td>
               </tr>
             
               <tr>
@@ -2757,7 +2762,8 @@ metadata).</p></td>
                 <td><a href="#extremo.api.external.consumers.v1.DeleteConsumerRequest">DeleteConsumerRequest</a></td>
                 <td><a href="#extremo.api.external.consumers.v1.DeleteConsumerResponse">DeleteConsumerResponse</a></td>
                 <td><p>DeleteConsumer deactivates the consumer&#39;s CONSUMER role for this tenant (soft; the
-underlying global user is never deleted).</p></td>
+underlying global user is never deleted). CreateConsumer with the same contact
+restores the consumer.</p></td>
               </tr>
             
           </tbody>

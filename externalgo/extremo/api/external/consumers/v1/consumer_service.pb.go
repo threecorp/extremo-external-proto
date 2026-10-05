@@ -45,7 +45,8 @@ type CreateConsumerRequest struct {
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Consumer email. Optional, but email or phone is required.
 	Email string `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	// Consumer phone. Optional, but email or phone is required.
+	// Consumer phone. Optional, but email or phone is required. Used only when no
+	// email is given; then a phone longer than 20 characters is InvalidArgument.
 	Phone string `protobuf:"bytes,4,opt,name=phone,proto3" json:"phone,omitempty"`
 	// Optional partner's own id for the consumer (any string, unique per tenant).
 	// Look the consumer up later with ListConsumers.external_id.
