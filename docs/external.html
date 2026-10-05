@@ -211,9 +211,21 @@
                 </li>
               
                 <li>
+                  <a href="#extremo.msg.external.v1.TenantAddress"><span class="badge">M</span>TenantAddress</a>
+                </li>
+              
+                <li>
+                  <a href="#extremo.msg.external.v1.TenantBookingSetting"><span class="badge">M</span>TenantBookingSetting</a>
+                </li>
+              
+                <li>
                   <a href="#extremo.msg.external.v1.TenantProfile"><span class="badge">M</span>TenantProfile</a>
                 </li>
               
+              
+                <li>
+                  <a href="#extremo.msg.external.v1.BookingConflictReason"><span class="badge">E</span>BookingConflictReason</a>
+                </li>
               
                 <li>
                   <a href="#extremo.msg.external.v1.BookingEventType"><span class="badge">E</span>BookingEventType</a>
@@ -684,7 +696,9 @@ request cursor to fetch events after this one. </p></td>
                   <td>booking_id</td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
-                  <td><p>Opaque public identifier of the booking this event is about. </p></td>
+                  <td><p>Opaque public identifier of the booking this event is about. It stays set
+after the shop hard-deletes the booking, so every event of a deleted booking
+still names it. </p></td>
                 </tr>
               
                 <tr>
@@ -929,6 +943,132 @@ this service records this price. </p></td>
 
         
       
+        <h3 id="extremo.msg.external.v1.TenantAddress">TenantAddress</h3>
+        <p>TenantAddress is the public address of a tenant (shop).</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>zip</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>ZIP / postal code. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>address1</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Prefecture, city and street name. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>address2</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Street number. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>building</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Building name. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>floor</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Floor and room number. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>nearby</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Nearby landmark (station, bus stop). </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="extremo.msg.external.v1.TenantBookingSetting">TenantBookingSetting</h3>
+        <p>TenantBookingSetting is the part of a tenant's settings that shapes its booking</p><p>calendar. Hours are wall-clock hours in `time_zone`; a value of 24 or more is</p><p>an hour of the next day (26 = 02:00 the next day). Which scheduling strategy</p><p>applies is reported by AvailabilityService.ListSlots as `schedule_type`.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>calendar_start</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p>First bookable hour of a day (5..28). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>calendar_end</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p>Hour the shop closes (6..29); a booking may end exactly at this hour. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>calendar_interval</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p>Slot width in seconds (1800 = 30 minutes). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>calendar_slot</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p>Bookings a single slot can hold when the strategy counts slots. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>auto_accept_booking</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p>When true, CreateBooking returns RESERVED; otherwise DRAFT until the shop
+accepts it. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>reservation_note</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Notes the shop asks consumers to read before booking. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>time_zone</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>IANA time zone the hours are in. Always &#34;Asia/Tokyo&#34; today. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="extremo.msg.external.v1.TenantProfile">TenantProfile</h3>
         <p>TenantProfile is the public profile of a tenant (shop).</p>
 
@@ -981,6 +1121,20 @@ this service records this price. </p></td>
                   <td><p>Public image URLs. </p></td>
                 </tr>
               
+                <tr>
+                  <td>address</td>
+                  <td><a href="#extremo.msg.external.v1.TenantAddress">TenantAddress</a></td>
+                  <td></td>
+                  <td><p>Shop address shown to consumers coming to the shop. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>booking_setting</td>
+                  <td><a href="#extremo.msg.external.v1.TenantBookingSetting">TenantBookingSetting</a></td>
+                  <td></td>
+                  <td><p>Booking rules a calendar needs before it asks for availability. </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -989,6 +1143,59 @@ this service records this price. </p></td>
         
       
 
+      
+        <h3 id="extremo.msg.external.v1.BookingConflictReason">BookingConflictReason</h3>
+        <p>BookingConflictReason is why a booking write was rejected by the availability</p><p>check. CreateBooking and UpdateBooking return it as the `reason` of a</p><p>google.rpc.ErrorInfo detail (domain "extremo.api.external") on an</p><p>INVALID_ARGUMENT status. The value names are a contract: they are never renamed</p><p>or reused. Treat an unknown reason as a generic rejection.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>BOOKING_CONFLICT_REASON_UNSPECIFIED</td>
+                <td>0</td>
+                <td><p>Unspecified / unknown reason.</p></td>
+              </tr>
+            
+              <tr>
+                <td>BOOKING_CONFLICT_REASON_NO_STAFF_ON_DUTY</td>
+                <td>1</td>
+                <td><p>No staff member is on shift for the requested time.</p></td>
+              </tr>
+            
+              <tr>
+                <td>BOOKING_CONFLICT_REASON_STAFF_NOT_ATTENDING</td>
+                <td>2</td>
+                <td><p>The requested staff member is not on shift for the requested time.</p></td>
+              </tr>
+            
+              <tr>
+                <td>BOOKING_CONFLICT_REASON_STAFF_BOOKED</td>
+                <td>3</td>
+                <td><p>The requested staff member already serves another booking at that time.</p></td>
+              </tr>
+            
+              <tr>
+                <td>BOOKING_CONFLICT_REASON_CAPACITY_FULL</td>
+                <td>4</td>
+                <td><p>Every seat or staff member is taken for the requested time.</p></td>
+              </tr>
+            
+              <tr>
+                <td>BOOKING_CONFLICT_REASON_TOO_SOON</td>
+                <td>5</td>
+                <td><p>The requested time has passed or starts too soon to book.</p></td>
+              </tr>
+            
+              <tr>
+                <td>BOOKING_CONFLICT_REASON_OUTSIDE_BUSINESS_HOURS</td>
+                <td>6</td>
+                <td><p>The requested time is outside the shop&#39;s business hours.</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
       
         <h3 id="extremo.msg.external.v1.BookingEventType">BookingEventType</h3>
         <p>BookingEventType is the public kind of a booking change in the event feed.</p><p>Internal mutation kinds are folded into this stable public vocabulary (e.g.</p><p>reject/delete both surface as CANCELED).</p>
@@ -2155,6 +2362,9 @@ Requires book.read.</p></td>
 validates the slot against the tenant&#39;s schedule (capacity / staff / no past
 times), sends the same notifications as an in-store booking, and returns the
 new booking (DRAFT, or RESERVED when the tenant auto-accepts).
+A slot the schedule cannot take returns INVALID_ARGUMENT with a
+google.rpc.ErrorInfo detail (domain &#34;extremo.api.external&#34;) whose reason is a
+BookingConflictReason name.
 Requires book.create. Supply idempotency_key to make retries safe: resending
 the same key replays the original booking instead of creating a duplicate.</p></td>
               </tr>
@@ -2166,7 +2376,9 @@ the same key replays the original booking instead of creating a duplicate.</p></
                 <td><p>UpdateBooking changes a booking&#39;s time / services / name / desc, and its
 external_id / metadata. Requires book.update. Pass expected_updated_at (from
 Booking.updated_at) for optimistic concurrency; a mismatch returns ABORTED.
-Changing only external_id / metadata leaves the booking itself untouched.</p></td>
+Changing only external_id / metadata leaves the booking itself untouched.
+A new time or service set the schedule cannot take is rejected the same way
+as CreateBooking (INVALID_ARGUMENT &#43; google.rpc.ErrorInfo).</p></td>
               </tr>
             
               <tr>
@@ -2182,7 +2394,7 @@ Requires book.update. There is no hard-delete on the external surface.</p></td>
                 <td><a href="#extremo.api.external.books.v1.AcceptBookingRequest">AcceptBookingRequest</a></td>
                 <td><a href="#extremo.api.external.books.v1.AcceptBookingResponse">AcceptBookingResponse</a></td>
                 <td><p>AcceptBooking confirms a DRAFT booking (DRAFT -&gt; RESERVED), as the admin UI
-does. Requires book.update.</p></td>
+does. Requires book.moderate.</p></td>
               </tr>
             
               <tr>
@@ -2190,7 +2402,7 @@ does. Requires book.update.</p></td>
                 <td><a href="#extremo.api.external.books.v1.RejectBookingRequest">RejectBookingRequest</a></td>
                 <td><a href="#extremo.api.external.books.v1.RejectBookingResponse">RejectBookingResponse</a></td>
                 <td><p>RejectBooking declines a DRAFT booking (DRAFT -&gt; CANCELED) of a tenant that
-does not auto-accept, as the admin UI does. Requires book.update.</p></td>
+does not auto-accept, as the admin UI does. Requires book.moderate.</p></td>
               </tr>
             
               <tr>
@@ -2198,7 +2410,7 @@ does not auto-accept, as the admin UI does. Requires book.update.</p></td>
                 <td><a href="#extremo.api.external.books.v1.NoShowBookingRequest">NoShowBookingRequest</a></td>
                 <td><a href="#extremo.api.external.books.v1.NoShowBookingResponse">NoShowBookingResponse</a></td>
                 <td><p>NoShowBooking records that the consumer did not show up (RESERVED -&gt;
-NO_SHOW), as the admin UI does. Requires book.update.</p></td>
+NO_SHOW), as the admin UI does. Requires book.moderate.</p></td>
               </tr>
             
           </tbody>

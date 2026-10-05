@@ -63,6 +63,9 @@ type BookServiceClient interface {
 	// validates the slot against the tenant's schedule (capacity / staff / no past
 	// times), sends the same notifications as an in-store booking, and returns the
 	// new booking (DRAFT, or RESERVED when the tenant auto-accepts).
+	// A slot the schedule cannot take returns INVALID_ARGUMENT with a
+	// google.rpc.ErrorInfo detail (domain "extremo.api.external") whose reason is a
+	// BookingConflictReason name.
 	// Requires book.create. Supply idempotency_key to make retries safe: resending
 	// the same key replays the original booking instead of creating a duplicate.
 	CreateBooking(ctx context.Context, in *CreateBookingRequest, opts ...grpc.CallOption) (*CreateBookingResponse, error)
@@ -70,18 +73,20 @@ type BookServiceClient interface {
 	// external_id / metadata. Requires book.update. Pass expected_updated_at (from
 	// Booking.updated_at) for optimistic concurrency; a mismatch returns ABORTED.
 	// Changing only external_id / metadata leaves the booking itself untouched.
+	// A new time or service set the schedule cannot take is rejected the same way
+	// as CreateBooking (INVALID_ARGUMENT + google.rpc.ErrorInfo).
 	UpdateBooking(ctx context.Context, in *UpdateBookingRequest, opts ...grpc.CallOption) (*UpdateBookingResponse, error)
 	// CancelBooking cancels a booking (DRAFT / RESERVED / ORDERED -> CANCELED).
 	// Requires book.update. There is no hard-delete on the external surface.
 	CancelBooking(ctx context.Context, in *CancelBookingRequest, opts ...grpc.CallOption) (*CancelBookingResponse, error)
 	// AcceptBooking confirms a DRAFT booking (DRAFT -> RESERVED), as the admin UI
-	// does. Requires book.update.
+	// does. Requires book.moderate.
 	AcceptBooking(ctx context.Context, in *AcceptBookingRequest, opts ...grpc.CallOption) (*AcceptBookingResponse, error)
 	// RejectBooking declines a DRAFT booking (DRAFT -> CANCELED) of a tenant that
-	// does not auto-accept, as the admin UI does. Requires book.update.
+	// does not auto-accept, as the admin UI does. Requires book.moderate.
 	RejectBooking(ctx context.Context, in *RejectBookingRequest, opts ...grpc.CallOption) (*RejectBookingResponse, error)
 	// NoShowBooking records that the consumer did not show up (RESERVED ->
-	// NO_SHOW), as the admin UI does. Requires book.update.
+	// NO_SHOW), as the admin UI does. Requires book.moderate.
 	NoShowBooking(ctx context.Context, in *NoShowBookingRequest, opts ...grpc.CallOption) (*NoShowBookingResponse, error)
 }
 
@@ -194,6 +199,9 @@ type BookServiceServer interface {
 	// validates the slot against the tenant's schedule (capacity / staff / no past
 	// times), sends the same notifications as an in-store booking, and returns the
 	// new booking (DRAFT, or RESERVED when the tenant auto-accepts).
+	// A slot the schedule cannot take returns INVALID_ARGUMENT with a
+	// google.rpc.ErrorInfo detail (domain "extremo.api.external") whose reason is a
+	// BookingConflictReason name.
 	// Requires book.create. Supply idempotency_key to make retries safe: resending
 	// the same key replays the original booking instead of creating a duplicate.
 	CreateBooking(context.Context, *CreateBookingRequest) (*CreateBookingResponse, error)
@@ -201,18 +209,20 @@ type BookServiceServer interface {
 	// external_id / metadata. Requires book.update. Pass expected_updated_at (from
 	// Booking.updated_at) for optimistic concurrency; a mismatch returns ABORTED.
 	// Changing only external_id / metadata leaves the booking itself untouched.
+	// A new time or service set the schedule cannot take is rejected the same way
+	// as CreateBooking (INVALID_ARGUMENT + google.rpc.ErrorInfo).
 	UpdateBooking(context.Context, *UpdateBookingRequest) (*UpdateBookingResponse, error)
 	// CancelBooking cancels a booking (DRAFT / RESERVED / ORDERED -> CANCELED).
 	// Requires book.update. There is no hard-delete on the external surface.
 	CancelBooking(context.Context, *CancelBookingRequest) (*CancelBookingResponse, error)
 	// AcceptBooking confirms a DRAFT booking (DRAFT -> RESERVED), as the admin UI
-	// does. Requires book.update.
+	// does. Requires book.moderate.
 	AcceptBooking(context.Context, *AcceptBookingRequest) (*AcceptBookingResponse, error)
 	// RejectBooking declines a DRAFT booking (DRAFT -> CANCELED) of a tenant that
-	// does not auto-accept, as the admin UI does. Requires book.update.
+	// does not auto-accept, as the admin UI does. Requires book.moderate.
 	RejectBooking(context.Context, *RejectBookingRequest) (*RejectBookingResponse, error)
 	// NoShowBooking records that the consumer did not show up (RESERVED ->
-	// NO_SHOW), as the admin UI does. Requires book.update.
+	// NO_SHOW), as the admin UI does. Requires book.moderate.
 	NoShowBooking(context.Context, *NoShowBookingRequest) (*NoShowBookingResponse, error)
 	mustEmbedUnimplementedBookServiceServer()
 }

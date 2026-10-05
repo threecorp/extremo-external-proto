@@ -81,6 +81,70 @@ message TenantProfile {
   string phone = 5;
   // Public image URLs.
   repeated string image_urls = 6;
+  // Shop address shown to consumers coming to the shop.
+  TenantAddress address = 7;
+  // Booking rules a calendar needs before it asks for availability.
+  TenantBookingSetting booking_setting = 8;
+}
+
+// TenantAddress is the public address of a tenant (shop).
+message TenantAddress {
+  // ZIP / postal code.
+  string zip = 1;
+  // Prefecture, city and street name.
+  string address1 = 2;
+  // Street number.
+  string address2 = 3;
+  // Building name.
+  string building = 4;
+  // Floor and room number.
+  string floor = 5;
+  // Nearby landmark (station, bus stop).
+  string nearby = 6;
+}
+
+// TenantBookingSetting is the part of a tenant's settings that shapes its booking
+// calendar. Hours are wall-clock hours in `time_zone`; a value of 24 or more is
+// an hour of the next day (26 = 02:00 the next day). Which scheduling strategy
+// applies is reported by AvailabilityService.ListSlots as `schedule_type`.
+message TenantBookingSetting {
+  // First bookable hour of a day (5..28).
+  int32 calendar_start = 1;
+  // Hour the shop closes (6..29); a booking may end exactly at this hour.
+  int32 calendar_end = 2;
+  // Slot width in seconds (1800 = 30 minutes).
+  int32 calendar_interval = 3;
+  // Bookings a single slot can hold when the strategy counts slots.
+  int32 calendar_slot = 4;
+  // When true, CreateBooking returns RESERVED; otherwise DRAFT until the shop
+  // accepts it.
+  bool auto_accept_booking = 5;
+  // Notes the shop asks consumers to read before booking.
+  string reservation_note = 6;
+  // IANA time zone the hours are in. Always "Asia/Tokyo" today.
+  string time_zone = 7;
+}
+
+// BookingConflictReason is why a booking write was rejected by the availability
+// check. CreateBooking and UpdateBooking return it as the `reason` of a
+// google.rpc.ErrorInfo detail (domain "extremo.api.external") on an
+// INVALID_ARGUMENT status. The value names are a contract: they are never renamed
+// or reused. Treat an unknown reason as a generic rejection.
+enum BookingConflictReason {
+  // Unspecified / unknown reason.
+  BOOKING_CONFLICT_REASON_UNSPECIFIED = 0;
+  // No staff member is on shift for the requested time.
+  BOOKING_CONFLICT_REASON_NO_STAFF_ON_DUTY = 1;
+  // The requested staff member is not on shift for the requested time.
+  BOOKING_CONFLICT_REASON_STAFF_NOT_ATTENDING = 2;
+  // The requested staff member already serves another booking at that time.
+  BOOKING_CONFLICT_REASON_STAFF_BOOKED = 3;
+  // Every seat or staff member is taken for the requested time.
+  BOOKING_CONFLICT_REASON_CAPACITY_FULL = 4;
+  // The requested time has passed or starts too soon to book.
+  BOOKING_CONFLICT_REASON_TOO_SOON = 5;
+  // The requested time is outside the shop's business hours.
+  BOOKING_CONFLICT_REASON_OUTSIDE_BUSINESS_HOURS = 6;
 }
 
 // Staff is the minimal public representation of a staff member.
@@ -184,7 +248,9 @@ message BookingEvent {
   string cursor = 1;
   // What kind of change this event represents.
   BookingEventType type = 2;
-  // Opaque public identifier of the booking this event is about.
+  // Opaque public identifier of the booking this event is about. It stays set
+  // after the shop hard-deletes the booking, so every event of a deleted booking
+  // still names it.
   uint64 booking_id = 3;
   // When the change occurred (UTC).
   google.protobuf.Timestamp occurred_at = 4;
