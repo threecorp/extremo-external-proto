@@ -46,9 +46,9 @@ type ListBookingsRequest struct {
 
 	// Tenant whose bookings to list (must match the API key's tenant).
 	TenantId uint64 `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
-	// Inclusive start of the time window.
+	// Start of the time window (inclusive).
 	StartAt *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=start_at,json=startAt,proto3" json:"start_at,omitempty"`
-	// Inclusive end of the time window.
+	// End of the time window (exclusive).
 	EndAt *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=end_at,json=endAt,proto3" json:"end_at,omitempty"`
 	// 1-based page number.
 	Page int64 `protobuf:"varint,4,opt,name=page,proto3" json:"page,omitempty"`

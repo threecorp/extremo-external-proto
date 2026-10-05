@@ -1719,14 +1719,14 @@ square brackets; value up to 500 chars). </p></td>
                   <td>start_at</td>
                   <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
                   <td></td>
-                  <td><p>Inclusive start of the time window. </p></td>
+                  <td><p>Start of the time window (inclusive). </p></td>
                 </tr>
               
                 <tr>
                   <td>end_at</td>
                   <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
                   <td></td>
-                  <td><p>Inclusive end of the time window. </p></td>
+                  <td><p>End of the time window (exclusive). </p></td>
                 </tr>
               
                 <tr>
@@ -2083,8 +2083,11 @@ merged result may hold at most 50 keys. </p></td>
                 <td>ListBookings</td>
                 <td><a href="#extremo.api.external.books.v1.ListBookingsRequest">ListBookingsRequest</a></td>
                 <td><a href="#extremo.api.external.books.v1.ListBookingsResponse">ListBookingsResponse</a></td>
-                <td><p>ListBookings returns a tenant&#39;s bookings whose time window falls in
-[start_at, end_at], newest first, paginated. Requires book.read.</p></td>
+                <td><p>ListBookings returns a tenant&#39;s bookings overlapping [start_at, end_at),
+newest first, paginated: a booking crossing either edge of the window is
+included, one that only touches it is not (a zero-length booking at
+start_at is included). A window with end_at not after start_at lists
+nothing. Requires book.read.</p></td>
               </tr>
             
               <tr>
