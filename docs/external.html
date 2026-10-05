@@ -697,8 +697,8 @@ request cursor to fetch events after this one. </p></td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
                   <td><p>Opaque public identifier of the booking this event is about. It stays set
-after the shop hard-deletes the booking, so every event of a deleted booking
-still names it. </p></td>
+after the shop hard-deletes the booking. 0 means the id is unknown, which
+only happens for an event recorded before the id was kept on delete. </p></td>
                 </tr>
               
                 <tr>

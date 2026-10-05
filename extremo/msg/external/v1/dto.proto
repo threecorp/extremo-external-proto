@@ -249,8 +249,8 @@ message BookingEvent {
   // What kind of change this event represents.
   BookingEventType type = 2;
   // Opaque public identifier of the booking this event is about. It stays set
-  // after the shop hard-deletes the booking, so every event of a deleted booking
-  // still names it.
+  // after the shop hard-deletes the booking. 0 means the id is unknown, which
+  // only happens for an event recorded before the id was kept on delete.
   uint64 booking_id = 3;
   // When the change occurred (UTC).
   google.protobuf.Timestamp occurred_at = 4;

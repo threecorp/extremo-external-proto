@@ -1113,8 +1113,8 @@ type BookingEvent struct {
 	// What kind of change this event represents.
 	Type BookingEventType `protobuf:"varint,2,opt,name=type,proto3,enum=extremo.msg.external.v1.BookingEventType" json:"type,omitempty"`
 	// Opaque public identifier of the booking this event is about. It stays set
-	// after the shop hard-deletes the booking, so every event of a deleted booking
-	// still names it.
+	// after the shop hard-deletes the booking. 0 means the id is unknown, which
+	// only happens for an event recorded before the id was kept on delete.
 	BookingId uint64 `protobuf:"varint,3,opt,name=booking_id,json=bookingId,proto3" json:"booking_id,omitempty"`
 	// When the change occurred (UTC).
 	OccurredAt *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=occurred_at,json=occurredAt,proto3" json:"occurred_at,omitempty"`
