@@ -1185,7 +1185,8 @@ start, as CreateBooking checks. Set this or service_id, not both. </p></td>
                   <td></td>
                   <td><p>Optional consumer the booking is for (Consumer.id). When set, slots that
 would overlap one of this consumer&#39;s own live bookings are FULL, because
-CreateBooking / UpdateBooking reject a consumer&#39;s double booking. </p></td>
+CreateBooking / UpdateBooking reject a consumer&#39;s double booking. A consumer
+that cannot book (pending or deactivated) is INVALID_ARGUMENT. </p></td>
                 </tr>
               
                 <tr>
@@ -1193,7 +1194,8 @@ CreateBooking / UpdateBooking reject a consumer&#39;s double booking. </p></td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
                   <td><p>Optional booking being rescheduled (Booking.id). When set, that booking is
-not counted, as UpdateBooking does not count it against itself. </p></td>
+not counted, as UpdateBooking does not count it against itself, and the slots
+are checked for the staff and consumers it keeps, as UpdateBooking checks them. </p></td>
                 </tr>
               
             </tbody>

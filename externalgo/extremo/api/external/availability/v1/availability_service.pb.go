@@ -50,10 +50,12 @@ type ListSlotsRequest struct {
 	ServiceIds []uint64 `protobuf:"varint,5,rep,packed,name=service_ids,json=serviceIds,proto3" json:"service_ids,omitempty"`
 	// Optional consumer the booking is for (Consumer.id). When set, slots that
 	// would overlap one of this consumer's own live bookings are FULL, because
-	// CreateBooking / UpdateBooking reject a consumer's double booking.
+	// CreateBooking / UpdateBooking reject a consumer's double booking. A consumer
+	// that cannot book (pending or deactivated) is INVALID_ARGUMENT.
 	ConsumerId uint64 `protobuf:"varint,6,opt,name=consumer_id,json=consumerId,proto3" json:"consumer_id,omitempty"`
 	// Optional booking being rescheduled (Booking.id). When set, that booking is
-	// not counted, as UpdateBooking does not count it against itself.
+	// not counted, as UpdateBooking does not count it against itself, and the slots
+	// are checked for the staff and consumers it keeps, as UpdateBooking checks them.
 	ExcludeBookingId uint64 `protobuf:"varint,7,opt,name=exclude_booking_id,json=excludeBookingId,proto3" json:"exclude_booking_id,omitempty"`
 }
 
