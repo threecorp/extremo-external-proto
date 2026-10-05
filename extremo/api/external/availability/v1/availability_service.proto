@@ -17,22 +17,45 @@ option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extr
 // authenticated external API consumers. Read-only.
 service AvailabilityService {
   // ListSlots returns per-slot availability (AVAILABLE / BUSY / FULL) for a
-  // tenant's service over a date range.
+  // tenant's service, or several services booked together, over a date range.
   rpc ListSlots(ListSlotsRequest) returns (ListSlotsResponse) {
     option (google.api.http) = {get: "/api/external/v1/{tenant_id}/availability"};
   }
 }
 
-// ListSlotsRequest selects a tenant + service + date range to compute availability for.
+// ListSlotsRequest selects a tenant + services + date range to compute availability for.
 message ListSlotsRequest {
+  option (buf.validate.message).cel = {
+    id: "service_selection"
+    message: "specify exactly one of service_id or service_ids"
+    expression: "(this.service_id > 0u) != (size(this.service_ids) > 0)"
+  };
+
   // Tenant whose availability to compute.
   uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
-  // Service whose duration drives slot feasibility.
-  uint64 service_id = 2 [(buf.validate.field).uint64.gt = 0];
+  // A single service whose total duration (children included) drives slot
+  // feasibility. Set this or service_ids, not both.
+  uint64 service_id = 2;
   // Start of the date range to compute (inclusive).
   google.protobuf.Timestamp opened_at = 3 [(buf.validate.field).required = true];
   // End of the date range to compute (exclusive).
   google.protobuf.Timestamp closed_at = 4 [(buf.validate.field).required = true];
+  // Services booked together (the service_ids CreateBooking will receive). A
+  // slot is available when the sum of their total durations fits from its
+  // start, as CreateBooking checks. Set this or service_id, not both.
+  repeated uint64 service_ids = 5 [(buf.validate.field).repeated = {
+    unique: true
+    items: {
+      uint64: {gt: 0}
+    }
+  }];
+  // Optional consumer the booking is for (Consumer.id). When set, slots that
+  // would overlap one of this consumer's own live bookings are FULL, because
+  // CreateBooking / UpdateBooking reject a consumer's double booking.
+  uint64 consumer_id = 6;
+  // Optional booking being rescheduled (Booking.id). When set, that booking is
+  // not counted, as UpdateBooking does not count it against itself.
+  uint64 exclude_booking_id = 7;
 }
 
 // ListSlotsResponse is the computed availability grid for the requested range.
