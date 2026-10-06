@@ -47,8 +47,9 @@ type ConsumerServiceClient interface {
 	// need it). Registering a contact that is already a consumer of this tenant
 	// returns that consumer; a consumer removed with DeleteConsumer is restored.
 	// Rejected with AlreadyExists if the contact belongs to tenant staff
-	// (OWNER/MEMBER) or to a person registered only at another tenant, or if
-	// external_id is used by another consumer.
+	// (OWNER/MEMBER), to a person registered only at another tenant, or to a
+	// deleted account, or if external_id is used by another consumer. Aborted when
+	// a concurrent registration of the same person collides; retry the call.
 	CreateConsumer(ctx context.Context, in *CreateConsumerRequest, opts ...grpc.CallOption) (*CreateConsumerResponse, error)
 	// GetConsumer returns a consumer by its Extremo id.
 	GetConsumer(ctx context.Context, in *GetConsumerRequest, opts ...grpc.CallOption) (*GetConsumerResponse, error)
@@ -135,8 +136,9 @@ type ConsumerServiceServer interface {
 	// need it). Registering a contact that is already a consumer of this tenant
 	// returns that consumer; a consumer removed with DeleteConsumer is restored.
 	// Rejected with AlreadyExists if the contact belongs to tenant staff
-	// (OWNER/MEMBER) or to a person registered only at another tenant, or if
-	// external_id is used by another consumer.
+	// (OWNER/MEMBER), to a person registered only at another tenant, or to a
+	// deleted account, or if external_id is used by another consumer. Aborted when
+	// a concurrent registration of the same person collides; retry the call.
 	CreateConsumer(context.Context, *CreateConsumerRequest) (*CreateConsumerResponse, error)
 	// GetConsumer returns a consumer by its Extremo id.
 	GetConsumer(context.Context, *GetConsumerRequest) (*GetConsumerResponse, error)
