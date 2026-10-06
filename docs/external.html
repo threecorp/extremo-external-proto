@@ -588,7 +588,8 @@ start_at &#43; the sum of the chosen services&#39; Service.total_duration. </p><
                   <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
                   <td></td>
                   <td><p>End time (UTC). Derived from the booked services&#39; total duration when the
-services are set; moving only start_at keeps the booking&#39;s length. </p></td>
+booking is made or its set of services changes; otherwise a move keeps the
+booking&#39;s length. </p></td>
                 </tr>
               
                 <tr>
@@ -2185,7 +2186,7 @@ tagged with an external_id / metadata through it; other bookings are excluded. <
         
       
         <h3 id="extremo.api.external.books.v1.UpdateBookingRequest">UpdateBookingRequest</h3>
-        <p>UpdateBookingRequest changes a booking. Only the set fields are applied.</p><p>Changing service_ids re-derives the end time from the new services' total</p><p>duration; changing only start_at keeps the booking's length, so a later price</p><p>or duration change of a service does not reach it. metadata merges into</p><p>the stored pairs: a key with an empty value is removed, and the merged result</p><p>may hold at most 50 keys.</p>
+        <p>UpdateBookingRequest changes a booking. Only the set fields are applied.</p><p>Changing the set of service_ids re-derives the end time from the new services'</p><p>total duration; otherwise a new start_at keeps the booking's length, so a later price</p><p>or duration change of a service does not reach it. metadata merges into</p><p>the stored pairs: a key with an empty value is removed, and the merged result</p><p>may hold at most 50 keys.</p>
 
         
           <table class="field-table">
