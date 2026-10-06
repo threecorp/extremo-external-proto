@@ -40,6 +40,8 @@ type BookEventServiceClient interface {
 	// ListBookingEvents returns booking change events after the given cursor, in
 	// ascending (oldest-first) order, so a consumer can advance through the feed
 	// incrementally by passing next_cursor back on each call.
+	// An event is returned about 60 seconds after the change is saved, so a change
+	// saved late is not skipped; has_more=false means nothing newer is visible yet.
 	ListBookingEvents(ctx context.Context, in *ListBookingEventsRequest, opts ...grpc.CallOption) (*ListBookingEventsResponse, error)
 }
 
@@ -71,6 +73,8 @@ type BookEventServiceServer interface {
 	// ListBookingEvents returns booking change events after the given cursor, in
 	// ascending (oldest-first) order, so a consumer can advance through the feed
 	// incrementally by passing next_cursor back on each call.
+	// An event is returned about 60 seconds after the change is saved, so a change
+	// saved late is not skipped; has_more=false means nothing newer is visible yet.
 	ListBookingEvents(context.Context, *ListBookingEventsRequest) (*ListBookingEventsResponse, error)
 	mustEmbedUnimplementedBookEventServiceServer()
 }
