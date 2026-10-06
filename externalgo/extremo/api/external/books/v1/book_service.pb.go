@@ -483,8 +483,10 @@ func (x *CreateBookingResponse) GetBooking() *v1.Booking {
 	return nil
 }
 
-// UpdateBookingRequest changes a booking. Only the set fields are applied;
-// changing service_ids or start_at re-derives the end time. metadata merges into
+// UpdateBookingRequest changes a booking. Only the set fields are applied.
+// Changing service_ids re-derives the end time from the new services' total
+// duration; changing only start_at keeps the booking's length, so a later price
+// or duration change of a service does not reach it. metadata merges into
 // the stored pairs: a key with an empty value is removed, and the merged result
 // may hold at most 50 keys.
 type UpdateBookingRequest struct {
