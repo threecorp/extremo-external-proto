@@ -485,10 +485,10 @@ func (x *CreateBookingResponse) GetBooking() *v1.Booking {
 
 // UpdateBookingRequest changes a booking. Only the set fields are applied.
 // Changing the set of service_ids re-derives the end time from the new services'
-// total duration; otherwise a new start_at keeps the booking's length, so a later price
-// or duration change of a service does not reach it. metadata merges into
-// the stored pairs: a key with an empty value is removed, and the merged result
-// may hold at most 50 keys.
+// total duration. If the set of service_ids is unchanged, updating start_at keeps
+// the booking's existing duration, even if the services' durations have changed
+// since it was made. metadata merges into the stored pairs: a key with an empty
+// value is removed, and the merged result may hold at most 50 keys.
 type UpdateBookingRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

@@ -801,8 +801,8 @@ type Booking struct {
 	// Start time (UTC).
 	StartAt *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=start_at,json=startAt,proto3" json:"start_at,omitempty"`
 	// End time (UTC). Derived from the booked services' total duration when the
-	// booking is made or its set of services changes; otherwise a move keeps the
-	// booking's length.
+	// booking is made or its set of services changes; updating only start_at keeps
+	// the booking's existing duration.
 	EndAt *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=end_at,json=endAt,proto3" json:"end_at,omitempty"`
 	// Opaque ids of the services booked (see Service.id). May be empty for
 	// bookings that predate service linkage.
