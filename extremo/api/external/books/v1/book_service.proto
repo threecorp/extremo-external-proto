@@ -25,8 +25,11 @@ option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extr
 // consumers: reads (book.read) plus create / update / status changes
 // (book.create, book.update). The status changes behave as in the admin UI.
 service BookService {
-  // ListBookings returns a tenant's bookings whose time window falls in
-  // [start_at, end_at], newest first, paginated. Requires book.read.
+  // ListBookings returns a tenant's bookings overlapping [start_at, end_at),
+  // newest first, paginated: a booking crossing either edge of the window is
+  // included, one that only touches it is not (a zero-length booking at
+  // start_at is included). A window with end_at not after start_at lists
+  // nothing. Requires book.read.
   rpc ListBookings(ListBookingsRequest) returns (ListBookingsResponse) {
     option (google.api.http) = {get: "/api/external/v1/{tenant_id}/books"};
   }
@@ -96,9 +99,9 @@ service BookService {
 message ListBookingsRequest {
   // Tenant whose bookings to list (must match the API key's tenant).
   uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
-  // Inclusive start of the time window.
+  // Start of the time window (inclusive).
   google.protobuf.Timestamp start_at = 2 [(buf.validate.field).required = true];
-  // Inclusive end of the time window.
+  // End of the time window (exclusive).
   google.protobuf.Timestamp end_at = 3 [(buf.validate.field).required = true];
   // 1-based page number.
   int64 page = 4 [(buf.validate.field).int64.gt = 0];

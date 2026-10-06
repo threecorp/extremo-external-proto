@@ -50,8 +50,11 @@ const (
 // consumers: reads (book.read) plus create / update / status changes
 // (book.create, book.update). The status changes behave as in the admin UI.
 type BookServiceClient interface {
-	// ListBookings returns a tenant's bookings whose time window falls in
-	// [start_at, end_at], newest first, paginated. Requires book.read.
+	// ListBookings returns a tenant's bookings overlapping [start_at, end_at),
+	// newest first, paginated: a booking crossing either edge of the window is
+	// included, one that only touches it is not (a zero-length booking at
+	// start_at is included). A window with end_at not after start_at lists
+	// nothing. Requires book.read.
 	ListBookings(ctx context.Context, in *ListBookingsRequest, opts ...grpc.CallOption) (*ListBookingsResponse, error)
 	// GetBooking returns a single booking by its opaque id, scoped to the tenant.
 	// Requires book.read.
@@ -178,8 +181,11 @@ func (c *bookServiceClient) NoShowBooking(ctx context.Context, in *NoShowBooking
 // consumers: reads (book.read) plus create / update / status changes
 // (book.create, book.update). The status changes behave as in the admin UI.
 type BookServiceServer interface {
-	// ListBookings returns a tenant's bookings whose time window falls in
-	// [start_at, end_at], newest first, paginated. Requires book.read.
+	// ListBookings returns a tenant's bookings overlapping [start_at, end_at),
+	// newest first, paginated: a booking crossing either edge of the window is
+	// included, one that only touches it is not (a zero-length booking at
+	// start_at is included). A window with end_at not after start_at lists
+	// nothing. Requires book.read.
 	ListBookings(context.Context, *ListBookingsRequest) (*ListBookingsResponse, error)
 	// GetBooking returns a single booking by its opaque id, scoped to the tenant.
 	// Requires book.read.
