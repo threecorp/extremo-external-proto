@@ -18,10 +18,15 @@ option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extr
 // ConsumerService manages a tenant's consumers (CONSUMER records) over the external
 // partner API. Reads require the consumer.read scope; writes require consumer.write.
 service ConsumerService {
-  // CreateConsumer registers a tenant consumer. Registering a contact that is
-  // already a consumer of this tenant returns that consumer. Rejected with
-  // AlreadyExists if the contact belongs to tenant staff (OWNER/MEMBER) or to a
-  // person registered elsewhere, or if external_id is used by another consumer.
+  // CreateConsumer registers a tenant consumer; it creates no sign-in for them.
+  // One contact identifies the consumer and is the only one stored: with both, the
+  // email identifies them and the phone is not stored (keep it in metadata if you
+  // need it). Registering a contact that is already a consumer of this tenant
+  // returns that consumer; a consumer removed with DeleteConsumer is restored.
+  // Rejected with AlreadyExists if the contact belongs to tenant staff
+  // (OWNER/MEMBER) or to a person registered only at another tenant, or if
+  // external_id is used by another consumer. A registration that races another
+  // one for the same person can fail with AlreadyExists or Aborted; retry it.
   rpc CreateConsumer(CreateConsumerRequest) returns (CreateConsumerResponse) {
     option (google.api.http) = {
       post: "/api/external/v1/{tenant_id}/consumers"
@@ -46,7 +51,8 @@ service ConsumerService {
     };
   }
   // DeleteConsumer deactivates the consumer's CONSUMER role for this tenant (soft; the
-  // underlying global user is never deleted).
+  // underlying global user is never deleted). CreateConsumer with the same contact
+  // restores the consumer.
   rpc DeleteConsumer(DeleteConsumerRequest) returns (DeleteConsumerResponse) {
     option (google.api.http) = {delete: "/api/external/v1/{tenant_id}/consumers/{id}"};
   }
@@ -71,7 +77,8 @@ message CreateConsumerRequest {
   }];
   // Consumer email. Optional, but email or phone is required.
   string email = 3 [(buf.validate.field).string.max_len = 255];
-  // Consumer phone. Optional, but email or phone is required.
+  // Consumer phone. Optional, but email or phone is required. Used only when no
+  // email is given; then a phone longer than 20 characters is InvalidArgument.
   string phone = 4 [(buf.validate.field).string.max_len = 32];
   // Optional partner's own id for the consumer (any string, unique per tenant).
   // Look the consumer up later with ListConsumers.external_id.
