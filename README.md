@@ -29,8 +29,13 @@ Each API key is granted a subset of these scopes; every RPC checks the scope it 
 | `book_event.read` | Read the booking change feed |
 | `book.create` | **Create** a booking for a consumer (`CreateBooking`) |
 | `book.update` | **Mutate** a booking (`UpdateBooking` / `CancelBooking`) |
+| `book.moderate` | **Decide** on a booking as the shop (`AcceptBooking` / `RejectBooking` / `NoShowBooking`) |
+| `consumer.read` | Read the tenant's consumers |
+| `consumer.write` | Register, update and deactivate the tenant's consumers |
 
-Booking **writes** (`book.create` / `book.update`) let a partner create, reschedule, and cancel bookings on a consumer's behalf: `CreateBooking` takes a `Consumer{name, email?, phone?}` and the platform resolves (or creates) the tenant's consumer record from it, validates the slot against the tenant's schedule (capacity / staff / no past times), and returns the booking. Supply an `idempotency_key` to make retries safe, and echo a booking's `updated_at` as `expected_updated_at` on `UpdateBooking` for optimistic concurrency (a mismatch returns `ABORTED`). Consumer contact details are never echoed back in a `Booking` — PII stays server-side.
+Booking **writes** (`book.create` / `book.update`) let a partner create, reschedule, and cancel bookings on a consumer's behalf: register the consumer through `ConsumerService` first, then `CreateBooking` takes its `consumer_id`, validates the slot against the tenant's schedule (capacity, staff, business hours, and 30 minutes' notice), and returns the booking. A slot rejection carries a `google.rpc.ErrorInfo` whose `reason` is a `BookingConflictReason` name. Supply an `idempotency_key` to make retries safe, and echo a booking's `updated_at` as `expected_updated_at` on `UpdateBooking` for optimistic concurrency (a mismatch returns `ABORTED`). Consumer contact details are never echoed back in a `Booking` — PII stays server-side.
+
+Give a consumer-facing system a key **without** `book.moderate`: accepting, rejecting and recording no-shows are the shop's decisions. A key cannot tell one consumer from another, so the partner's own server must check that the signed-in consumer owns a booking before it reads, changes or cancels it.
 
 ## Layout
 
