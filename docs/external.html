@@ -2383,8 +2383,9 @@ A new time or service set the schedule cannot take is rejected the same way
 as CreateBooking (INVALID_ARGUMENT &#43; google.rpc.ErrorInfo); a new start needs
 the same 30 minutes&#39; notice (BOOKING_CONFLICT_REASON_TOO_SOON). A booking that
 starts within 30 minutes keeps its time and services: changing them returns
-INVALID_ARGUMENT without ErrorInfo. Without expected_updated_at, a change
-committed after this call read the booking returns ABORTED too.</p></td>
+INVALID_ARGUMENT without ErrorInfo. A call that changes the booking itself
+(not only external_id / metadata) without expected_updated_at returns ABORTED
+when a change was committed after this call read the booking.</p></td>
               </tr>
             
               <tr>

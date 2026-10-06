@@ -80,8 +80,9 @@ type BookServiceClient interface {
 	// as CreateBooking (INVALID_ARGUMENT + google.rpc.ErrorInfo); a new start needs
 	// the same 30 minutes' notice (BOOKING_CONFLICT_REASON_TOO_SOON). A booking that
 	// starts within 30 minutes keeps its time and services: changing them returns
-	// INVALID_ARGUMENT without ErrorInfo. Without expected_updated_at, a change
-	// committed after this call read the booking returns ABORTED too.
+	// INVALID_ARGUMENT without ErrorInfo. A call that changes the booking itself
+	// (not only external_id / metadata) without expected_updated_at returns ABORTED
+	// when a change was committed after this call read the booking.
 	UpdateBooking(ctx context.Context, in *UpdateBookingRequest, opts ...grpc.CallOption) (*UpdateBookingResponse, error)
 	// CancelBooking cancels a booking (DRAFT / RESERVED / ORDERED -> CANCELED).
 	// Requires book.update. There is no hard-delete on the external surface.
@@ -223,8 +224,9 @@ type BookServiceServer interface {
 	// as CreateBooking (INVALID_ARGUMENT + google.rpc.ErrorInfo); a new start needs
 	// the same 30 minutes' notice (BOOKING_CONFLICT_REASON_TOO_SOON). A booking that
 	// starts within 30 minutes keeps its time and services: changing them returns
-	// INVALID_ARGUMENT without ErrorInfo. Without expected_updated_at, a change
-	// committed after this call read the booking returns ABORTED too.
+	// INVALID_ARGUMENT without ErrorInfo. A call that changes the booking itself
+	// (not only external_id / metadata) without expected_updated_at returns ABORTED
+	// when a change was committed after this call read the booking.
 	UpdateBooking(context.Context, *UpdateBookingRequest) (*UpdateBookingResponse, error)
 	// CancelBooking cancels a booking (DRAFT / RESERVED / ORDERED -> CANCELED).
 	// Requires book.update. There is no hard-delete on the external surface.
