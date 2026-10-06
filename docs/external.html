@@ -1602,7 +1602,10 @@ beginning of the feed. </p></td>
                 <td><a href="#extremo.api.external.books.v1.ListBookingEventsResponse">ListBookingEventsResponse</a></td>
                 <td><p>ListBookingEvents returns booking change events after the given cursor, in
 ascending (oldest-first) order, so a consumer can advance through the feed
-incrementally by passing next_cursor back on each call.</p></td>
+incrementally by passing next_cursor back on each call.
+An event is published about 60 seconds after it is written, so that changes
+committed out of order are not skipped in normal operation. has_more=false
+means nothing newer is visible yet; keep polling from next_cursor.</p></td>
               </tr>
             
           </tbody>
