@@ -24,10 +24,9 @@ service ConsumerService {
   // need it). Registering a contact that is already a consumer of this tenant
   // returns that consumer; a consumer removed with DeleteConsumer is restored.
   // Rejected with AlreadyExists if the contact belongs to tenant staff
-  // (OWNER/MEMBER), to a person registered only at another tenant, or to a
-  // deleted account whose email or phone it is, or if external_id is used by
-  // another consumer. A registration racing another one for the same person
-  // fails with AlreadyExists or, on a deadlock, Aborted; retry the call.
+  // (OWNER/MEMBER) or to a person registered only at another tenant, or if
+  // external_id is used by another consumer. A registration that races another
+  // one for the same person can fail with AlreadyExists or Aborted; retry it.
   rpc CreateConsumer(CreateConsumerRequest) returns (CreateConsumerResponse) {
     option (google.api.http) = {
       post: "/api/external/v1/{tenant_id}/consumers"
