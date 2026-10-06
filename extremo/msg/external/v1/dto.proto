@@ -47,9 +47,11 @@ message Service {
   string name = 2;
   // Description.
   string desc = 3;
-  // Duration in seconds (3600 for a one-hour service).
+  // This service's own duration in seconds (3600 for a one-hour service),
+  // children excluded. See total_duration for what a booking reserves.
   int32 duration = 4;
-  // Price in the tenant's minor currency unit (e.g. JPY).
+  // This service's own price in the tenant's minor currency unit (e.g. JPY),
+  // children excluded. See total_price for what a booking charges.
   int64 price = 5;
   // Display order (ascending).
   int32 sort = 6;
@@ -57,6 +59,12 @@ message Service {
   repeated Service children = 7;
   // Public image URLs.
   repeated string image_urls = 8;
+  // Duration in seconds including all child services. Booking this service
+  // reserves start_at .. start_at + total_duration.
+  int32 total_duration = 9;
+  // Price including all child services, in the same unit as price. Booking
+  // this service records this price.
+  int64 total_price = 10;
 }
 
 // TenantProfile is the public profile of a tenant (shop).
@@ -137,9 +145,11 @@ message Consumer {
 
 // AvailabilitySlot is a single bookable time window with its resolved status.
 message AvailabilitySlot {
-  // Start time (UTC).
+  // Start time (UTC). The start_at to pass to CreateBooking.
   google.protobuf.Timestamp start_at = 1;
-  // End time (UTC).
+  // End of this calendar cell (UTC): start_at + the tenant's calendar interval.
+  // It is not when a booking would end; a booking starting at start_at ends at
+  // start_at + the sum of the chosen services' Service.total_duration.
   google.protobuf.Timestamp end_at = 2;
   // Availability status of this slot.
   SlotStatus status = 3;

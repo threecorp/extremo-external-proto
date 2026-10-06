@@ -35,7 +35,7 @@ const (
 // authenticated external API consumers. Read-only.
 type AvailabilityServiceClient interface {
 	// ListSlots returns per-slot availability (AVAILABLE / BUSY / FULL) for a
-	// tenant's service over a date range.
+	// tenant's service, or several services booked together, over a date range.
 	ListSlots(ctx context.Context, in *ListSlotsRequest, opts ...grpc.CallOption) (*ListSlotsResponse, error)
 }
 
@@ -65,7 +65,7 @@ func (c *availabilityServiceClient) ListSlots(ctx context.Context, in *ListSlots
 // authenticated external API consumers. Read-only.
 type AvailabilityServiceServer interface {
 	// ListSlots returns per-slot availability (AVAILABLE / BUSY / FULL) for a
-	// tenant's service over a date range.
+	// tenant's service, or several services booked together, over a date range.
 	ListSlots(context.Context, *ListSlotsRequest) (*ListSlotsResponse, error)
 	mustEmbedUnimplementedAvailabilityServiceServer()
 }

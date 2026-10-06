@@ -500,14 +500,16 @@
                   <td>start_at</td>
                   <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
                   <td></td>
-                  <td><p>Start time (UTC). </p></td>
+                  <td><p>Start time (UTC). The start_at to pass to CreateBooking. </p></td>
                 </tr>
               
                 <tr>
                   <td>end_at</td>
                   <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
                   <td></td>
-                  <td><p>End time (UTC). </p></td>
+                  <td><p>End of this calendar cell (UTC): start_at &#43; the tenant&#39;s calendar interval.
+It is not when a booking would end; a booking starting at start_at ends at
+start_at &#43; the sum of the chosen services&#39; Service.total_duration. </p></td>
                 </tr>
               
                 <tr>
@@ -840,14 +842,16 @@ tenant among consumers). </p></td>
                   <td>duration</td>
                   <td><a href="#int32">int32</a></td>
                   <td></td>
-                  <td><p>Duration in seconds (3600 for a one-hour service). </p></td>
+                  <td><p>This service&#39;s own duration in seconds (3600 for a one-hour service),
+children excluded. See total_duration for what a booking reserves. </p></td>
                 </tr>
               
                 <tr>
                   <td>price</td>
                   <td><a href="#int64">int64</a></td>
                   <td></td>
-                  <td><p>Price in the tenant&#39;s minor currency unit (e.g. JPY). </p></td>
+                  <td><p>This service&#39;s own price in the tenant&#39;s minor currency unit (e.g. JPY),
+children excluded. See total_price for what a booking charges. </p></td>
                 </tr>
               
                 <tr>
@@ -869,6 +873,22 @@ tenant among consumers). </p></td>
                   <td><a href="#string">string</a></td>
                   <td>repeated</td>
                   <td><p>Public image URLs. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>total_duration</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p>Duration in seconds including all child services. Booking this service
+reserves start_at .. start_at &#43; total_duration. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>total_price</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p>Price including all child services, in the same unit as price. Booking
+this service records this price. </p></td>
                 </tr>
               
             </tbody>
@@ -1112,7 +1132,7 @@ tenant among consumers). </p></td>
 
       
         <h3 id="extremo.api.external.availability.v1.ListSlotsRequest">ListSlotsRequest</h3>
-        <p>ListSlotsRequest selects a tenant + service + date range to compute availability for.</p>
+        <p>ListSlotsRequest selects a tenant + services + date range to compute availability for.</p>
 
         
           <table class="field-table">
@@ -1132,7 +1152,8 @@ tenant among consumers). </p></td>
                   <td>service_id</td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
-                  <td><p>Service whose duration drives slot feasibility. </p></td>
+                  <td><p>A single service whose total duration (children included) drives slot
+feasibility. Set this or service_ids, not both. </p></td>
                 </tr>
               
                 <tr>
@@ -1147,6 +1168,34 @@ tenant among consumers). </p></td>
                   <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
                   <td></td>
                   <td><p>End of the date range to compute (exclusive). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>service_ids</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td>repeated</td>
+                  <td><p>Services booked together (the service_ids CreateBooking will receive). A
+slot is available when the sum of their total durations fits from its
+start, as CreateBooking checks. Set this or service_id, not both. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>consumer_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Optional consumer the booking is for (Consumer.id). When set, slots that
+would overlap one of this consumer&#39;s own live bookings are FULL, because
+CreateBooking / UpdateBooking reject a consumer&#39;s double booking. A consumer
+that cannot book (pending or deactivated) is INVALID_ARGUMENT. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>exclude_booking_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Optional booking being rescheduled (Booking.id). When set, that booking is
+not counted, as UpdateBooking does not count it against itself, and the slots
+are checked for the staff and consumers it keeps, as UpdateBooking checks them. </p></td>
                 </tr>
               
             </tbody>
@@ -1206,7 +1255,7 @@ tenant among consumers). </p></td>
                 <td><a href="#extremo.api.external.availability.v1.ListSlotsRequest">ListSlotsRequest</a></td>
                 <td><a href="#extremo.api.external.availability.v1.ListSlotsResponse">ListSlotsResponse</a></td>
                 <td><p>ListSlots returns per-slot availability (AVAILABLE / BUSY / FULL) for a
-tenant&#39;s service over a date range.</p></td>
+tenant&#39;s service, or several services booked together, over a date range.</p></td>
               </tr>
             
           </tbody>
