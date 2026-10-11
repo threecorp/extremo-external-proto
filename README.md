@@ -32,16 +32,39 @@ Each API key is granted a subset of these scopes; every RPC checks the scope it 
 | `book.moderate` | **Decide** on a booking as the shop (`AcceptBooking` / `RejectBooking` / `NoShowBooking`) |
 | `consumer.read` | Read the tenant's consumers |
 | `consumer.write` | Register, update and deactivate the tenant's consumers |
+| `service.create` | **Create** a service (`CreateService`) |
+| `service.update` | **Change** services and their images (`UpdateService` / `ReorderServices` / the service image RPCs) |
+| `tenant.update` | **Change** the shop's settings, profile, address, theme and images |
+| `role.read` | List the staff members who can take shifts (`ListStaff`) |
+| `attendance.read` | Read staff shifts and their breaks (`ListAttendances`) |
+| `attendance.create` | **Create** a shift (`CreateAttendance`) |
+| `attendance.update` | **Change** a shift's time, title and breaks |
+| `attendance.reassign` | **Move** a shift to another staff member (with `attendance.update`) |
+| `attendance.delete` | **Delete** a shift (`DeleteAttendance`) |
+| `tenant_design.read` | Read the shop's booking page design |
+| `tenant_design.update` | Edit a draft of the shop's booking page design |
+| `tenant_design.moderate` | Publish, unpublish and roll back the shop's booking page design |
 
 Booking **writes** (`book.create` / `book.update`) let a partner create, reschedule, and cancel bookings on a consumer's behalf: register the consumer through `ConsumerService` first, then `CreateBooking` takes its `consumer_id`, validates the slot against the tenant's schedule (capacity, staff, business hours, and 30 minutes' notice), and returns the booking. A slot rejection carries a `google.rpc.ErrorInfo` whose `reason` is a `BookingConflictReason` name. Supply an `idempotency_key` to make retries safe, and echo a booking's `updated_at` as `expected_updated_at` on `UpdateBooking` for optimistic concurrency (a mismatch returns `ABORTED`). Consumer contact details are never echoed back in a `Booking` — PII stays server-side.
 
-Give a consumer-facing system a key **without** `book.moderate`: accepting, rejecting and recording no-shows are the shop's decisions. A key cannot tell one consumer from another, so the partner's own server must check that the signed-in consumer owns a booking before it reads, changes or cancels it.
+The shop management RPCs (`ServiceService` writes, `TenantService` writes, `StaffService`, `AttendanceService`) do what the admin UI does. An update changes only the fields set in the request: a field left unset keeps its value, and a field set to `false`, `0` or `""` takes that value. They return these codes:
+
+| Situation | Code |
+|-----------|------|
+| An id that does not exist, belongs to another tenant, or belongs to another parent (an image of another service, a break of another shift) | `NOT_FOUND` |
+| A missing or invalid value (an empty name, an end before its start, a shift outside business hours, a file that is not an image) | `INVALID_ARGUMENT` |
+| An `UpdateAttendance` setting `staff_id` while another request moved the same shift to another staff member | `ABORTED` |
+| A missing scope | `PERMISSION_DENIED` |
+| A missing or invalid API key | `UNAUTHENTICATED` |
+| Too many requests | `RESOURCE_EXHAUSTED` |
+
+Give a consumer-facing system a key **without** `book.moderate` and without the shop management scopes (`service.create` / `service.update` / `tenant.update` / `role.read` / the `attendance.*` scopes): accepting, rejecting and recording no-shows are the shop's decisions, as is managing the menu, the staff shifts and the shop's settings. A key cannot tell one consumer from another, so the partner's own server must check that the signed-in consumer owns a booking before it reads, changes or cancels it.
 
 ## Layout
 
 ```
 extremo/
-├── msg/external/v1/        # Public DTOs (Service, Booking, TenantProfile, AvailabilitySlot, Staff, enums)
+├── msg/external/v1/        # Public DTOs (Service, Booking, TenantProfile, AvailabilitySlot, Staff, Attendance, enums)
 └── api/external/<svc>/v1/  # External services (REST via google.api.http: /api/external/v1/...)
 ```
 

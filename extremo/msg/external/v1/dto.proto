@@ -65,6 +65,37 @@ message Service {
   // Price including all child services, in the same unit as price. Booking
   // this service records this price.
   int64 total_price = 10;
+  // Opaque id of the parent service; 0 for a top-level service.
+  uint64 parent_id = 11;
+  // Images of the service, in display order (descending sort: a higher sort
+  // comes first).
+  repeated ServiceImage images = 12;
+}
+
+// ServiceImageType is where a service image is shown.
+enum ServiceImageType {
+  // Unspecified / unknown type.
+  SERVICE_IMAGE_TYPE_UNSPECIFIED = 0;
+  // The large image at the top of the service page.
+  SERVICE_IMAGE_TYPE_HERO = 1;
+  // The small image in service lists.
+  SERVICE_IMAGE_TYPE_THUMB = 2;
+}
+
+// ServiceImage is an image of a service.
+message ServiceImage {
+  // Opaque public identifier of the image.
+  uint64 id = 1;
+  // Public URL of the image.
+  string url = 2;
+  // Where the image is shown.
+  ServiceImageType image_type = 3;
+  // Display order; a higher sort comes first.
+  int32 sort = 4;
+  // Display name.
+  string name = 5;
+  // Description.
+  string desc = 6;
 }
 
 // TenantProfile is the public profile of a tenant (shop).
@@ -85,6 +116,82 @@ message TenantProfile {
   TenantAddress address = 7;
   // Booking rules a calendar needs before it asks for availability.
   TenantBookingSetting booking_setting = 8;
+  // Images of the shop, in display order (descending sort: a higher sort comes
+  // first).
+  repeated TenantImage images = 9;
+  // Theme of the shop's booking page. A published custom design of the page
+  // takes precedence over the theme.
+  TenantTheme theme = 10;
+}
+
+// TenantImageType is the section of the shop's page an image belongs to.
+enum TenantImageType {
+  // Unspecified / unknown type.
+  TENANT_IMAGE_TYPE_UNSPECIFIED = 0;
+  // The home section.
+  TENANT_IMAGE_TYPE_HOME = 1;
+  // The service section.
+  TENANT_IMAGE_TYPE_SERVICE = 2;
+  // The staff section.
+  TENANT_IMAGE_TYPE_MEMBER = 3;
+  // The contact section.
+  TENANT_IMAGE_TYPE_CONTACT = 4;
+}
+
+// TenantImage is an image of a tenant (shop).
+message TenantImage {
+  // Opaque public identifier of the image.
+  uint64 id = 1;
+  // Public URL of the image.
+  string url = 2;
+  // The section of the shop's page the image belongs to.
+  TenantImageType image_type = 3;
+  // Display order; a higher sort comes first.
+  int32 sort = 4;
+  // Display name.
+  string name = 5;
+  // Description.
+  string desc = 6;
+}
+
+// TenantTheme is the look of a tenant's booking page.
+enum TenantTheme {
+  // Unspecified / unknown theme.
+  TENANT_THEME_UNSPECIFIED = 0;
+  // The default theme.
+  TENANT_THEME_DEFAULT = 1;
+  // The BEAUTY theme.
+  TENANT_THEME_BEAUTY = 2;
+  // The SALON theme.
+  TENANT_THEME_SALON = 3;
+  // The FASHION theme.
+  TENANT_THEME_FASHION = 4;
+  // The COMMUNITY theme.
+  TENANT_THEME_COMMUNITY = 5;
+  // The CORPORATE theme.
+  TENANT_THEME_CORPORATE = 6;
+  // The SOCIAL theme.
+  TENANT_THEME_SOCIAL = 7;
+  // The MINIMAL theme.
+  TENANT_THEME_MINIMAL = 8;
+  // The COSMETIC theme.
+  TENANT_THEME_COSMETIC = 9;
+  // The HOTEL theme.
+  TENANT_THEME_HOTEL = 10;
+  // The STREAMLINE theme.
+  TENANT_THEME_STREAMLINE = 11;
+  // The ECOMMERCE theme.
+  TENANT_THEME_ECOMMERCE = 12;
+  // The CANDLE theme.
+  TENANT_THEME_CANDLE = 13;
+  // The FURNITURE theme.
+  TENANT_THEME_FURNITURE = 14;
+  // The TECH theme.
+  TENANT_THEME_TECH = 15;
+  // The FINANCE theme.
+  TENANT_THEME_FINANCE = 16;
+  // The STARTUP theme.
+  TENANT_THEME_STARTUP = 17;
 }
 
 // TenantAddress is the public address of a tenant (shop).
@@ -123,6 +230,15 @@ message TenantBookingSetting {
   string reservation_note = 6;
   // IANA time zone the hours are in. Always "Asia/Tokyo" today.
   string time_zone = 7;
+  // Minutes after a booking ends before a booking still RESERVED is marked
+  // NO_SHOW automatically (0..1440). 0 turns the automatic marking off.
+  int32 no_show_threshold_minutes = 8;
+  // When true, booking capacity follows staff shifts (see AttendanceService): a
+  // time is bookable only while a staff member is on shift, and calendar_slot,
+  // when above 0, caps it further. When false, shifts are ignored and
+  // calendar_slot alone sizes each slot. Busy time imported from staff members'
+  // connected calendars applies only when true.
+  bool calendar_sync_attendance = 9;
 }
 
 // BookingConflictReason is why a booking write was rejected by the availability
@@ -153,6 +269,40 @@ message Staff {
   uint64 id = 1;
   // Display name.
   string name = 2;
+}
+
+// Attendance is a staff member's shift: the time they work at the shop. Shifts
+// size the booking capacity of a shop that schedules by staff.
+message Attendance {
+  // Opaque public identifier of the shift.
+  uint64 id = 1;
+  // The staff member on shift (see Staff.id).
+  uint64 staff_id = 2;
+  // Title.
+  string name = 3;
+  // Description.
+  string desc = 4;
+  // Start time (UTC).
+  google.protobuf.Timestamp start_at = 5;
+  // End time (UTC).
+  google.protobuf.Timestamp end_at = 6;
+  // Breaks within the shift, earliest first.
+  repeated AttendanceBreak breaks = 7;
+}
+
+// AttendanceBreak is a break within a shift: time the staff member cannot take a
+// booking.
+message AttendanceBreak {
+  // Opaque public identifier of the break.
+  uint64 id = 1;
+  // The shift the break belongs to (see Attendance.id).
+  uint64 attendance_id = 2;
+  // Why the staff member is away.
+  string reason = 3;
+  // Start time (UTC).
+  google.protobuf.Timestamp start_at = 4;
+  // End time (UTC).
+  google.protobuf.Timestamp end_at = 5;
 }
 
 // Booking is a public booking / reservation.

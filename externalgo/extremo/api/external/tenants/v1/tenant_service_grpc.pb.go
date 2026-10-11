@@ -24,18 +24,54 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TenantService_GetTenant_FullMethodName = "/extremo.api.external.tenants.v1.TenantService/GetTenant"
+	TenantService_GetTenant_FullMethodName           = "/extremo.api.external.tenants.v1.TenantService/GetTenant"
+	TenantService_UpdateTenantSetting_FullMethodName = "/extremo.api.external.tenants.v1.TenantService/UpdateTenantSetting"
+	TenantService_UpdateTenantProfile_FullMethodName = "/extremo.api.external.tenants.v1.TenantService/UpdateTenantProfile"
+	TenantService_UpdateTenantAddress_FullMethodName = "/extremo.api.external.tenants.v1.TenantService/UpdateTenantAddress"
+	TenantService_UpdateTenantTheme_FullMethodName   = "/extremo.api.external.tenants.v1.TenantService/UpdateTenantTheme"
+	TenantService_AddTenantImage_FullMethodName      = "/extremo.api.external.tenants.v1.TenantService/AddTenantImage"
+	TenantService_UpdateTenantImage_FullMethodName   = "/extremo.api.external.tenants.v1.TenantService/UpdateTenantImage"
+	TenantService_ReorderTenantImages_FullMethodName = "/extremo.api.external.tenants.v1.TenantService/ReorderTenantImages"
+	TenantService_DeleteTenantImage_FullMethodName   = "/extremo.api.external.tenants.v1.TenantService/DeleteTenantImage"
 )
 
 // TenantServiceClient is the client API for TenantService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// TenantService exposes a tenant's public profile to authenticated external API
-// consumers. Read-only.
+// TenantService exposes a tenant's profile and settings to authenticated external
+// API consumers: the read (tenant.read) and the shop settings the admin UI
+// manages (tenant.update).
+//
+// An image id of another tenant returns NOT_FOUND. An invalid value returns
+// INVALID_ARGUMENT.
 type TenantServiceClient interface {
-	// GetTenant returns a single tenant's public profile.
+	// GetTenant returns a single tenant's public profile. Requires tenant.read.
 	GetTenant(ctx context.Context, in *GetTenantRequest, opts ...grpc.CallOption) (*GetTenantResponse, error)
+	// UpdateTenantSetting changes the booking settings set in the request and
+	// keeps the others. Requires tenant.update.
+	UpdateTenantSetting(ctx context.Context, in *UpdateTenantSettingRequest, opts ...grpc.CallOption) (*UpdateTenantSettingResponse, error)
+	// UpdateTenantProfile changes the profile fields set in the request and keeps
+	// the others. Requires tenant.update.
+	UpdateTenantProfile(ctx context.Context, in *UpdateTenantProfileRequest, opts ...grpc.CallOption) (*UpdateTenantProfileResponse, error)
+	// UpdateTenantAddress changes the address fields set in the request and keeps
+	// the others. The map position is looked up from the new address. Requires
+	// tenant.update.
+	UpdateTenantAddress(ctx context.Context, in *UpdateTenantAddressRequest, opts ...grpc.CallOption) (*UpdateTenantAddressResponse, error)
+	// UpdateTenantTheme sets the theme of the shop's booking page. While the shop
+	// has a published custom design, the page shows the design instead of the
+	// theme. Requires tenant.update.
+	UpdateTenantTheme(ctx context.Context, in *UpdateTenantThemeRequest, opts ...grpc.CallOption) (*UpdateTenantThemeResponse, error)
+	// AddTenantImage uploads an image for the shop. Requires tenant.update.
+	AddTenantImage(ctx context.Context, in *AddTenantImageRequest, opts ...grpc.CallOption) (*AddTenantImageResponse, error)
+	// UpdateTenantImage changes the fields set in the request and keeps the
+	// others; with data set it also replaces the image. Requires tenant.update.
+	UpdateTenantImage(ctx context.Context, in *UpdateTenantImageRequest, opts ...grpc.CallOption) (*UpdateTenantImageResponse, error)
+	// ReorderTenantImages sets the display order of several images of the shop at
+	// once. All the moves apply, or none do. Requires tenant.update.
+	ReorderTenantImages(ctx context.Context, in *ReorderTenantImagesRequest, opts ...grpc.CallOption) (*ReorderTenantImagesResponse, error)
+	// DeleteTenantImage removes an image of the shop. Requires tenant.update.
+	DeleteTenantImage(ctx context.Context, in *DeleteTenantImageRequest, opts ...grpc.CallOption) (*DeleteTenantImageResponse, error)
 }
 
 type tenantServiceClient struct {
@@ -56,15 +92,123 @@ func (c *tenantServiceClient) GetTenant(ctx context.Context, in *GetTenantReques
 	return out, nil
 }
 
+func (c *tenantServiceClient) UpdateTenantSetting(ctx context.Context, in *UpdateTenantSettingRequest, opts ...grpc.CallOption) (*UpdateTenantSettingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateTenantSettingResponse)
+	err := c.cc.Invoke(ctx, TenantService_UpdateTenantSetting_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tenantServiceClient) UpdateTenantProfile(ctx context.Context, in *UpdateTenantProfileRequest, opts ...grpc.CallOption) (*UpdateTenantProfileResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateTenantProfileResponse)
+	err := c.cc.Invoke(ctx, TenantService_UpdateTenantProfile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tenantServiceClient) UpdateTenantAddress(ctx context.Context, in *UpdateTenantAddressRequest, opts ...grpc.CallOption) (*UpdateTenantAddressResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateTenantAddressResponse)
+	err := c.cc.Invoke(ctx, TenantService_UpdateTenantAddress_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tenantServiceClient) UpdateTenantTheme(ctx context.Context, in *UpdateTenantThemeRequest, opts ...grpc.CallOption) (*UpdateTenantThemeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateTenantThemeResponse)
+	err := c.cc.Invoke(ctx, TenantService_UpdateTenantTheme_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tenantServiceClient) AddTenantImage(ctx context.Context, in *AddTenantImageRequest, opts ...grpc.CallOption) (*AddTenantImageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AddTenantImageResponse)
+	err := c.cc.Invoke(ctx, TenantService_AddTenantImage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tenantServiceClient) UpdateTenantImage(ctx context.Context, in *UpdateTenantImageRequest, opts ...grpc.CallOption) (*UpdateTenantImageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateTenantImageResponse)
+	err := c.cc.Invoke(ctx, TenantService_UpdateTenantImage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tenantServiceClient) ReorderTenantImages(ctx context.Context, in *ReorderTenantImagesRequest, opts ...grpc.CallOption) (*ReorderTenantImagesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ReorderTenantImagesResponse)
+	err := c.cc.Invoke(ctx, TenantService_ReorderTenantImages_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tenantServiceClient) DeleteTenantImage(ctx context.Context, in *DeleteTenantImageRequest, opts ...grpc.CallOption) (*DeleteTenantImageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteTenantImageResponse)
+	err := c.cc.Invoke(ctx, TenantService_DeleteTenantImage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TenantServiceServer is the server API for TenantService service.
 // All implementations must embed UnimplementedTenantServiceServer
 // for forward compatibility.
 //
-// TenantService exposes a tenant's public profile to authenticated external API
-// consumers. Read-only.
+// TenantService exposes a tenant's profile and settings to authenticated external
+// API consumers: the read (tenant.read) and the shop settings the admin UI
+// manages (tenant.update).
+//
+// An image id of another tenant returns NOT_FOUND. An invalid value returns
+// INVALID_ARGUMENT.
 type TenantServiceServer interface {
-	// GetTenant returns a single tenant's public profile.
+	// GetTenant returns a single tenant's public profile. Requires tenant.read.
 	GetTenant(context.Context, *GetTenantRequest) (*GetTenantResponse, error)
+	// UpdateTenantSetting changes the booking settings set in the request and
+	// keeps the others. Requires tenant.update.
+	UpdateTenantSetting(context.Context, *UpdateTenantSettingRequest) (*UpdateTenantSettingResponse, error)
+	// UpdateTenantProfile changes the profile fields set in the request and keeps
+	// the others. Requires tenant.update.
+	UpdateTenantProfile(context.Context, *UpdateTenantProfileRequest) (*UpdateTenantProfileResponse, error)
+	// UpdateTenantAddress changes the address fields set in the request and keeps
+	// the others. The map position is looked up from the new address. Requires
+	// tenant.update.
+	UpdateTenantAddress(context.Context, *UpdateTenantAddressRequest) (*UpdateTenantAddressResponse, error)
+	// UpdateTenantTheme sets the theme of the shop's booking page. While the shop
+	// has a published custom design, the page shows the design instead of the
+	// theme. Requires tenant.update.
+	UpdateTenantTheme(context.Context, *UpdateTenantThemeRequest) (*UpdateTenantThemeResponse, error)
+	// AddTenantImage uploads an image for the shop. Requires tenant.update.
+	AddTenantImage(context.Context, *AddTenantImageRequest) (*AddTenantImageResponse, error)
+	// UpdateTenantImage changes the fields set in the request and keeps the
+	// others; with data set it also replaces the image. Requires tenant.update.
+	UpdateTenantImage(context.Context, *UpdateTenantImageRequest) (*UpdateTenantImageResponse, error)
+	// ReorderTenantImages sets the display order of several images of the shop at
+	// once. All the moves apply, or none do. Requires tenant.update.
+	ReorderTenantImages(context.Context, *ReorderTenantImagesRequest) (*ReorderTenantImagesResponse, error)
+	// DeleteTenantImage removes an image of the shop. Requires tenant.update.
+	DeleteTenantImage(context.Context, *DeleteTenantImageRequest) (*DeleteTenantImageResponse, error)
 	mustEmbedUnimplementedTenantServiceServer()
 }
 
@@ -77,6 +221,30 @@ type UnimplementedTenantServiceServer struct{}
 
 func (UnimplementedTenantServiceServer) GetTenant(context.Context, *GetTenantRequest) (*GetTenantResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTenant not implemented")
+}
+func (UnimplementedTenantServiceServer) UpdateTenantSetting(context.Context, *UpdateTenantSettingRequest) (*UpdateTenantSettingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTenantSetting not implemented")
+}
+func (UnimplementedTenantServiceServer) UpdateTenantProfile(context.Context, *UpdateTenantProfileRequest) (*UpdateTenantProfileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTenantProfile not implemented")
+}
+func (UnimplementedTenantServiceServer) UpdateTenantAddress(context.Context, *UpdateTenantAddressRequest) (*UpdateTenantAddressResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTenantAddress not implemented")
+}
+func (UnimplementedTenantServiceServer) UpdateTenantTheme(context.Context, *UpdateTenantThemeRequest) (*UpdateTenantThemeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTenantTheme not implemented")
+}
+func (UnimplementedTenantServiceServer) AddTenantImage(context.Context, *AddTenantImageRequest) (*AddTenantImageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddTenantImage not implemented")
+}
+func (UnimplementedTenantServiceServer) UpdateTenantImage(context.Context, *UpdateTenantImageRequest) (*UpdateTenantImageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTenantImage not implemented")
+}
+func (UnimplementedTenantServiceServer) ReorderTenantImages(context.Context, *ReorderTenantImagesRequest) (*ReorderTenantImagesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReorderTenantImages not implemented")
+}
+func (UnimplementedTenantServiceServer) DeleteTenantImage(context.Context, *DeleteTenantImageRequest) (*DeleteTenantImageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteTenantImage not implemented")
 }
 func (UnimplementedTenantServiceServer) mustEmbedUnimplementedTenantServiceServer() {}
 func (UnimplementedTenantServiceServer) testEmbeddedByValue()                       {}
@@ -117,6 +285,150 @@ func _TenantService_GetTenant_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TenantService_UpdateTenantSetting_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTenantSettingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TenantServiceServer).UpdateTenantSetting(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TenantService_UpdateTenantSetting_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TenantServiceServer).UpdateTenantSetting(ctx, req.(*UpdateTenantSettingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TenantService_UpdateTenantProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTenantProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TenantServiceServer).UpdateTenantProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TenantService_UpdateTenantProfile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TenantServiceServer).UpdateTenantProfile(ctx, req.(*UpdateTenantProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TenantService_UpdateTenantAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTenantAddressRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TenantServiceServer).UpdateTenantAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TenantService_UpdateTenantAddress_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TenantServiceServer).UpdateTenantAddress(ctx, req.(*UpdateTenantAddressRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TenantService_UpdateTenantTheme_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTenantThemeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TenantServiceServer).UpdateTenantTheme(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TenantService_UpdateTenantTheme_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TenantServiceServer).UpdateTenantTheme(ctx, req.(*UpdateTenantThemeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TenantService_AddTenantImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddTenantImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TenantServiceServer).AddTenantImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TenantService_AddTenantImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TenantServiceServer).AddTenantImage(ctx, req.(*AddTenantImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TenantService_UpdateTenantImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTenantImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TenantServiceServer).UpdateTenantImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TenantService_UpdateTenantImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TenantServiceServer).UpdateTenantImage(ctx, req.(*UpdateTenantImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TenantService_ReorderTenantImages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReorderTenantImagesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TenantServiceServer).ReorderTenantImages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TenantService_ReorderTenantImages_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TenantServiceServer).ReorderTenantImages(ctx, req.(*ReorderTenantImagesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TenantService_DeleteTenantImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteTenantImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TenantServiceServer).DeleteTenantImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TenantService_DeleteTenantImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TenantServiceServer).DeleteTenantImage(ctx, req.(*DeleteTenantImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TenantService_ServiceDesc is the grpc.ServiceDesc for TenantService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -127,6 +439,38 @@ var TenantService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTenant",
 			Handler:    _TenantService_GetTenant_Handler,
+		},
+		{
+			MethodName: "UpdateTenantSetting",
+			Handler:    _TenantService_UpdateTenantSetting_Handler,
+		},
+		{
+			MethodName: "UpdateTenantProfile",
+			Handler:    _TenantService_UpdateTenantProfile_Handler,
+		},
+		{
+			MethodName: "UpdateTenantAddress",
+			Handler:    _TenantService_UpdateTenantAddress_Handler,
+		},
+		{
+			MethodName: "UpdateTenantTheme",
+			Handler:    _TenantService_UpdateTenantTheme_Handler,
+		},
+		{
+			MethodName: "AddTenantImage",
+			Handler:    _TenantService_AddTenantImage_Handler,
+		},
+		{
+			MethodName: "UpdateTenantImage",
+			Handler:    _TenantService_UpdateTenantImage_Handler,
+		},
+		{
+			MethodName: "ReorderTenantImages",
+			Handler:    _TenantService_ReorderTenantImages_Handler,
+		},
+		{
+			MethodName: "DeleteTenantImage",
+			Handler:    _TenantService_DeleteTenantImage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

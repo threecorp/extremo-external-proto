@@ -12,12 +12,75 @@ import "google/api/annotations.proto";
 
 option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/api/external/services/v1;services";
 
-// ServiceService exposes a tenant's public service catalog to authenticated
-// external API consumers. Read-only.
+// ServiceService exposes a tenant's service catalog (the shop's menu) to
+// authenticated external API consumers: reads (service.read) and the menu
+// management the admin UI offers (service.create, service.update). A menu item is
+// never deleted, as in the admin UI.
+//
+// An id of another tenant, or an image of another service, returns NOT_FOUND. An
+// invalid value returns INVALID_ARGUMENT.
 service ServiceService {
-  // ListServices returns the service catalog for a tenant.
+  // ListServices returns the service catalog for a tenant. Requires
+  // service.read.
   rpc ListServices(ListServicesRequest) returns (ListServicesResponse) {
     option (google.api.http) = {get: "/api/external/v1/{tenant_id}/services"};
+  }
+  // GetService returns a single service with its children. Requires
+  // service.read.
+  rpc GetService(GetServiceRequest) returns (GetServiceResponse) {
+    option (google.api.http) = {get: "/api/external/v1/{tenant_id}/services/{id}"};
+  }
+  // CreateService adds a service, under parent_id when it is set. Requires
+  // service.create.
+  rpc CreateService(CreateServiceRequest) returns (CreateServiceResponse) {
+    option (google.api.http) = {
+      post: "/api/external/v1/{tenant_id}/services"
+      body: "*"
+    };
+  }
+  // UpdateService changes the fields set in the request and keeps the others.
+  // Requires service.update.
+  rpc UpdateService(UpdateServiceRequest) returns (UpdateServiceResponse) {
+    option (google.api.http) = {
+      patch: "/api/external/v1/{tenant_id}/services/{id}"
+      body: "*"
+    };
+  }
+  // ReorderServices sets the parent and the display order of several services at
+  // once, as dragging the menu tree in the admin UI does. All the moves apply, or
+  // none do. Requires service.update.
+  rpc ReorderServices(ReorderServicesRequest) returns (ReorderServicesResponse) {
+    option (google.api.http) = {
+      post: "/api/external/v1/{tenant_id}/services:reorder"
+      body: "*"
+    };
+  }
+  // AddServiceImage uploads an image for a service. Requires service.update.
+  rpc AddServiceImage(AddServiceImageRequest) returns (AddServiceImageResponse) {
+    option (google.api.http) = {
+      post: "/api/external/v1/{tenant_id}/services/{service_id}/images"
+      body: "*"
+    };
+  }
+  // UpdateServiceImage changes the fields set in the request and keeps the
+  // others; with data set it also replaces the image. Requires service.update.
+  rpc UpdateServiceImage(UpdateServiceImageRequest) returns (UpdateServiceImageResponse) {
+    option (google.api.http) = {
+      patch: "/api/external/v1/{tenant_id}/services/{service_id}/images/{id}"
+      body: "*"
+    };
+  }
+  // ReorderServiceImages sets the display order of several images of a service
+  // at once. All the moves apply, or none do. Requires service.update.
+  rpc ReorderServiceImages(ReorderServiceImagesRequest) returns (ReorderServiceImagesResponse) {
+    option (google.api.http) = {
+      post: "/api/external/v1/{tenant_id}/services/{service_id}/images:reorder"
+      body: "*"
+    };
+  }
+  // DeleteServiceImage removes an image of a service. Requires service.update.
+  rpc DeleteServiceImage(DeleteServiceImageRequest) returns (DeleteServiceImageResponse) {
+    option (google.api.http) = {delete: "/api/external/v1/{tenant_id}/services/{service_id}/images/{id}"};
   }
 }
 
@@ -41,3 +104,244 @@ message ListServicesResponse {
   // Total number of services across all pages.
   int64 total_size = 2 [(buf.validate.field).int64.gte = 0];
 }
+
+// GetServiceRequest selects a single service under a tenant.
+message GetServiceRequest {
+  // Tenant the service belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Opaque public identifier of the service.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+}
+
+// GetServiceResponse carries the requested service.
+message GetServiceResponse {
+  // The service.
+  extremo.msg.external.v1.Service service = 1;
+}
+
+// CreateServiceRequest adds a service to a tenant's catalog.
+message CreateServiceRequest {
+  // Tenant to add the service to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Parent service (Service.id) to add it under; 0 adds a top-level service.
+  uint64 parent_id = 2;
+  // Display name (required, at most 128 characters, not only spaces).
+  string name = 3 [(buf.validate.field).string = {
+    max_len: 128
+    pattern: "\\S"
+  }];
+  // Description.
+  string desc = 4 [(buf.validate.field).string.max_len = 512];
+  // The service's own duration in seconds (1..43200), children excluded.
+  int32 duration = 5 [(buf.validate.field).int32 = {
+    gt: 0
+    lte: 43200
+  }];
+  // The service's own price in the tenant's minor currency unit, children
+  // excluded (0..100000000). 0 means the service has no price: a free service
+  // and a service without a price are not told apart.
+  int64 price = 6 [(buf.validate.field).int64 = {
+    gte: 0
+    lte: 100000000
+  }];
+  // Display order among its siblings (0..100).
+  int32 sort = 7 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 100
+  }];
+}
+
+// CreateServiceResponse carries the created service.
+message CreateServiceResponse {
+  // The created service.
+  extremo.msg.external.v1.Service service = 1;
+}
+
+// UpdateServiceRequest changes a service. A field left unset keeps its current
+// value; a field set to 0 or "" takes that value.
+message UpdateServiceRequest {
+  // Tenant the service belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Service to update.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+  // New parent service (Service.id); 0 makes it a top-level service.
+  optional uint64 parent_id = 3;
+  // New display name; it cannot be emptied.
+  optional string name = 4 [(buf.validate.field).string = {
+    max_len: 128
+    pattern: "\\S"
+  }];
+  // New description.
+  optional string desc = 5 [(buf.validate.field).string.max_len = 512];
+  // New own duration in seconds.
+  optional int32 duration = 6 [(buf.validate.field).int32 = {
+    gt: 0
+    lte: 43200
+  }];
+  // New own price; 0 means no price (see CreateServiceRequest.price).
+  optional int64 price = 7 [(buf.validate.field).int64 = {
+    gte: 0
+    lte: 100000000
+  }];
+  // New display order among its siblings.
+  optional int32 sort = 8 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 100
+  }];
+}
+
+// UpdateServiceResponse carries the updated service.
+message UpdateServiceResponse {
+  // The updated service.
+  extremo.msg.external.v1.Service service = 1;
+}
+
+// ServicePlacement is where one service goes in a reorder.
+message ServicePlacement {
+  // Service to move.
+  uint64 id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Its parent service (Service.id); 0 makes it a top-level service.
+  uint64 parent_id = 2;
+  // Its display order among its siblings.
+  int32 sort = 3 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 100
+  }];
+}
+
+// ReorderServicesRequest moves several services of a tenant at once.
+message ReorderServicesRequest {
+  // Tenant the services belong to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Where each service goes (1..50 services).
+  repeated ServicePlacement placements = 2 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 50
+  }];
+}
+
+// ReorderServicesResponse carries the moved services.
+message ReorderServicesResponse {
+  // The moved services, in request order.
+  repeated extremo.msg.external.v1.Service services = 1;
+}
+
+// AddServiceImageRequest uploads an image for a service. data is a JPEG, PNG,
+// WebP or GIF file of at most 10 MiB; any other bytes return INVALID_ARGUMENT.
+message AddServiceImageRequest {
+  // Tenant the service belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Service to add the image to.
+  uint64 service_id = 2 [(buf.validate.field).uint64.gt = 0];
+  // Where the image is shown (required).
+  extremo.msg.external.v1.ServiceImageType image_type = 3 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  // Display order; a higher sort comes first.
+  int32 sort = 4 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 100
+  }];
+  // Display name (required, not only spaces).
+  string name = 5 [(buf.validate.field).string = {
+    max_len: 255
+    pattern: "\\S"
+  }];
+  // Description.
+  string desc = 6 [(buf.validate.field).string.max_len = 512];
+  // The image file.
+  bytes data = 7 [(buf.validate.field).bytes = {
+    min_len: 1
+    max_len: 10485760
+  }];
+}
+
+// AddServiceImageResponse carries the added image.
+message AddServiceImageResponse {
+  // The added image.
+  extremo.msg.external.v1.ServiceImage image = 1;
+}
+
+// UpdateServiceImageRequest changes an image of a service. A field left unset
+// keeps its current value; a field set to 0 or "" takes that value. data, when
+// set, replaces the image file under the same rules as AddServiceImageRequest.
+message UpdateServiceImageRequest {
+  // Tenant the service belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Service the image belongs to.
+  uint64 service_id = 2 [(buf.validate.field).uint64.gt = 0];
+  // Image to update.
+  uint64 id = 3 [(buf.validate.field).uint64.gt = 0];
+  // New place the image is shown.
+  optional extremo.msg.external.v1.ServiceImageType image_type = 4 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  // New display order.
+  optional int32 sort = 5 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 100
+  }];
+  // New display name; it cannot be emptied.
+  optional string name = 6 [(buf.validate.field).string = {
+    max_len: 255
+    pattern: "\\S"
+  }];
+  // New description.
+  optional string desc = 7 [(buf.validate.field).string.max_len = 512];
+  // New image file.
+  optional bytes data = 8 [(buf.validate.field).bytes = {
+    min_len: 1
+    max_len: 10485760
+  }];
+}
+
+// UpdateServiceImageResponse carries the updated image.
+message UpdateServiceImageResponse {
+  // The updated image.
+  extremo.msg.external.v1.ServiceImage image = 1;
+}
+
+// ServiceImagePlacement is the display order of one image in a reorder.
+message ServiceImagePlacement {
+  // Image to move.
+  uint64 id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Its display order; a higher sort comes first.
+  int32 sort = 2 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 100
+  }];
+}
+
+// ReorderServiceImagesRequest sets the display order of images of one service.
+message ReorderServiceImagesRequest {
+  // Tenant the service belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Service the images belong to.
+  uint64 service_id = 2 [(buf.validate.field).uint64.gt = 0];
+  // The order of each image (1..100 images).
+  repeated ServiceImagePlacement placements = 3 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 100
+  }];
+}
+
+// ReorderServiceImagesResponse carries the moved images.
+message ReorderServiceImagesResponse {
+  // The moved images, in request order.
+  repeated extremo.msg.external.v1.ServiceImage images = 1;
+}
+
+// DeleteServiceImageRequest removes an image of a service.
+message DeleteServiceImageRequest {
+  // Tenant the service belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Service the image belongs to.
+  uint64 service_id = 2 [(buf.validate.field).uint64.gt = 0];
+  // Image to remove.
+  uint64 id = 3 [(buf.validate.field).uint64.gt = 0];
+}
+
+// DeleteServiceImageResponse is empty.
+message DeleteServiceImageResponse {}

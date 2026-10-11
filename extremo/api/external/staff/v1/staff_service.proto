@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+// Package extremo.api.external.staff.v1 is part of the Extremo external partner
+// API. The `external/` surface is authenticated via a per-tenant API key and
+// scoped. It returns public DTOs only.
+package extremo.api.external.staff.v1;
+
+import "buf/validate/validate.proto";
+import "extremo/msg/external/v1/dto.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/api/external/staff/v1;staff";
+
+// StaffService lists the staff members of a tenant who can take shifts.
+// Read-only.
+service StaffService {
+  // ListStaff returns the tenant's active owners and members: the staff members a
+  // shift can name (see AttendanceService). Requires role.read.
+  rpc ListStaff(ListStaffRequest) returns (ListStaffResponse) {
+    option (google.api.http) = {get: "/api/external/v1/{tenant_id}/staff"};
+  }
+}
+
+// ListStaffRequest selects a tenant's staff members with pagination.
+message ListStaffRequest {
+  // Tenant whose staff members to list.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // 1-based page number.
+  int64 page = 2 [(buf.validate.field).int64.gt = 0];
+  // Page size (1..100).
+  int64 page_size = 3 [(buf.validate.field).int64 = {
+    gt: 0
+    lte: 100
+  }];
+}
+
+// ListStaffResponse is a page of staff members.
+message ListStaffResponse {
+  // The staff members on this page.
+  repeated extremo.msg.external.v1.Staff staff = 1;
+  // Total number of staff members across all pages.
+  int64 total_size = 2 [(buf.validate.field).int64.gte = 0];
+}
