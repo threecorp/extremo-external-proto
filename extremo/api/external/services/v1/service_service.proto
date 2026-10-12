@@ -128,7 +128,7 @@ message CreateServiceRequest {
   // Display name (required, at most 128 characters, not only spaces).
   string name = 3 [(buf.validate.field).string = {
     max_len: 128
-    pattern: "\\S"
+    pattern: "[^\\s\\x{0B}\\x{FEFF}\\p{Z}]"
   }];
   // Description.
   string desc = 4 [(buf.validate.field).string.max_len = 512];
@@ -169,7 +169,7 @@ message UpdateServiceRequest {
   // New display name; it cannot be emptied.
   optional string name = 4 [(buf.validate.field).string = {
     max_len: 128
-    pattern: "\\S"
+    pattern: "[^\\s\\x{0B}\\x{FEFF}\\p{Z}]"
   }];
   // New description.
   optional string desc = 5 [(buf.validate.field).string.max_len = 512];
@@ -246,7 +246,7 @@ message AddServiceImageRequest {
   // Display name (required, not only spaces).
   string name = 5 [(buf.validate.field).string = {
     max_len: 255
-    pattern: "\\S"
+    pattern: "[^\\s\\x{0B}\\x{FEFF}\\p{Z}]"
   }];
   // Description.
   string desc = 6 [(buf.validate.field).string.max_len = 512];
@@ -286,7 +286,7 @@ message UpdateServiceImageRequest {
   // New display name; it cannot be emptied.
   optional string name = 6 [(buf.validate.field).string = {
     max_len: 255
-    pattern: "\\S"
+    pattern: "[^\\s\\x{0B}\\x{FEFF}\\p{Z}]"
   }];
   // New description.
   optional string desc = 7 [(buf.validate.field).string.max_len = 512];

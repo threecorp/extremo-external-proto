@@ -152,7 +152,7 @@ message UpdateTenantProfileRequest {
   // New shop name; it cannot be emptied.
   optional string name = 2 [(buf.validate.field).string = {
     max_len: 255
-    pattern: "\\S"
+    pattern: "[^\\s\\x{0B}\\x{FEFF}\\p{Z}]"
   }];
   // New description.
   optional string desc = 3 [(buf.validate.field).string.max_len = 512];
@@ -162,7 +162,7 @@ message UpdateTenantProfileRequest {
     (buf.validate.field).cel = {
       id: "link.http_url"
       message: "link must be an http(s) URL or empty"
-      expression: "this == '' || (this.isUri() && this.matches('^https?://[^/?#]+'))"
+      expression: "this == '' || (this.isUri() && this.matches('^https?://[^/?#:@ ]+(:(6553[0-5]|655[0-2][0-9]|65[0-4][0-9]{2}|6[0-4][0-9]{3}|[1-5][0-9]{4}|[0-9]{1,4}))?([/?#]|$)'))"
     }
   ];
   // New public contact phone: "+" followed by digits (+819012345678); "" clears
