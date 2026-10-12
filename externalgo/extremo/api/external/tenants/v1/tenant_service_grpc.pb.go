@@ -55,8 +55,9 @@ type TenantServiceClient interface {
 	// the others. Requires tenant.update.
 	UpdateTenantProfile(ctx context.Context, in *UpdateTenantProfileRequest, opts ...grpc.CallOption) (*UpdateTenantProfileResponse, error)
 	// UpdateTenantAddress changes the address fields set in the request and keeps
-	// the others. The map position is looked up from the new address. Requires
-	// tenant.update.
+	// the others. The map position is looked up from the new address; if another
+	// update changes address1 or address2 during the lookup, it returns ABORTED and
+	// can be retried. Requires tenant.update.
 	UpdateTenantAddress(ctx context.Context, in *UpdateTenantAddressRequest, opts ...grpc.CallOption) (*UpdateTenantAddressResponse, error)
 	// UpdateTenantTheme sets the theme of the shop's booking page. While the shop
 	// has a published custom design, the page shows the design instead of the
@@ -192,8 +193,9 @@ type TenantServiceServer interface {
 	// the others. Requires tenant.update.
 	UpdateTenantProfile(context.Context, *UpdateTenantProfileRequest) (*UpdateTenantProfileResponse, error)
 	// UpdateTenantAddress changes the address fields set in the request and keeps
-	// the others. The map position is looked up from the new address. Requires
-	// tenant.update.
+	// the others. The map position is looked up from the new address; if another
+	// update changes address1 or address2 during the lookup, it returns ABORTED and
+	// can be retried. Requires tenant.update.
 	UpdateTenantAddress(context.Context, *UpdateTenantAddressRequest) (*UpdateTenantAddressResponse, error)
 	// UpdateTenantTheme sets the theme of the shop's booking page. While the shop
 	// has a published custom design, the page shows the design instead of the

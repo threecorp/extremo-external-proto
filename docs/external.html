@@ -6245,8 +6245,9 @@ the others. Requires tenant.update.</p></td>
                 <td><a href="#extremo.api.external.tenants.v1.UpdateTenantAddressRequest">UpdateTenantAddressRequest</a></td>
                 <td><a href="#extremo.api.external.tenants.v1.UpdateTenantAddressResponse">UpdateTenantAddressResponse</a></td>
                 <td><p>UpdateTenantAddress changes the address fields set in the request and keeps
-the others. The map position is looked up from the new address. Requires
-tenant.update.</p></td>
+the others. The map position is looked up from the new address; if another
+update changes address1 or address2 during the lookup, it returns ABORTED and
+can be retried. Requires tenant.update.</p></td>
               </tr>
             
               <tr>

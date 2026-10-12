@@ -53,7 +53,7 @@ The shop management RPCs (`ServiceService` writes, `TenantService` writes, `Staf
 |-----------|------|
 | An id that does not exist, belongs to another tenant, or belongs to another parent (an image of another service, a break of another shift) | `NOT_FOUND` |
 | A missing or invalid value (an empty name, an end before its start, a shift outside business hours, a file that is not an image) | `INVALID_ARGUMENT` |
-| An `UpdateAttendance` setting `staff_id` while another request moved the same shift to another staff member | `ABORTED` |
+| An `UpdateAttendance` setting `staff_id` while another request moved the same shift to another staff member, or an `UpdateTenantAddress` while another request changed the address during the map lookup | `ABORTED` |
 | A missing scope | `PERMISSION_DENIED` |
 | A missing or invalid API key | `UNAUTHENTICATED` |
 | Too many requests | `RESOURCE_EXHAUSTED` |

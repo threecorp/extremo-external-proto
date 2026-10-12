@@ -40,8 +40,9 @@ service TenantService {
     };
   }
   // UpdateTenantAddress changes the address fields set in the request and keeps
-  // the others. The map position is looked up from the new address. Requires
-  // tenant.update.
+  // the others. The map position is looked up from the new address; if another
+  // update changes address1 or address2 during the lookup, it returns ABORTED and
+  // can be retried. Requires tenant.update.
   rpc UpdateTenantAddress(UpdateTenantAddressRequest) returns (UpdateTenantAddressResponse) {
     option (google.api.http) = {
       patch: "/api/external/v1/{tenant_id}/address"
