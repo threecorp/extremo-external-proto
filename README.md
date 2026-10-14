@@ -47,7 +47,7 @@ Each API key is granted a subset of these scopes; every RPC checks the scope it 
 
 Booking **writes** (`book.create` / `book.update`) let a partner create, reschedule, and cancel bookings on a consumer's behalf: register the consumer through `ConsumerService` first, then `CreateBooking` takes its `consumer_id`, validates the slot against the tenant's schedule (capacity, staff, business hours, and 30 minutes' notice), and returns the booking. A slot rejection carries a `google.rpc.ErrorInfo` whose `reason` is a `BookingConflictReason` name. Supply an `idempotency_key` to make retries safe, and echo a booking's `updated_at` as `expected_updated_at` on `UpdateBooking` for optimistic concurrency (a mismatch returns `ABORTED`). Consumer contact details are never echoed back in a `Booking` — PII stays server-side.
 
-The shop management RPCs (`ServiceService` writes, `TenantService` writes, `StaffService`, `AttendanceService`) do what the admin UI does. An update changes only the fields set in the request: a field left unset keeps its value, and a field set to `false`, `0` or `""` takes that value. `AttendanceService` is defined ahead of the server: until it ships, the API answers it with `UNIMPLEMENTED`. The shop management RPCs return these codes:
+The shop management RPCs (`ServiceService` writes, `TenantService` writes, `StaffService`, `AttendanceService`) do what the admin UI does. An update changes only the fields set in the request: a field left unset keeps its value, and a field set to `false`, `0` or `""` takes that value. The shop management RPCs return these codes:
 
 | Situation | Code |
 |-----------|------|
