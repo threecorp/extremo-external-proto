@@ -42,9 +42,10 @@ const (
 // (attendance.reassign) and deleting (attendance.delete).
 //
 // A shift belongs to a staff member listed by StaffService.ListStaff, may not
-// overlap another shift of the same staff member, and must lie within the shop's
-// business hours (TenantBookingSetting.calendar_start .. calendar_end). A break
-// must lie within its shift.
+// overlap another shift of the same staff member, and may span several days. Its
+// start and its end must each fall within the shop's business hours of their own
+// day (TenantBookingSetting.calendar_start .. calendar_end, minute precision). A
+// break must lie within its shift.
 //
 // Deleting a shift, or moving it to another staff member, removes the previous
 // staff member as the requested staff of the bookings overlapping the shift's
@@ -54,9 +55,9 @@ const (
 // An update changes only the fields set in the request, so two updates of
 // different fields of the same shift both apply. An id of another tenant, or a
 // break of another shift, returns NOT_FOUND. An invalid value returns
-// INVALID_ARGUMENT. An UpdateAttendance that sets staff_id returns ABORTED when
-// another request moved the shift to another staff member while this one ran;
-// read the shift again and retry.
+// INVALID_ARGUMENT. A write to a shift or its breaks returns ABORTED when another
+// request moved the shift to another staff member while this one ran, or when it
+// hits a database deadlock with another edit; read the shift again and retry.
 type AttendanceServiceClient interface {
 	// ListAttendances returns the shifts overlapping [start_at, end_at), earliest
 	// first, with their breaks: a shift crossing either edge of the window is
@@ -169,9 +170,10 @@ func (c *attendanceServiceClient) DeleteAttendanceBreak(ctx context.Context, in 
 // (attendance.reassign) and deleting (attendance.delete).
 //
 // A shift belongs to a staff member listed by StaffService.ListStaff, may not
-// overlap another shift of the same staff member, and must lie within the shop's
-// business hours (TenantBookingSetting.calendar_start .. calendar_end). A break
-// must lie within its shift.
+// overlap another shift of the same staff member, and may span several days. Its
+// start and its end must each fall within the shop's business hours of their own
+// day (TenantBookingSetting.calendar_start .. calendar_end, minute precision). A
+// break must lie within its shift.
 //
 // Deleting a shift, or moving it to another staff member, removes the previous
 // staff member as the requested staff of the bookings overlapping the shift's
@@ -181,9 +183,9 @@ func (c *attendanceServiceClient) DeleteAttendanceBreak(ctx context.Context, in 
 // An update changes only the fields set in the request, so two updates of
 // different fields of the same shift both apply. An id of another tenant, or a
 // break of another shift, returns NOT_FOUND. An invalid value returns
-// INVALID_ARGUMENT. An UpdateAttendance that sets staff_id returns ABORTED when
-// another request moved the shift to another staff member while this one ran;
-// read the shift again and retry.
+// INVALID_ARGUMENT. A write to a shift or its breaks returns ABORTED when another
+// request moved the shift to another staff member while this one ran, or when it
+// hits a database deadlock with another edit; read the shift again and retry.
 type AttendanceServiceServer interface {
 	// ListAttendances returns the shifts overlapping [start_at, end_at), earliest
 	// first, with their breaks: a shift crossing either edge of the window is
