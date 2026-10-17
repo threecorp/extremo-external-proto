@@ -1,0 +1,236 @@
+syntax = "proto3";
+
+// Package extremo.api.external.attendances.v1 is part of the Extremo external
+// partner API. The `external/` surface is authenticated via a per-tenant API key
+// and scoped. It returns public DTOs only.
+package extremo.api.external.attendances.v1;
+
+import "buf/validate/validate.proto";
+import "extremo/msg/external/v1/dto.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/api/external/attendances/v1;attendances";
+
+// AttendanceService manages a tenant's staff shifts and their breaks, as the
+// admin UI does: reads (attendance.read), creating (attendance.create), changing
+// (attendance.update), moving a shift to another staff member
+// (attendance.reassign) and deleting (attendance.delete).
+//
+// A shift belongs to a staff member listed by StaffService.ListStaff, may not
+// overlap another shift of the same staff member, and may span several days. Its
+// start and its end must each fall within the shop's business hours of their own
+// day (TenantBookingSetting.calendar_start .. calendar_end, minute precision). A
+// break must lie within its shift.
+//
+// Deleting a shift, or moving it to another staff member, removes the previous
+// staff member as the requested staff of the bookings overlapping the shift's
+// time before the change, except bookings that are CANCELED or NO_SHOW; the
+// bookings themselves remain.
+//
+// An update changes only the fields set in the request, so two updates of
+// different fields of the same shift both apply. An id of another tenant, or a
+// break of another shift, returns NOT_FOUND. An invalid value returns
+// INVALID_ARGUMENT. A write to a shift or its breaks returns ABORTED when another
+// request moved the shift to another staff member while this one ran, or when it
+// hits a database deadlock with another edit; read the shift again and retry.
+service AttendanceService {
+  // ListAttendances returns the shifts overlapping [start_at, end_at), earliest
+  // first, with their breaks: a shift crossing either edge of the window is
+  // included, one that only touches it is not. Requires attendance.read.
+  rpc ListAttendances(ListAttendancesRequest) returns (ListAttendancesResponse) {
+    option (google.api.http) = {get: "/api/external/v1/{tenant_id}/attendances"};
+  }
+  // CreateAttendance adds a shift for a staff member. Requires
+  // attendance.create.
+  rpc CreateAttendance(CreateAttendanceRequest) returns (CreateAttendanceResponse) {
+    option (google.api.http) = {
+      post: "/api/external/v1/{tenant_id}/attendances"
+      body: "*"
+    };
+  }
+  // UpdateAttendance changes the fields set in the request and keeps the others.
+  // Requires attendance.update; setting staff_id to another staff member also
+  // requires attendance.reassign.
+  rpc UpdateAttendance(UpdateAttendanceRequest) returns (UpdateAttendanceResponse) {
+    option (google.api.http) = {
+      patch: "/api/external/v1/{tenant_id}/attendances/{id}"
+      body: "*"
+    };
+  }
+  // DeleteAttendance removes a shift and its breaks. Requires attendance.delete.
+  rpc DeleteAttendance(DeleteAttendanceRequest) returns (DeleteAttendanceResponse) {
+    option (google.api.http) = {delete: "/api/external/v1/{tenant_id}/attendances/{id}"};
+  }
+  // CreateAttendanceBreak adds a break to a shift. Requires attendance.update.
+  rpc CreateAttendanceBreak(CreateAttendanceBreakRequest) returns (CreateAttendanceBreakResponse) {
+    option (google.api.http) = {
+      post: "/api/external/v1/{tenant_id}/attendances/{attendance_id}/breaks"
+      body: "*"
+    };
+  }
+  // UpdateAttendanceBreak changes the fields set in the request and keeps the
+  // others. Requires attendance.update.
+  rpc UpdateAttendanceBreak(UpdateAttendanceBreakRequest) returns (UpdateAttendanceBreakResponse) {
+    option (google.api.http) = {
+      patch: "/api/external/v1/{tenant_id}/attendances/{attendance_id}/breaks/{id}"
+      body: "*"
+    };
+  }
+  // DeleteAttendanceBreak removes a break from a shift. Requires
+  // attendance.update.
+  rpc DeleteAttendanceBreak(DeleteAttendanceBreakRequest) returns (DeleteAttendanceBreakResponse) {
+    option (google.api.http) = {delete: "/api/external/v1/{tenant_id}/attendances/{attendance_id}/breaks/{id}"};
+  }
+}
+
+// ListAttendancesRequest selects a tenant's shifts within a bounded time window.
+// The window is required so the query is never unbounded; a window with end_at
+// not after start_at lists nothing.
+message ListAttendancesRequest {
+  // Tenant whose shifts to list.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Start of the time window (inclusive).
+  google.protobuf.Timestamp start_at = 2 [(buf.validate.field).required = true];
+  // End of the time window (exclusive).
+  google.protobuf.Timestamp end_at = 3 [(buf.validate.field).required = true];
+  // 1-based page number.
+  int64 page = 4 [(buf.validate.field).int64.gt = 0];
+  // Page size (1..100).
+  int64 page_size = 5 [(buf.validate.field).int64 = {
+    gt: 0
+    lte: 100
+  }];
+}
+
+// ListAttendancesResponse is a page of shifts.
+message ListAttendancesResponse {
+  // The shifts on this page.
+  repeated extremo.msg.external.v1.Attendance attendances = 1;
+  // Total number of shifts across all pages within the window.
+  int64 total_size = 2 [(buf.validate.field).int64.gte = 0];
+}
+
+// CreateAttendanceRequest adds a shift. start_at must be before end_at.
+message CreateAttendanceRequest {
+  // Tenant to add the shift to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Staff member on shift (Staff.id from StaffService.ListStaff).
+  uint64 staff_id = 2 [(buf.validate.field).uint64.gt = 0];
+  // Title (required, not only spaces).
+  string name = 3 [(buf.validate.field).string = {
+    max_len: 255
+    pattern: "[^\\s\\x{0B}\\x{FEFF}\\p{Z}]"
+  }];
+  // Description.
+  string desc = 4 [(buf.validate.field).string.max_len = 512];
+  // Start time (required).
+  google.protobuf.Timestamp start_at = 5 [(buf.validate.field).required = true];
+  // End time (required).
+  google.protobuf.Timestamp end_at = 6 [(buf.validate.field).required = true];
+}
+
+// CreateAttendanceResponse carries the created shift.
+message CreateAttendanceResponse {
+  // The created shift.
+  extremo.msg.external.v1.Attendance attendance = 1;
+}
+
+// UpdateAttendanceRequest changes a shift. A field left unset keeps its current
+// value; desc set to "" clears it. After the update start_at must be
+// before end_at, and the breaks must still lie within the shift.
+message UpdateAttendanceRequest {
+  // Tenant the shift belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Shift to update.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+  // New staff member on shift (Staff.id). A different staff member needs the
+  // attendance.reassign scope.
+  optional uint64 staff_id = 3 [(buf.validate.field).uint64.gt = 0];
+  // New title; it cannot be emptied.
+  optional string name = 4 [(buf.validate.field).string = {
+    max_len: 255
+    pattern: "[^\\s\\x{0B}\\x{FEFF}\\p{Z}]"
+  }];
+  // New description.
+  optional string desc = 5 [(buf.validate.field).string.max_len = 512];
+  // New start time.
+  google.protobuf.Timestamp start_at = 6;
+  // New end time.
+  google.protobuf.Timestamp end_at = 7;
+}
+
+// UpdateAttendanceResponse carries the updated shift.
+message UpdateAttendanceResponse {
+  // The updated shift.
+  extremo.msg.external.v1.Attendance attendance = 1;
+}
+
+// DeleteAttendanceRequest removes a shift.
+message DeleteAttendanceRequest {
+  // Tenant the shift belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Shift to remove.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+}
+
+// DeleteAttendanceResponse is empty.
+message DeleteAttendanceResponse {}
+
+// CreateAttendanceBreakRequest adds a break to a shift. start_at must be before
+// end_at, and both must lie within the shift.
+message CreateAttendanceBreakRequest {
+  // Tenant the shift belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Shift to add the break to.
+  uint64 attendance_id = 2 [(buf.validate.field).uint64.gt = 0];
+  // Why the staff member is away.
+  string reason = 3 [(buf.validate.field).string.max_len = 512];
+  // Start time (required).
+  google.protobuf.Timestamp start_at = 4 [(buf.validate.field).required = true];
+  // End time (required).
+  google.protobuf.Timestamp end_at = 5 [(buf.validate.field).required = true];
+}
+
+// CreateAttendanceBreakResponse carries the created break.
+message CreateAttendanceBreakResponse {
+  // The created break.
+  extremo.msg.external.v1.AttendanceBreak attendance_break = 1;
+}
+
+// UpdateAttendanceBreakRequest changes a break. A field left unset keeps its
+// current value; a field set to "" takes that value. After the update start_at
+// must be before end_at, and both must lie within the shift.
+message UpdateAttendanceBreakRequest {
+  // Tenant the shift belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Shift the break belongs to.
+  uint64 attendance_id = 2 [(buf.validate.field).uint64.gt = 0];
+  // Break to update.
+  uint64 id = 3 [(buf.validate.field).uint64.gt = 0];
+  // New reason.
+  optional string reason = 4 [(buf.validate.field).string.max_len = 512];
+  // New start time.
+  google.protobuf.Timestamp start_at = 5;
+  // New end time.
+  google.protobuf.Timestamp end_at = 6;
+}
+
+// UpdateAttendanceBreakResponse carries the updated break.
+message UpdateAttendanceBreakResponse {
+  // The updated break.
+  extremo.msg.external.v1.AttendanceBreak attendance_break = 1;
+}
+
+// DeleteAttendanceBreakRequest removes a break from a shift.
+message DeleteAttendanceBreakRequest {
+  // Tenant the shift belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Shift the break belongs to.
+  uint64 attendance_id = 2 [(buf.validate.field).uint64.gt = 0];
+  // Break to remove.
+  uint64 id = 3 [(buf.validate.field).uint64.gt = 0];
+}
+
+// DeleteAttendanceBreakResponse is empty.
+message DeleteAttendanceBreakResponse {}

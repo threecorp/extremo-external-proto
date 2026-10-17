@@ -12,12 +12,78 @@ import "google/api/annotations.proto";
 
 option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/api/external/tenants/v1;tenants";
 
-// TenantService exposes a tenant's public profile to authenticated external API
-// consumers. Read-only.
+// TenantService exposes a tenant's profile and settings to authenticated external
+// API consumers: the read (tenant.read) and the shop settings the admin UI
+// manages (tenant.update).
+//
+// An image id of another tenant returns NOT_FOUND. An invalid value returns
+// INVALID_ARGUMENT.
 service TenantService {
-  // GetTenant returns a single tenant's public profile.
+  // GetTenant returns a single tenant's public profile. Requires tenant.read.
   rpc GetTenant(GetTenantRequest) returns (GetTenantResponse) {
     option (google.api.http) = {get: "/api/external/v1/{tenant_id}"};
+  }
+  // UpdateTenantSetting changes the booking settings set in the request and
+  // keeps the others. Requires tenant.update.
+  rpc UpdateTenantSetting(UpdateTenantSettingRequest) returns (UpdateTenantSettingResponse) {
+    option (google.api.http) = {
+      patch: "/api/external/v1/{tenant_id}/setting"
+      body: "*"
+    };
+  }
+  // UpdateTenantProfile changes the profile fields set in the request and keeps
+  // the others. Requires tenant.update.
+  rpc UpdateTenantProfile(UpdateTenantProfileRequest) returns (UpdateTenantProfileResponse) {
+    option (google.api.http) = {
+      patch: "/api/external/v1/{tenant_id}/profile"
+      body: "*"
+    };
+  }
+  // UpdateTenantAddress changes the address fields set in the request and keeps
+  // the others. The map position is looked up from the new address; if another
+  // update changes address1 or address2 during the lookup, it returns ABORTED and
+  // can be retried. Requires tenant.update.
+  rpc UpdateTenantAddress(UpdateTenantAddressRequest) returns (UpdateTenantAddressResponse) {
+    option (google.api.http) = {
+      patch: "/api/external/v1/{tenant_id}/address"
+      body: "*"
+    };
+  }
+  // UpdateTenantTheme sets the theme of the shop's booking page. While the shop
+  // has a published custom design, the page shows the design instead of the
+  // theme. Requires tenant.update.
+  rpc UpdateTenantTheme(UpdateTenantThemeRequest) returns (UpdateTenantThemeResponse) {
+    option (google.api.http) = {
+      put: "/api/external/v1/{tenant_id}/theme"
+      body: "*"
+    };
+  }
+  // AddTenantImage uploads an image for the shop. Requires tenant.update.
+  rpc AddTenantImage(AddTenantImageRequest) returns (AddTenantImageResponse) {
+    option (google.api.http) = {
+      post: "/api/external/v1/{tenant_id}/images"
+      body: "*"
+    };
+  }
+  // UpdateTenantImage changes the fields set in the request and keeps the
+  // others; with data set it also replaces the image. Requires tenant.update.
+  rpc UpdateTenantImage(UpdateTenantImageRequest) returns (UpdateTenantImageResponse) {
+    option (google.api.http) = {
+      patch: "/api/external/v1/{tenant_id}/images/{id}"
+      body: "*"
+    };
+  }
+  // ReorderTenantImages sets the display order of several images of the shop at
+  // once. All the moves apply, or none do. Requires tenant.update.
+  rpc ReorderTenantImages(ReorderTenantImagesRequest) returns (ReorderTenantImagesResponse) {
+    option (google.api.http) = {
+      post: "/api/external/v1/{tenant_id}/images:reorder"
+      body: "*"
+    };
+  }
+  // DeleteTenantImage removes an image of the shop. Requires tenant.update.
+  rpc DeleteTenantImage(DeleteTenantImageRequest) returns (DeleteTenantImageResponse) {
+    option (google.api.http) = {delete: "/api/external/v1/{tenant_id}/images/{id}"};
   }
 }
 
@@ -32,3 +98,238 @@ message GetTenantResponse {
   // The tenant's public profile.
   extremo.msg.external.v1.TenantProfile tenant = 1;
 }
+
+// UpdateTenantSettingRequest changes a tenant's booking settings (see
+// TenantBookingSetting). A field left unset keeps its current value; a field set
+// to false, 0 or "" takes that value. After the update calendar_start must be
+// before calendar_end, or the request returns INVALID_ARGUMENT.
+message UpdateTenantSettingRequest {
+  // Tenant to update.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // New first bookable hour of a day (5..28).
+  optional int32 calendar_start = 2 [(buf.validate.field).int32 = {
+    gte: 5
+    lte: 28
+  }];
+  // New closing hour (6..29).
+  optional int32 calendar_end = 3 [(buf.validate.field).int32 = {
+    gte: 6
+    lte: 29
+  }];
+  // New slot width in seconds (60..43200).
+  optional int32 calendar_interval = 4 [(buf.validate.field).int32 = {
+    gte: 60
+    lte: 43200
+  }];
+  // New number of bookings a single slot can hold (1..120).
+  optional int32 calendar_slot = 5 [(buf.validate.field).int32 = {
+    gte: 1
+    lte: 120
+  }];
+  // New auto-accept rule.
+  optional bool auto_accept_booking = 6;
+  // New notes for consumers.
+  optional string reservation_note = 7 [(buf.validate.field).string.max_len = 512];
+  // New minutes before an unattended booking becomes NO_SHOW (0..1440).
+  optional int32 no_show_threshold_minutes = 8 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 1440
+  }];
+  // New rule for whether booking capacity follows staff shifts.
+  optional bool calendar_sync_attendance = 9;
+}
+
+// UpdateTenantSettingResponse carries the tenant after the update.
+message UpdateTenantSettingResponse {
+  // The tenant's public profile.
+  extremo.msg.external.v1.TenantProfile tenant = 1;
+}
+
+// UpdateTenantProfileRequest changes a tenant's profile. A field left unset keeps
+// its current value; a field set to "" takes that value.
+message UpdateTenantProfileRequest {
+  // Tenant to update.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // New shop name; it cannot be emptied.
+  optional string name = 2 [(buf.validate.field).string = {
+    max_len: 255
+    pattern: "[^\\s\\x{0B}\\x{FEFF}\\p{Z}]"
+  }];
+  // New description.
+  optional string desc = 3 [(buf.validate.field).string.max_len = 512];
+  // New public link, an absolute http(s) URL; "" clears it.
+  optional string link = 4 [
+    (buf.validate.field).string.max_len = 1024,
+    (buf.validate.field).cel = {
+      id: "link.http_url"
+      message: "link must be an http(s) URL or empty"
+      expression: "this == '' || (this.isUri() && this.matches('^https?://[^/?#:@ ]+(:(6553[0-5]|655[0-2][0-9]|65[0-4][0-9]{2}|6[0-4][0-9]{3}|[1-5][0-9]{4}|[0-9]{1,4}))?([/?#]|$)'))"
+    }
+  ];
+  // New public contact phone: "+" followed by digits (+819012345678); "" clears
+  // it.
+  optional string phone = 5 [(buf.validate.field).string = {
+    max_len: 255
+    pattern: "^(\\+[0-9]+)?$"
+  }];
+}
+
+// UpdateTenantProfileResponse carries the tenant after the update.
+message UpdateTenantProfileResponse {
+  // The tenant's public profile.
+  extremo.msg.external.v1.TenantProfile tenant = 1;
+}
+
+// UpdateTenantAddressRequest changes a tenant's address (see TenantAddress). A
+// field left unset keeps its current value; a field set to "" takes that value.
+// TenantAddress.nearby is not set here: it is looked up from the address when
+// address1 or address2 changes.
+message UpdateTenantAddressRequest {
+  // Tenant to update.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // New ZIP / postal code.
+  optional string zip = 2 [(buf.validate.field).string.max_len = 255];
+  // New prefecture, city and street name; it cannot be emptied.
+  optional string address1 = 3 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 255
+  }];
+  // New street number; it cannot be emptied.
+  optional string address2 = 4 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 255
+  }];
+  // New building name.
+  optional string building = 5 [(buf.validate.field).string.max_len = 255];
+  // New floor and room number.
+  optional string floor = 6 [(buf.validate.field).string.max_len = 255];
+}
+
+// UpdateTenantAddressResponse carries the tenant after the update.
+message UpdateTenantAddressResponse {
+  // The tenant's public profile.
+  extremo.msg.external.v1.TenantProfile tenant = 1;
+}
+
+// UpdateTenantThemeRequest sets the theme of a tenant's booking page.
+message UpdateTenantThemeRequest {
+  // Tenant to update.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // The theme (required).
+  extremo.msg.external.v1.TenantTheme theme = 2 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+}
+
+// UpdateTenantThemeResponse carries the tenant after the update.
+message UpdateTenantThemeResponse {
+  // The tenant's public profile.
+  extremo.msg.external.v1.TenantProfile tenant = 1;
+}
+
+// AddTenantImageRequest uploads an image for a tenant. data is a JPEG, PNG, WebP
+// or GIF file of at most 10 MiB; any other bytes return INVALID_ARGUMENT.
+message AddTenantImageRequest {
+  // Tenant to add the image to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // The section of the shop's page the image belongs to (required).
+  extremo.msg.external.v1.TenantImageType image_type = 2 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  // Display order; a higher sort comes first.
+  int32 sort = 3 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 100
+  }];
+  // Display name.
+  string name = 4 [(buf.validate.field).string.max_len = 255];
+  // Description.
+  string desc = 5 [(buf.validate.field).string.max_len = 512];
+  // The image file.
+  bytes data = 6 [(buf.validate.field).bytes = {
+    min_len: 1
+    max_len: 10485760
+  }];
+}
+
+// AddTenantImageResponse carries the added image.
+message AddTenantImageResponse {
+  // The added image.
+  extremo.msg.external.v1.TenantImage image = 1;
+}
+
+// UpdateTenantImageRequest changes an image of a tenant. A field left unset keeps
+// its current value; a field set to 0 or "" takes that value. data, when set,
+// replaces the image file under the same rules as AddTenantImageRequest.
+message UpdateTenantImageRequest {
+  // Tenant the image belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Image to update.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+  // New section of the shop's page.
+  optional extremo.msg.external.v1.TenantImageType image_type = 3 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  // New display order.
+  optional int32 sort = 4 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 100
+  }];
+  // New display name.
+  optional string name = 5 [(buf.validate.field).string.max_len = 255];
+  // New description.
+  optional string desc = 6 [(buf.validate.field).string.max_len = 512];
+  // New image file.
+  optional bytes data = 7 [(buf.validate.field).bytes = {
+    min_len: 1
+    max_len: 10485760
+  }];
+}
+
+// UpdateTenantImageResponse carries the updated image.
+message UpdateTenantImageResponse {
+  // The updated image.
+  extremo.msg.external.v1.TenantImage image = 1;
+}
+
+// TenantImagePlacement is the display order of one image in a reorder.
+message TenantImagePlacement {
+  // Image to move.
+  uint64 id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Its display order; a higher sort comes first.
+  int32 sort = 2 [(buf.validate.field).int32 = {
+    gte: 0
+    lte: 100
+  }];
+}
+
+// ReorderTenantImagesRequest sets the display order of images of a tenant.
+message ReorderTenantImagesRequest {
+  // Tenant the images belong to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // The order of each image (1..100 images).
+  repeated TenantImagePlacement placements = 2 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 100
+  }];
+}
+
+// ReorderTenantImagesResponse carries the moved images.
+message ReorderTenantImagesResponse {
+  // The moved images, in request order.
+  repeated extremo.msg.external.v1.TenantImage images = 1;
+}
+
+// DeleteTenantImageRequest removes an image of a tenant.
+message DeleteTenantImageRequest {
+  // Tenant the image belongs to.
+  uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
+  // Image to remove.
+  uint64 id = 2 [(buf.validate.field).uint64.gt = 0];
+}
+
+// DeleteTenantImageResponse is empty.
+message DeleteTenantImageResponse {}

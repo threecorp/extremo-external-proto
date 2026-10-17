@@ -24,18 +24,55 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ServiceService_ListServices_FullMethodName = "/extremo.api.external.services.v1.ServiceService/ListServices"
+	ServiceService_ListServices_FullMethodName         = "/extremo.api.external.services.v1.ServiceService/ListServices"
+	ServiceService_GetService_FullMethodName           = "/extremo.api.external.services.v1.ServiceService/GetService"
+	ServiceService_CreateService_FullMethodName        = "/extremo.api.external.services.v1.ServiceService/CreateService"
+	ServiceService_UpdateService_FullMethodName        = "/extremo.api.external.services.v1.ServiceService/UpdateService"
+	ServiceService_ReorderServices_FullMethodName      = "/extremo.api.external.services.v1.ServiceService/ReorderServices"
+	ServiceService_AddServiceImage_FullMethodName      = "/extremo.api.external.services.v1.ServiceService/AddServiceImage"
+	ServiceService_UpdateServiceImage_FullMethodName   = "/extremo.api.external.services.v1.ServiceService/UpdateServiceImage"
+	ServiceService_ReorderServiceImages_FullMethodName = "/extremo.api.external.services.v1.ServiceService/ReorderServiceImages"
+	ServiceService_DeleteServiceImage_FullMethodName   = "/extremo.api.external.services.v1.ServiceService/DeleteServiceImage"
 )
 
 // ServiceServiceClient is the client API for ServiceService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// ServiceService exposes a tenant's public service catalog to authenticated
-// external API consumers. Read-only.
+// ServiceService exposes a tenant's service catalog (the shop's menu) to
+// authenticated external API consumers: reads (service.read) and the menu
+// management the admin UI offers (service.create, service.update). A menu item is
+// never deleted, as in the admin UI.
+//
+// An id of another tenant, or an image of another service, returns NOT_FOUND. An
+// invalid value returns INVALID_ARGUMENT.
 type ServiceServiceClient interface {
-	// ListServices returns the service catalog for a tenant.
+	// ListServices returns the service catalog for a tenant. Requires
+	// service.read.
 	ListServices(ctx context.Context, in *ListServicesRequest, opts ...grpc.CallOption) (*ListServicesResponse, error)
+	// GetService returns a single service with its children. Requires
+	// service.read.
+	GetService(ctx context.Context, in *GetServiceRequest, opts ...grpc.CallOption) (*GetServiceResponse, error)
+	// CreateService adds a service, under parent_id when it is set. Requires
+	// service.create.
+	CreateService(ctx context.Context, in *CreateServiceRequest, opts ...grpc.CallOption) (*CreateServiceResponse, error)
+	// UpdateService changes the fields set in the request and keeps the others.
+	// Requires service.update.
+	UpdateService(ctx context.Context, in *UpdateServiceRequest, opts ...grpc.CallOption) (*UpdateServiceResponse, error)
+	// ReorderServices sets the parent and the display order of several services at
+	// once, as dragging the menu tree in the admin UI does. All the moves apply, or
+	// none do. Requires service.update.
+	ReorderServices(ctx context.Context, in *ReorderServicesRequest, opts ...grpc.CallOption) (*ReorderServicesResponse, error)
+	// AddServiceImage uploads an image for a service. Requires service.update.
+	AddServiceImage(ctx context.Context, in *AddServiceImageRequest, opts ...grpc.CallOption) (*AddServiceImageResponse, error)
+	// UpdateServiceImage changes the fields set in the request and keeps the
+	// others; with data set it also replaces the image. Requires service.update.
+	UpdateServiceImage(ctx context.Context, in *UpdateServiceImageRequest, opts ...grpc.CallOption) (*UpdateServiceImageResponse, error)
+	// ReorderServiceImages sets the display order of several images of a service
+	// at once. All the moves apply, or none do. Requires service.update.
+	ReorderServiceImages(ctx context.Context, in *ReorderServiceImagesRequest, opts ...grpc.CallOption) (*ReorderServiceImagesResponse, error)
+	// DeleteServiceImage removes an image of a service. Requires service.update.
+	DeleteServiceImage(ctx context.Context, in *DeleteServiceImageRequest, opts ...grpc.CallOption) (*DeleteServiceImageResponse, error)
 }
 
 type serviceServiceClient struct {
@@ -56,15 +93,124 @@ func (c *serviceServiceClient) ListServices(ctx context.Context, in *ListService
 	return out, nil
 }
 
+func (c *serviceServiceClient) GetService(ctx context.Context, in *GetServiceRequest, opts ...grpc.CallOption) (*GetServiceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetServiceResponse)
+	err := c.cc.Invoke(ctx, ServiceService_GetService_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceServiceClient) CreateService(ctx context.Context, in *CreateServiceRequest, opts ...grpc.CallOption) (*CreateServiceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateServiceResponse)
+	err := c.cc.Invoke(ctx, ServiceService_CreateService_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceServiceClient) UpdateService(ctx context.Context, in *UpdateServiceRequest, opts ...grpc.CallOption) (*UpdateServiceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateServiceResponse)
+	err := c.cc.Invoke(ctx, ServiceService_UpdateService_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceServiceClient) ReorderServices(ctx context.Context, in *ReorderServicesRequest, opts ...grpc.CallOption) (*ReorderServicesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ReorderServicesResponse)
+	err := c.cc.Invoke(ctx, ServiceService_ReorderServices_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceServiceClient) AddServiceImage(ctx context.Context, in *AddServiceImageRequest, opts ...grpc.CallOption) (*AddServiceImageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AddServiceImageResponse)
+	err := c.cc.Invoke(ctx, ServiceService_AddServiceImage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceServiceClient) UpdateServiceImage(ctx context.Context, in *UpdateServiceImageRequest, opts ...grpc.CallOption) (*UpdateServiceImageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateServiceImageResponse)
+	err := c.cc.Invoke(ctx, ServiceService_UpdateServiceImage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceServiceClient) ReorderServiceImages(ctx context.Context, in *ReorderServiceImagesRequest, opts ...grpc.CallOption) (*ReorderServiceImagesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ReorderServiceImagesResponse)
+	err := c.cc.Invoke(ctx, ServiceService_ReorderServiceImages_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceServiceClient) DeleteServiceImage(ctx context.Context, in *DeleteServiceImageRequest, opts ...grpc.CallOption) (*DeleteServiceImageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteServiceImageResponse)
+	err := c.cc.Invoke(ctx, ServiceService_DeleteServiceImage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ServiceServiceServer is the server API for ServiceService service.
 // All implementations must embed UnimplementedServiceServiceServer
 // for forward compatibility.
 //
-// ServiceService exposes a tenant's public service catalog to authenticated
-// external API consumers. Read-only.
+// ServiceService exposes a tenant's service catalog (the shop's menu) to
+// authenticated external API consumers: reads (service.read) and the menu
+// management the admin UI offers (service.create, service.update). A menu item is
+// never deleted, as in the admin UI.
+//
+// An id of another tenant, or an image of another service, returns NOT_FOUND. An
+// invalid value returns INVALID_ARGUMENT.
 type ServiceServiceServer interface {
-	// ListServices returns the service catalog for a tenant.
+	// ListServices returns the service catalog for a tenant. Requires
+	// service.read.
 	ListServices(context.Context, *ListServicesRequest) (*ListServicesResponse, error)
+	// GetService returns a single service with its children. Requires
+	// service.read.
+	GetService(context.Context, *GetServiceRequest) (*GetServiceResponse, error)
+	// CreateService adds a service, under parent_id when it is set. Requires
+	// service.create.
+	CreateService(context.Context, *CreateServiceRequest) (*CreateServiceResponse, error)
+	// UpdateService changes the fields set in the request and keeps the others.
+	// Requires service.update.
+	UpdateService(context.Context, *UpdateServiceRequest) (*UpdateServiceResponse, error)
+	// ReorderServices sets the parent and the display order of several services at
+	// once, as dragging the menu tree in the admin UI does. All the moves apply, or
+	// none do. Requires service.update.
+	ReorderServices(context.Context, *ReorderServicesRequest) (*ReorderServicesResponse, error)
+	// AddServiceImage uploads an image for a service. Requires service.update.
+	AddServiceImage(context.Context, *AddServiceImageRequest) (*AddServiceImageResponse, error)
+	// UpdateServiceImage changes the fields set in the request and keeps the
+	// others; with data set it also replaces the image. Requires service.update.
+	UpdateServiceImage(context.Context, *UpdateServiceImageRequest) (*UpdateServiceImageResponse, error)
+	// ReorderServiceImages sets the display order of several images of a service
+	// at once. All the moves apply, or none do. Requires service.update.
+	ReorderServiceImages(context.Context, *ReorderServiceImagesRequest) (*ReorderServiceImagesResponse, error)
+	// DeleteServiceImage removes an image of a service. Requires service.update.
+	DeleteServiceImage(context.Context, *DeleteServiceImageRequest) (*DeleteServiceImageResponse, error)
 	mustEmbedUnimplementedServiceServiceServer()
 }
 
@@ -77,6 +223,30 @@ type UnimplementedServiceServiceServer struct{}
 
 func (UnimplementedServiceServiceServer) ListServices(context.Context, *ListServicesRequest) (*ListServicesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListServices not implemented")
+}
+func (UnimplementedServiceServiceServer) GetService(context.Context, *GetServiceRequest) (*GetServiceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetService not implemented")
+}
+func (UnimplementedServiceServiceServer) CreateService(context.Context, *CreateServiceRequest) (*CreateServiceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateService not implemented")
+}
+func (UnimplementedServiceServiceServer) UpdateService(context.Context, *UpdateServiceRequest) (*UpdateServiceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateService not implemented")
+}
+func (UnimplementedServiceServiceServer) ReorderServices(context.Context, *ReorderServicesRequest) (*ReorderServicesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReorderServices not implemented")
+}
+func (UnimplementedServiceServiceServer) AddServiceImage(context.Context, *AddServiceImageRequest) (*AddServiceImageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddServiceImage not implemented")
+}
+func (UnimplementedServiceServiceServer) UpdateServiceImage(context.Context, *UpdateServiceImageRequest) (*UpdateServiceImageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateServiceImage not implemented")
+}
+func (UnimplementedServiceServiceServer) ReorderServiceImages(context.Context, *ReorderServiceImagesRequest) (*ReorderServiceImagesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReorderServiceImages not implemented")
+}
+func (UnimplementedServiceServiceServer) DeleteServiceImage(context.Context, *DeleteServiceImageRequest) (*DeleteServiceImageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteServiceImage not implemented")
 }
 func (UnimplementedServiceServiceServer) mustEmbedUnimplementedServiceServiceServer() {}
 func (UnimplementedServiceServiceServer) testEmbeddedByValue()                        {}
@@ -117,6 +287,150 @@ func _ServiceService_ListServices_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ServiceService_GetService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetServiceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServiceServer).GetService(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServiceService_GetService_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServiceServer).GetService(ctx, req.(*GetServiceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ServiceService_CreateService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateServiceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServiceServer).CreateService(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServiceService_CreateService_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServiceServer).CreateService(ctx, req.(*CreateServiceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ServiceService_UpdateService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateServiceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServiceServer).UpdateService(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServiceService_UpdateService_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServiceServer).UpdateService(ctx, req.(*UpdateServiceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ServiceService_ReorderServices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReorderServicesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServiceServer).ReorderServices(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServiceService_ReorderServices_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServiceServer).ReorderServices(ctx, req.(*ReorderServicesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ServiceService_AddServiceImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddServiceImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServiceServer).AddServiceImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServiceService_AddServiceImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServiceServer).AddServiceImage(ctx, req.(*AddServiceImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ServiceService_UpdateServiceImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateServiceImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServiceServer).UpdateServiceImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServiceService_UpdateServiceImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServiceServer).UpdateServiceImage(ctx, req.(*UpdateServiceImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ServiceService_ReorderServiceImages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReorderServiceImagesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServiceServer).ReorderServiceImages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServiceService_ReorderServiceImages_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServiceServer).ReorderServiceImages(ctx, req.(*ReorderServiceImagesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ServiceService_DeleteServiceImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteServiceImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServiceServiceServer).DeleteServiceImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServiceService_DeleteServiceImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServiceServiceServer).DeleteServiceImage(ctx, req.(*DeleteServiceImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ServiceService_ServiceDesc is the grpc.ServiceDesc for ServiceService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -127,6 +441,38 @@ var ServiceService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListServices",
 			Handler:    _ServiceService_ListServices_Handler,
+		},
+		{
+			MethodName: "GetService",
+			Handler:    _ServiceService_GetService_Handler,
+		},
+		{
+			MethodName: "CreateService",
+			Handler:    _ServiceService_CreateService_Handler,
+		},
+		{
+			MethodName: "UpdateService",
+			Handler:    _ServiceService_UpdateService_Handler,
+		},
+		{
+			MethodName: "ReorderServices",
+			Handler:    _ServiceService_ReorderServices_Handler,
+		},
+		{
+			MethodName: "AddServiceImage",
+			Handler:    _ServiceService_AddServiceImage_Handler,
+		},
+		{
+			MethodName: "UpdateServiceImage",
+			Handler:    _ServiceService_UpdateServiceImage_Handler,
+		},
+		{
+			MethodName: "ReorderServiceImages",
+			Handler:    _ServiceService_ReorderServiceImages_Handler,
+		},
+		{
+			MethodName: "DeleteServiceImage",
+			Handler:    _ServiceService_DeleteServiceImage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
