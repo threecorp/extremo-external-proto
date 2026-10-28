@@ -187,8 +187,9 @@ message UpdateTenantProfileResponse {
 message UpdateTenantAddressRequest {
   // Tenant to update.
   uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
-  // New ZIP / postal code.
-  optional string zip = 2 [(buf.validate.field).string.max_len = 255];
+  // New Japanese postal code: 7 digits, with an optional hyphen after the
+  // third (e.g. "123-4567" or "1234567"), the same rule as the admin screen.
+  optional string zip = 2 [(buf.validate.field).string.pattern = "^[0-9]{3}-?[0-9]{4}$"];
   // New prefecture, city and street name; it cannot be emptied.
   optional string address1 = 3 [(buf.validate.field).string = {
     min_len: 1
