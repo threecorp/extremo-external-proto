@@ -81,7 +81,7 @@ Give a consumer-facing system a key **without** `book.moderate` and without the 
 ```
 extremo/
 ├── msg/external/v1/        # Public DTOs (Service, Booking, TenantProfile, AvailabilitySlot, Staff, Attendance, enums)
-└── api/external/<svc>/v1/  # External services (REST via google.api.http: /api/external/v1/...)
+└── api/external/<svc>/v1/  # External services, served over gRPC (the google.api.http routes in the protos are not served)
 ```
 
 Generated SDKs:
