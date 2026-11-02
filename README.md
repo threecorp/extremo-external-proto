@@ -2,9 +2,13 @@
 
 **Open gRPC / Protocol Buffer specification for the Extremo external partner API.**
 
-This repository is the source of truth for the **public, externally-published** surface of the Extremo booking platform — the API that third-party partners and integrations call. It is published as an open spec under **Apache-2.0**.
+This repository is the source of truth for the **public, externally-published** surface of the Extremo booking platform — the API that partners call. It is published as an open spec under **Apache-2.0**.
+
+A **partner** is the tenant (the shop) itself, integrating its own systems with Extremo, not a separate third party. The partner's customers are members of the partner's own system.
 
 > Status: **early / v1 in progress.**
+
+[API reference](http://3corp.jp/extremo-external-proto/)
 
 ## Why a separate repo
 
@@ -15,6 +19,18 @@ The Extremo internal protos live in a private monorepo. The external API is deli
 3. **Independent stability.** `buf breaking` on this repo checks the external API's v1 compatibility (report-only until v1 is released).
 
 The external surface is **authenticated** (per-tenant API key + scopes) and distinct from the internal anonymous `public/` booking-page services.
+
+## Authentication
+
+Send the shop's API key as a bearer token in the `authorization` metadata of every call. Keys start with `extk_` and are issued from the admin panel.
+
+```bash
+grpcurl -H "authorization: bearer extk_..." \
+  -d '{"tenant_id": 1}' \
+  api.example.com:443 extremo.api.external.tenants.v1.TenantService/GetTenant
+```
+
+A missing or invalid key returns `UNAUTHENTICATED`, and a key without the scope an RPC needs returns `PERMISSION_DENIED`.
 
 ## Scopes
 
@@ -72,9 +88,9 @@ Generated SDKs:
 
 ```
 externalgo/        # Go
-externaltsnode/    # TypeScript (ES + TanStack Query)
-lib/               # Dart
 ```
+
+TypeScript and Dart SDKs are not generated yet; generate them from these protos with your own `buf` setup.
 
 ## Generate
 
@@ -83,7 +99,7 @@ Requires `buf` and `go` (provided by the bundled nix flake via direnv):
 ```bash
 direnv allow      # first time
 make lint         # buf lint + build
-make protocol     # generate Go / TS / Dart
+make protocol     # generate Go and docs/index.html
 ```
 
 ## Consume
