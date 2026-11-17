@@ -49,10 +49,11 @@ service TenantService {
       body: "*"
     };
   }
-  // UpdateTenantTheme sets the theme of the shop's booking page. While the shop
-  // has a published custom design, the page shows the design instead of the
-  // theme. Requires tenant.update.
+  // UpdateTenantTheme is deprecated: a shop's look is now set by the theme of
+  // its website, which is edited in the site editor, so this RPC always fails
+  // with FAILED_PRECONDITION. It is kept so existing clients still compile.
   rpc UpdateTenantTheme(UpdateTenantThemeRequest) returns (UpdateTenantThemeResponse) {
+    option deprecated = true;
     option (google.api.http) = {
       put: "/api/external/v1/{tenant_id}/theme"
       body: "*"
@@ -212,8 +213,9 @@ message UpdateTenantAddressResponse {
   extremo.msg.external.v1.TenantProfile tenant = 1;
 }
 
-// UpdateTenantThemeRequest sets the theme of a tenant's booking page.
+// UpdateTenantThemeRequest is the request of the deprecated UpdateTenantTheme.
 message UpdateTenantThemeRequest {
+  option deprecated = true;
   // Tenant to update.
   uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
   // The theme (required).
@@ -223,8 +225,9 @@ message UpdateTenantThemeRequest {
   }];
 }
 
-// UpdateTenantThemeResponse carries the tenant after the update.
+// UpdateTenantThemeResponse is the response of the deprecated UpdateTenantTheme.
 message UpdateTenantThemeResponse {
+  option deprecated = true;
   // The tenant's public profile.
   extremo.msg.external.v1.TenantProfile tenant = 1;
 }
