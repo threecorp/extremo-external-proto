@@ -57,9 +57,6 @@ Each API key is granted a subset of these scopes; every RPC checks the scope it 
 | `attendance.update` | **Change** a shift's time, title and breaks |
 | `attendance.reassign` | **Move** a shift to another staff member (with `attendance.update`) |
 | `attendance.delete` | **Delete** a shift (`DeleteAttendance`) |
-| `tenant_design.read` | Read the shop's booking page design |
-| `tenant_design.update` | Edit a draft of the shop's booking page design |
-| `tenant_design.moderate` | Publish, unpublish and roll back the shop's booking page design |
 
 Booking **writes** (`book.create` / `book.update`) let a partner create, reschedule, and cancel bookings on a consumer's behalf: register the consumer through `ConsumerService` first, then `CreateBooking` takes its `consumer_id`, validates the slot against the tenant's schedule (capacity, staff, business hours, and 30 minutes' notice), and returns the booking. A slot rejection carries a `google.rpc.ErrorInfo` whose `reason` is a `BookingConflictReason` name. Supply an `idempotency_key` to make retries safe, and echo a booking's `updated_at` as `expected_updated_at` on `UpdateBooking` for optimistic concurrency (a mismatch returns `ABORTED`). Consumer contact details are never echoed back in a `Booking` — PII stays server-side.
 
