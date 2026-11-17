@@ -218,11 +218,9 @@ message UpdateTenantThemeRequest {
   option deprecated = true;
   // Tenant to update.
   uint64 tenant_id = 1 [(buf.validate.field).uint64.gt = 0];
-  // The theme (required).
-  extremo.msg.external.v1.TenantTheme theme = 2 [(buf.validate.field).enum = {
-    defined_only: true
-    not_in: [0]
-  }];
+  // The theme. Any value, UNSPECIFIED included, is answered with
+  // FAILED_PRECONDITION.
+  extremo.msg.external.v1.TenantTheme theme = 2 [(buf.validate.field).enum.defined_only = true];
 }
 
 // UpdateTenantThemeResponse is the response of the deprecated UpdateTenantTheme.
