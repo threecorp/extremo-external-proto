@@ -1681,13 +1681,34 @@ first). </p></td>
                   <td>theme</td>
                   <td><a href="#extremo.msg.external.v1.TenantTheme">TenantTheme</a></td>
                   <td></td>
-                  <td><p>Theme of the shop&#39;s booking page. A published custom design of the page
-takes precedence over the theme. </p></td>
+                  <td><p><strong>Deprecated.</strong> Deprecated: always TENANT_THEME_UNSPECIFIED. A shop&#39;s look is now set by
+the theme of its website, which this API does not expose. </p></td>
                 </tr>
               
             </tbody>
           </table>
 
+          
+            
+            
+            <h4>Fields with deprecated option</h4>
+            <table>
+              <thead>
+                <tr>
+                  <td>Name</td>
+                  <td>Option</td>
+                </tr>
+              </thead>
+              <tbody>
+              
+                <tr>
+                  <td>theme</td>
+                  <td><p>true</p></td>
+                </tr>
+              
+              </tbody>
+            </table>
+            
           
 
         
@@ -1947,7 +1968,7 @@ takes precedence over the theme. </p></td>
         </table>
       
         <h3 id="extremo.msg.external.v1.TenantTheme">TenantTheme</h3>
-        <p>TenantTheme is the look of a tenant's booking page.</p>
+        <p>TenantTheme was the look of a tenant's booking page. Deprecated: only</p><p>TENANT_THEME_UNSPECIFIED is returned now (see TenantProfile.theme).</p>
         <table class="enum-table">
           <thead>
             <tr><td>Name</td><td>Number</td><td>Description</td></tr>
@@ -6155,7 +6176,7 @@ it. </p></td>
         
       
         <h3 id="extremo.api.external.tenants.v1.UpdateTenantThemeRequest">UpdateTenantThemeRequest</h3>
-        <p>UpdateTenantThemeRequest sets the theme of a tenant's booking page.</p>
+        <p>UpdateTenantThemeRequest is the request of the deprecated UpdateTenantTheme.</p>
 
         
           <table class="field-table">
@@ -6175,7 +6196,8 @@ it. </p></td>
                   <td>theme</td>
                   <td><a href="#extremo.msg.external.v1.TenantTheme">extremo.msg.external.v1.TenantTheme</a></td>
                   <td></td>
-                  <td><p>The theme (required). </p></td>
+                  <td><p>The theme. Any value, UNSPECIFIED included, is answered with
+FAILED_PRECONDITION. </p></td>
                 </tr>
               
             </tbody>
@@ -6186,7 +6208,7 @@ it. </p></td>
         
       
         <h3 id="extremo.api.external.tenants.v1.UpdateTenantThemeResponse">UpdateTenantThemeResponse</h3>
-        <p>UpdateTenantThemeResponse carries the tenant after the update.</p>
+        <p>UpdateTenantThemeResponse is the response of the deprecated UpdateTenantTheme.</p>
 
         
           <table class="field-table">
@@ -6260,9 +6282,9 @@ can be retried. Requires tenant.update.</p></td>
                 <td>UpdateTenantTheme</td>
                 <td><a href="#extremo.api.external.tenants.v1.UpdateTenantThemeRequest">UpdateTenantThemeRequest</a></td>
                 <td><a href="#extremo.api.external.tenants.v1.UpdateTenantThemeResponse">UpdateTenantThemeResponse</a></td>
-                <td><p>UpdateTenantTheme sets the theme of the shop&#39;s booking page. While the shop
-has a published custom design, the page shows the design instead of the
-theme. Requires tenant.update.</p></td>
+                <td><p>UpdateTenantTheme is deprecated: a shop&#39;s look is now set by the theme of
+its website, which is edited in the site editor, so this RPC always fails
+with FAILED_PRECONDITION. It is kept so existing clients still compile.</p></td>
               </tr>
             
               <tr>
@@ -6298,6 +6320,27 @@ once. All the moves apply, or none do. Requires tenant.update.</p></td>
           </tbody>
         </table>
 
+        
+          
+          
+          <h4>Methods with deprecated option</h4>
+          <table>
+            <thead>
+              <tr>
+                <td>Method Name</td>
+                <td>Option</td>
+              </tr>
+            </thead>
+            <tbody>
+            
+              <tr>
+                <td>UpdateTenantTheme</td>
+                <td><p>true</p></td>
+              </tr>
+            
+            </tbody>
+          </table>
+          
         
           
           

@@ -59,9 +59,10 @@ type TenantServiceClient interface {
 	// update changes address1 or address2 during the lookup, it returns ABORTED and
 	// can be retried. Requires tenant.update.
 	UpdateTenantAddress(ctx context.Context, in *UpdateTenantAddressRequest, opts ...grpc.CallOption) (*UpdateTenantAddressResponse, error)
-	// UpdateTenantTheme sets the theme of the shop's booking page. While the shop
-	// has a published custom design, the page shows the design instead of the
-	// theme. Requires tenant.update.
+	// Deprecated: Do not use.
+	// UpdateTenantTheme is deprecated: a shop's look is now set by the theme of
+	// its website, which is edited in the site editor, so this RPC always fails
+	// with FAILED_PRECONDITION. It is kept so existing clients still compile.
 	UpdateTenantTheme(ctx context.Context, in *UpdateTenantThemeRequest, opts ...grpc.CallOption) (*UpdateTenantThemeResponse, error)
 	// AddTenantImage uploads an image for the shop. Requires tenant.update.
 	AddTenantImage(ctx context.Context, in *AddTenantImageRequest, opts ...grpc.CallOption) (*AddTenantImageResponse, error)
@@ -123,6 +124,7 @@ func (c *tenantServiceClient) UpdateTenantAddress(ctx context.Context, in *Updat
 	return out, nil
 }
 
+// Deprecated: Do not use.
 func (c *tenantServiceClient) UpdateTenantTheme(ctx context.Context, in *UpdateTenantThemeRequest, opts ...grpc.CallOption) (*UpdateTenantThemeResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UpdateTenantThemeResponse)
@@ -197,9 +199,10 @@ type TenantServiceServer interface {
 	// update changes address1 or address2 during the lookup, it returns ABORTED and
 	// can be retried. Requires tenant.update.
 	UpdateTenantAddress(context.Context, *UpdateTenantAddressRequest) (*UpdateTenantAddressResponse, error)
-	// UpdateTenantTheme sets the theme of the shop's booking page. While the shop
-	// has a published custom design, the page shows the design instead of the
-	// theme. Requires tenant.update.
+	// Deprecated: Do not use.
+	// UpdateTenantTheme is deprecated: a shop's look is now set by the theme of
+	// its website, which is edited in the site editor, so this RPC always fails
+	// with FAILED_PRECONDITION. It is kept so existing clients still compile.
 	UpdateTenantTheme(context.Context, *UpdateTenantThemeRequest) (*UpdateTenantThemeResponse, error)
 	// AddTenantImage uploads an image for the shop. Requires tenant.update.
 	AddTenantImage(context.Context, *AddTenantImageRequest) (*AddTenantImageResponse, error)

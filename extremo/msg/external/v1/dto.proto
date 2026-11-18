@@ -119,9 +119,9 @@ message TenantProfile {
   // Images of the shop, in display order (descending sort: a higher sort comes
   // first).
   repeated TenantImage images = 9;
-  // Theme of the shop's booking page. A published custom design of the page
-  // takes precedence over the theme.
-  TenantTheme theme = 10;
+  // Deprecated: always TENANT_THEME_UNSPECIFIED. A shop's look is now set by
+  // the theme of its website, which this API does not expose.
+  TenantTheme theme = 10 [deprecated = true];
 }
 
 // TenantImageType is the section of the shop's page an image belongs to.
@@ -154,8 +154,10 @@ message TenantImage {
   string desc = 6;
 }
 
-// TenantTheme is the look of a tenant's booking page.
+// TenantTheme was the look of a tenant's booking page. Deprecated: only
+// TENANT_THEME_UNSPECIFIED is returned now (see TenantProfile.theme).
 enum TenantTheme {
+  option deprecated = true;
   // Unspecified / unknown theme.
   TENANT_THEME_UNSPECIFIED = 0;
   // The default theme.
