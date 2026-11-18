@@ -4364,7 +4364,7 @@ merged result may hold at most 50 keys. </p></td>
 
       
         <h3 id="extremo.api.external.consumers.v1.ConsumerService">ConsumerService</h3>
-        <p>ConsumerService manages a tenant's consumers (CONSUMER records) over the external</p><p>partner API. Reads require the consumer.read scope; writes require consumer.write.</p>
+        <p>ConsumerService manages a tenant's own consumer records over the external partner</p><p>API. A consumer belongs to one tenant: the same contact can be registered at</p><p>another tenant under a different name, and nothing done here changes that one.</p><p>Reads require the consumer.read scope; writes require consumer.write.</p>
         <table class="enum-table">
           <thead>
             <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
@@ -4380,10 +4380,9 @@ One contact identifies the consumer and is the only one stored: with both, the
 email identifies them and the phone is not stored (keep it in metadata if you
 need it). Registering a contact that is already a consumer of this tenant
 returns that consumer; a consumer removed with DeleteConsumer is restored.
-Rejected with AlreadyExists if the contact belongs to tenant staff
-(OWNER/MEMBER) or to a person registered only at another tenant, or if
-external_id is used by another consumer. A registration that races another
-one for the same person can fail with AlreadyExists or Aborted; retry it.</p></td>
+Rejected with AlreadyExists if external_id is used by another consumer. A
+registration that races another one for the same contact can fail with
+AlreadyExists or Aborted; retry it.</p></td>
               </tr>
             
               <tr>
@@ -4406,16 +4405,15 @@ to look a consumer up by the partner&#39;s own id.</p></td>
                 <td><a href="#extremo.api.external.consumers.v1.UpdateConsumerRequest">UpdateConsumerRequest</a></td>
                 <td><a href="#extremo.api.external.consumers.v1.UpdateConsumerResponse">UpdateConsumerResponse</a></td>
                 <td><p>UpdateConsumer updates a consumer&#39;s mutable fields (display name, external_id,
-metadata).</p></td>
+metadata) in this tenant&#39;s record only.</p></td>
               </tr>
             
               <tr>
                 <td>DeleteConsumer</td>
                 <td><a href="#extremo.api.external.consumers.v1.DeleteConsumerRequest">DeleteConsumerRequest</a></td>
                 <td><a href="#extremo.api.external.consumers.v1.DeleteConsumerResponse">DeleteConsumerResponse</a></td>
-                <td><p>DeleteConsumer deactivates the consumer&#39;s CONSUMER role for this tenant (soft; the
-underlying global user is never deleted). CreateConsumer with the same contact
-restores the consumer.</p></td>
+                <td><p>DeleteConsumer removes the consumer from this tenant (soft; their bookings keep
+pointing at them). CreateConsumer with the same contact restores the consumer.</p></td>
               </tr>
             
           </tbody>

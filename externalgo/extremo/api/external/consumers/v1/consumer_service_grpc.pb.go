@@ -38,18 +38,19 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// ConsumerService manages a tenant's consumers (CONSUMER records) over the external
-// partner API. Reads require the consumer.read scope; writes require consumer.write.
+// ConsumerService manages a tenant's own consumer records over the external partner
+// API. A consumer belongs to one tenant: the same contact can be registered at
+// another tenant under a different name, and nothing done here changes that one.
+// Reads require the consumer.read scope; writes require consumer.write.
 type ConsumerServiceClient interface {
 	// CreateConsumer registers a tenant consumer; it creates no sign-in for them.
 	// One contact identifies the consumer and is the only one stored: with both, the
 	// email identifies them and the phone is not stored (keep it in metadata if you
 	// need it). Registering a contact that is already a consumer of this tenant
 	// returns that consumer; a consumer removed with DeleteConsumer is restored.
-	// Rejected with AlreadyExists if the contact belongs to tenant staff
-	// (OWNER/MEMBER) or to a person registered only at another tenant, or if
-	// external_id is used by another consumer. A registration that races another
-	// one for the same person can fail with AlreadyExists or Aborted; retry it.
+	// Rejected with AlreadyExists if external_id is used by another consumer. A
+	// registration that races another one for the same contact can fail with
+	// AlreadyExists or Aborted; retry it.
 	CreateConsumer(ctx context.Context, in *CreateConsumerRequest, opts ...grpc.CallOption) (*CreateConsumerResponse, error)
 	// GetConsumer returns a consumer by its Extremo id.
 	GetConsumer(ctx context.Context, in *GetConsumerRequest, opts ...grpc.CallOption) (*GetConsumerResponse, error)
@@ -57,11 +58,10 @@ type ConsumerServiceClient interface {
 	// to look a consumer up by the partner's own id.
 	ListConsumers(ctx context.Context, in *ListConsumersRequest, opts ...grpc.CallOption) (*ListConsumersResponse, error)
 	// UpdateConsumer updates a consumer's mutable fields (display name, external_id,
-	// metadata).
+	// metadata) in this tenant's record only.
 	UpdateConsumer(ctx context.Context, in *UpdateConsumerRequest, opts ...grpc.CallOption) (*UpdateConsumerResponse, error)
-	// DeleteConsumer deactivates the consumer's CONSUMER role for this tenant (soft; the
-	// underlying global user is never deleted). CreateConsumer with the same contact
-	// restores the consumer.
+	// DeleteConsumer removes the consumer from this tenant (soft; their bookings keep
+	// pointing at them). CreateConsumer with the same contact restores the consumer.
 	DeleteConsumer(ctx context.Context, in *DeleteConsumerRequest, opts ...grpc.CallOption) (*DeleteConsumerResponse, error)
 }
 
@@ -127,18 +127,19 @@ func (c *consumerServiceClient) DeleteConsumer(ctx context.Context, in *DeleteCo
 // All implementations must embed UnimplementedConsumerServiceServer
 // for forward compatibility.
 //
-// ConsumerService manages a tenant's consumers (CONSUMER records) over the external
-// partner API. Reads require the consumer.read scope; writes require consumer.write.
+// ConsumerService manages a tenant's own consumer records over the external partner
+// API. A consumer belongs to one tenant: the same contact can be registered at
+// another tenant under a different name, and nothing done here changes that one.
+// Reads require the consumer.read scope; writes require consumer.write.
 type ConsumerServiceServer interface {
 	// CreateConsumer registers a tenant consumer; it creates no sign-in for them.
 	// One contact identifies the consumer and is the only one stored: with both, the
 	// email identifies them and the phone is not stored (keep it in metadata if you
 	// need it). Registering a contact that is already a consumer of this tenant
 	// returns that consumer; a consumer removed with DeleteConsumer is restored.
-	// Rejected with AlreadyExists if the contact belongs to tenant staff
-	// (OWNER/MEMBER) or to a person registered only at another tenant, or if
-	// external_id is used by another consumer. A registration that races another
-	// one for the same person can fail with AlreadyExists or Aborted; retry it.
+	// Rejected with AlreadyExists if external_id is used by another consumer. A
+	// registration that races another one for the same contact can fail with
+	// AlreadyExists or Aborted; retry it.
 	CreateConsumer(context.Context, *CreateConsumerRequest) (*CreateConsumerResponse, error)
 	// GetConsumer returns a consumer by its Extremo id.
 	GetConsumer(context.Context, *GetConsumerRequest) (*GetConsumerResponse, error)
@@ -146,11 +147,10 @@ type ConsumerServiceServer interface {
 	// to look a consumer up by the partner's own id.
 	ListConsumers(context.Context, *ListConsumersRequest) (*ListConsumersResponse, error)
 	// UpdateConsumer updates a consumer's mutable fields (display name, external_id,
-	// metadata).
+	// metadata) in this tenant's record only.
 	UpdateConsumer(context.Context, *UpdateConsumerRequest) (*UpdateConsumerResponse, error)
-	// DeleteConsumer deactivates the consumer's CONSUMER role for this tenant (soft; the
-	// underlying global user is never deleted). CreateConsumer with the same contact
-	// restores the consumer.
+	// DeleteConsumer removes the consumer from this tenant (soft; their bookings keep
+	// pointing at them). CreateConsumer with the same contact restores the consumer.
 	DeleteConsumer(context.Context, *DeleteConsumerRequest) (*DeleteConsumerResponse, error)
 	mustEmbedUnimplementedConsumerServiceServer()
 }
