@@ -62,6 +62,7 @@ type ConsumerServiceClient interface {
 	UpdateConsumer(ctx context.Context, in *UpdateConsumerRequest, opts ...grpc.CallOption) (*UpdateConsumerResponse, error)
 	// DeleteConsumer removes the consumer from this tenant (soft; their bookings keep
 	// pointing at them). CreateConsumer with the same contact restores the consumer.
+	// A consumer who signs in to book cannot be removed here (FAILED_PRECONDITION).
 	DeleteConsumer(ctx context.Context, in *DeleteConsumerRequest, opts ...grpc.CallOption) (*DeleteConsumerResponse, error)
 }
 
@@ -151,6 +152,7 @@ type ConsumerServiceServer interface {
 	UpdateConsumer(context.Context, *UpdateConsumerRequest) (*UpdateConsumerResponse, error)
 	// DeleteConsumer removes the consumer from this tenant (soft; their bookings keep
 	// pointing at them). CreateConsumer with the same contact restores the consumer.
+	// A consumer who signs in to book cannot be removed here (FAILED_PRECONDITION).
 	DeleteConsumer(context.Context, *DeleteConsumerRequest) (*DeleteConsumerResponse, error)
 	mustEmbedUnimplementedConsumerServiceServer()
 }

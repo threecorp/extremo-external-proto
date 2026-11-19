@@ -4413,7 +4413,8 @@ metadata) in this tenant&#39;s record only.</p></td>
                 <td><a href="#extremo.api.external.consumers.v1.DeleteConsumerRequest">DeleteConsumerRequest</a></td>
                 <td><a href="#extremo.api.external.consumers.v1.DeleteConsumerResponse">DeleteConsumerResponse</a></td>
                 <td><p>DeleteConsumer removes the consumer from this tenant (soft; their bookings keep
-pointing at them). CreateConsumer with the same contact restores the consumer.</p></td>
+pointing at them). CreateConsumer with the same contact restores the consumer.
+A consumer who signs in to book cannot be removed here (FAILED_PRECONDITION).</p></td>
               </tr>
             
           </tbody>

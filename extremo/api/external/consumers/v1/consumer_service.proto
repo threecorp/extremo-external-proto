@@ -53,6 +53,7 @@ service ConsumerService {
   }
   // DeleteConsumer removes the consumer from this tenant (soft; their bookings keep
   // pointing at them). CreateConsumer with the same contact restores the consumer.
+  // A consumer who signs in to book cannot be removed here (FAILED_PRECONDITION).
   rpc DeleteConsumer(DeleteConsumerRequest) returns (DeleteConsumerResponse) {
     option (google.api.http) = {delete: "/api/external/v1/{tenant_id}/consumers/{id}"};
   }
