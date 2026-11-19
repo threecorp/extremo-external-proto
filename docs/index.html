@@ -4406,8 +4406,9 @@ to look a consumer up by the partner&#39;s own id.</p></td>
                 <td><a href="#extremo.api.external.consumers.v1.UpdateConsumerResponse">UpdateConsumerResponse</a></td>
                 <td><p>UpdateConsumer updates a consumer&#39;s mutable fields (display name, external_id,
 metadata) in this tenant&#39;s record only. A consumer who signs in to book keeps
-the name of their account: a request that changes it is refused
-(FAILED_PRECONDITION); external_id and metadata can still be updated.</p></td>
+the name of their account: for them, any non-empty name (even the current one)
+is refused with FAILED_PRECONDITION. Leave name empty to update only their
+external_id and metadata.</p></td>
               </tr>
             
               <tr>

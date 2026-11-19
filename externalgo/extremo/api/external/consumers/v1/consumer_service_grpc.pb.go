@@ -59,8 +59,9 @@ type ConsumerServiceClient interface {
 	ListConsumers(ctx context.Context, in *ListConsumersRequest, opts ...grpc.CallOption) (*ListConsumersResponse, error)
 	// UpdateConsumer updates a consumer's mutable fields (display name, external_id,
 	// metadata) in this tenant's record only. A consumer who signs in to book keeps
-	// the name of their account: a request that changes it is refused
-	// (FAILED_PRECONDITION); external_id and metadata can still be updated.
+	// the name of their account: for them, any non-empty name (even the current one)
+	// is refused with FAILED_PRECONDITION. Leave name empty to update only their
+	// external_id and metadata.
 	UpdateConsumer(ctx context.Context, in *UpdateConsumerRequest, opts ...grpc.CallOption) (*UpdateConsumerResponse, error)
 	// DeleteConsumer removes the consumer from this tenant (soft; their bookings keep
 	// pointing at them). CreateConsumer with the same contact restores the consumer.
@@ -151,8 +152,9 @@ type ConsumerServiceServer interface {
 	ListConsumers(context.Context, *ListConsumersRequest) (*ListConsumersResponse, error)
 	// UpdateConsumer updates a consumer's mutable fields (display name, external_id,
 	// metadata) in this tenant's record only. A consumer who signs in to book keeps
-	// the name of their account: a request that changes it is refused
-	// (FAILED_PRECONDITION); external_id and metadata can still be updated.
+	// the name of their account: for them, any non-empty name (even the current one)
+	// is refused with FAILED_PRECONDITION. Leave name empty to update only their
+	// external_id and metadata.
 	UpdateConsumer(context.Context, *UpdateConsumerRequest) (*UpdateConsumerResponse, error)
 	// DeleteConsumer removes the consumer from this tenant (soft; their bookings keep
 	// pointing at them). CreateConsumer with the same contact restores the consumer.
