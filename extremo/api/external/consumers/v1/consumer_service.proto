@@ -15,18 +15,19 @@ import "google/api/annotations.proto";
 
 option go_package = "github.com/threecorp/extremo-external-proto/externalgo/extremo/api/external/consumers/v1;consumers";
 
-// ConsumerService manages a tenant's consumers (CONSUMER records) over the external
-// partner API. Reads require the consumer.read scope; writes require consumer.write.
+// ConsumerService manages a tenant's own consumer records over the external partner
+// API. A consumer belongs to one tenant: the same contact can be registered at
+// another tenant under a different name, and nothing done here changes that one.
+// Reads require the consumer.read scope; writes require consumer.write.
 service ConsumerService {
   // CreateConsumer registers a tenant consumer; it creates no sign-in for them.
   // One contact identifies the consumer and is the only one stored: with both, the
   // email identifies them and the phone is not stored (keep it in metadata if you
   // need it). Registering a contact that is already a consumer of this tenant
   // returns that consumer; a consumer removed with DeleteConsumer is restored.
-  // Rejected with AlreadyExists if the contact belongs to tenant staff
-  // (OWNER/MEMBER) or to a person registered only at another tenant, or if
-  // external_id is used by another consumer. A registration that races another
-  // one for the same person can fail with AlreadyExists or Aborted; retry it.
+  // Rejected with AlreadyExists if external_id is used by another consumer. A
+  // registration that races another one for the same contact can fail with
+  // AlreadyExists or Aborted; retry it.
   rpc CreateConsumer(CreateConsumerRequest) returns (CreateConsumerResponse) {
     option (google.api.http) = {
       post: "/api/external/v1/{tenant_id}/consumers"
@@ -43,16 +44,19 @@ service ConsumerService {
     option (google.api.http) = {get: "/api/external/v1/{tenant_id}/consumers"};
   }
   // UpdateConsumer updates a consumer's mutable fields (display name, external_id,
-  // metadata).
+  // metadata) in this tenant's record only. A consumer who signs in to book keeps
+  // the name of their account: for them, any non-empty name (even the current one)
+  // is refused with FAILED_PRECONDITION. Leave name empty to update only their
+  // external_id and metadata.
   rpc UpdateConsumer(UpdateConsumerRequest) returns (UpdateConsumerResponse) {
     option (google.api.http) = {
       patch: "/api/external/v1/{tenant_id}/consumers/{id}"
       body: "*"
     };
   }
-  // DeleteConsumer deactivates the consumer's CONSUMER role for this tenant (soft; the
-  // underlying global user is never deleted). CreateConsumer with the same contact
-  // restores the consumer.
+  // DeleteConsumer removes the consumer from this tenant (soft; their bookings keep
+  // pointing at them). CreateConsumer with the same contact restores the consumer.
+  // A consumer who signs in to book cannot be removed here (FAILED_PRECONDITION).
   rpc DeleteConsumer(DeleteConsumerRequest) returns (DeleteConsumerResponse) {
     option (google.api.http) = {delete: "/api/external/v1/{tenant_id}/consumers/{id}"};
   }
